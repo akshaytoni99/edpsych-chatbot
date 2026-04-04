@@ -888,9 +888,7 @@ async def _handle_free_text(
         cat = classification.get("category", current_category)
         _update_assessment_data(session, cat, classification, message_input.content)
 
-    # Update background profile
-    if result.get("background_update"):
-        session.context_data["background_profile"] = result["background_update"]
+    # Background profile generation removed — psychologist generates reports later
 
     # Auto-advance to next flow question (AI response + next question combined)
     if current_node:
@@ -969,11 +967,11 @@ def _update_assessment_data(session: ChatSession, category: str, classification:
     if classification.get("severity"):
         assessment[category]["severity"] = classification["severity"]
 
-    # Add text input
+    # Add text input — store full answer, no truncation
     if text and len(text) > 3:
         text_inputs = assessment[category].get("text_inputs", [])
-        text_inputs.append(text[:200])  # cap length
-        assessment[category]["text_inputs"] = text_inputs[-5:]  # keep last 5
+        text_inputs.append(text)
+        assessment[category]["text_inputs"] = text_inputs
 
     # Add indicators
     if classification.get("indicators"):
@@ -1195,13 +1193,12 @@ async def reset_session(
 @router.post("/sessions/{session_id}/complete")
 async def complete_chat_session(
     session_id: UUID,
-    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Mark session as complete and trigger report generation.
-    Also generates comprehensive background profile from collected data.
+    Mark session as complete and store all parent inputs as structured JSON.
+    The psychologist can generate background reports later from this data.
     """
     result = await db.execute(select(ChatSession).where(ChatSession.id == session_id))
     session = result.scalar_one_or_none()
@@ -1232,15 +1229,8 @@ async def complete_chat_session(
     )
     student = result.scalar_one_or_none() if assignment else None
 
-    # Generate comprehensive background profile
-    try:
-        bg_report = await orchestrator.generate_background_report(session.context_data)
-        session.context_data["background_report"] = bg_report.get("profile", {})
-        session.context_data["completeness"] = bg_report.get("completeness", {})
-    except Exception as e:
-        logger.error(f"Background generation failed: {e}")
-
-    # Gather messages for report generation
+    # ── Store all raw data as JSON (no AI generation) ──────────────────────
+    # Gather every message from the session
     result = await db.execute(
         select(ChatMessage)
         .where(ChatMessage.session_id == session_id)
@@ -1248,95 +1238,70 @@ async def complete_chat_session(
     )
     all_messages = result.scalars().all()
 
-    chatbot_data = {
-        "student_name": f"{student.first_name} {student.last_name}" if student else "Unknown",
-        "age": (date.today() - student.date_of_birth).days // 365 if student and student.date_of_birth else "unknown",
-        "school": student.school_name or "not specified" if student else "not specified",
-        "year_group": student.year_group or "not specified" if student else "not specified",
-        "session_context": session.context_data,
-        "background_profile": session.context_data.get("background_report", {}),
-        "answers": {},
-        "conversation_log": []
-    }
+    # Build a clean JSON summary: every question asked + every answer given
+    qa_pairs = []
+    bot_question_buffer = None  # track the last bot question
 
     for msg in all_messages:
-        chatbot_data["conversation_log"].append({
-            "role": msg.role,
-            "type": msg.message_type,
-            "content": msg.content,
-            "metadata": msg.message_metadata or {},
-            "classification": msg.intent_classification
-        })
-        if msg.role == "user" and msg.message_metadata:
-            category = msg.message_metadata.get("category", "general")
-            if category not in chatbot_data["answers"]:
-                chatbot_data["answers"][category] = []
-            chatbot_data["answers"][category].append({
-                "question_id": msg.message_metadata.get("question_id"),
-                "selected_option": msg.message_metadata.get("selected_option"),
-                "content": msg.content
+        if msg.role == "bot":
+            # Store the question text + metadata for pairing
+            bot_question_buffer = {
+                "node_id": (msg.message_metadata or {}).get("node_id"),
+                "category": (msg.message_metadata or {}).get("category"),
+                "question": msg.content,
+                "message_type": msg.message_type,
+                "timestamp": msg.timestamp.isoformat(),
+            }
+        elif msg.role == "user" and bot_question_buffer:
+            # Pair this user answer with the preceding bot question
+            qa_pairs.append({
+                "question_node_id": bot_question_buffer.get("node_id"),
+                "category": bot_question_buffer.get("category"),
+                "question_text": bot_question_buffer["question"],
+                "question_type": bot_question_buffer["message_type"],
+                "answer_text": msg.content,
+                "answer_type": msg.message_type,
+                "selected_option": (msg.message_metadata or {}).get("selected_option"),
+                "timestamp": msg.timestamp.isoformat(),
+            })
+            bot_question_buffer = None
+        elif msg.role == "user":
+            # User message without a preceding question (shouldn't happen, but store it)
+            qa_pairs.append({
+                "question_node_id": None,
+                "category": None,
+                "question_text": None,
+                "question_type": None,
+                "answer_text": msg.content,
+                "answer_type": msg.message_type,
+                "selected_option": (msg.message_metadata or {}).get("selected_option"),
+                "timestamp": msg.timestamp.isoformat(),
             })
 
-    assessment_data = session.context_data.get("assessment_data", {})
-    chatbot_data["concerns"] = session.context_data.get("conversation_summary", "Assessment completed via hybrid chat")
-    chatbot_data["family_background"] = "Information gathered via parent hybrid chat"
-    chatbot_data["learning_difficulties"] = str(assessment_data.get("academic", {}))
-    chatbot_data["classroom_behavior"] = str(assessment_data.get("behavioral", {}))
-    chatbot_data["identified_needs"] = f"Based on assessment responses across {len(chatbot_data['answers'])} areas"
-    chatbot_data["current_support"] = "To be determined from assessment"
-
-    # Create report and jobs
-    report_session_id = assignment.assessment_session_id if assignment and assignment.assessment_session_id else None
-    report = None
-    jobs_created = {}
-
-    if student and report_session_id:
-        result = await db.execute(
-            select(GeneratedReport).where(GeneratedReport.session_id == report_session_id)
-        )
-        existing_report = result.scalar_one_or_none()
-
-        if not existing_report:
-            report = GeneratedReport(
-                student_id=student.id,
-                session_id=report_session_id,
-                status='draft'
-            )
-            db.add(report)
-            await db.flush()
-
-            for job_type in ['profile', 'impact', 'recommendations']:
-                job = AIGenerationJob(
-                    student_id=student.id,
-                    session_id=report_session_id,
-                    job_type=job_type,
-                    status='pending',
-                    input_data=chatbot_data
-                )
-                db.add(job)
-                await db.flush()
-                jobs_created[job_type] = job.id
-
-            report.profile_job_id = jobs_created.get('profile')
-            report.impact_job_id = jobs_created.get('impact')
-            report.recommendations_job_id = jobs_created.get('recommendations')
-        else:
-            report = existing_report
+    # Store the clean Q&A summary + full assessment data in the session
+    session.context_data["completed_qa_pairs"] = qa_pairs
+    session.context_data["completion_summary"] = {
+        "student_name": f"{student.first_name} {student.last_name}" if student else "Unknown",
+        "student_age": session.context_data.get("user_profile", {}).get("student_age"),
+        "school": student.school_name if student else None,
+        "year_group": student.year_group if student else None,
+        "total_questions": len(qa_pairs),
+        "categories_covered": list(session.context_data.get("explored_areas", [])),
+        "assessment_data": session.context_data.get("assessment_data", {}),
+        "duration_minutes": session.duration_minutes,
+        "completed_at": session.completed_at.isoformat(),
+    }
 
     await db.commit()
 
-    if jobs_created:
-        for job_type, job_id in jobs_created.items():
-            background_tasks.add_task(_run_report_generation_job, job_id, job_type, chatbot_data)
-        logger.info(f"Spawned {len(jobs_created)} report generation jobs for session {session_id}")
+    logger.info(f"Session {session_id} completed with {len(qa_pairs)} Q&A pairs stored as JSON")
 
     return {
         "message": "Chat session completed successfully",
         "session_id": str(session.id),
         "duration_minutes": session.duration_minutes,
-        "report_id": str(report.id) if report else None,
-        "report_jobs": {k: str(v) for k, v in jobs_created.items()} if jobs_created else None,
-        "background_profile": session.context_data.get("background_report", {}),
+        "total_questions_answered": len(qa_pairs),
+        "categories_covered": list(session.context_data.get("explored_areas", [])),
     }
 
 
