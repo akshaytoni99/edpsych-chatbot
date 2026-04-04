@@ -328,6 +328,21 @@ async def start_chat_session(
     if assignment.assigned_to_user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
 
+    # Check for completed session — block re-taking
+    completed_result = await db.execute(
+        select(ChatSession).where(
+            ChatSession.assignment_id == assignment.id,
+            ChatSession.status == ChatSessionStatus.COMPLETED.value,
+        )
+    )
+    completed_session = completed_result.scalar_one_or_none()
+
+    if completed_session:
+        raise HTTPException(
+            status_code=400,
+            detail="This assessment has already been completed. You cannot take it again."
+        )
+
     # Check for existing active session (enables resume / "Continue Assessment")
     existing_session_result = await db.execute(
         select(ChatSession).where(
@@ -500,6 +515,10 @@ async def send_message(
 
     if not session or session.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    # Block messages on completed sessions
+    if session.status == ChatSessionStatus.COMPLETED.value or session.completed_at is not None:
+        raise HTTPException(status_code=400, detail="This assessment has already been completed. You cannot submit further answers.")
 
     student_name = session.context_data.get("user_profile", {}).get("student_name", "your child")
 

@@ -394,19 +394,22 @@ export default function DashboardPage() {
                     </button>
                   )}
                   {assignment.status === "COMPLETED" && (
-                    <div className="flex-1 flex items-center gap-3">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-green-50 text-green-700 text-sm font-bold rounded-lg border border-green-200">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                        Assessment Complete
-                      </span>
-                      <button
-                        onClick={() => router.push(`/parent/reports/${assignment.id}`)}
-                        className="px-4 py-2.5 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-all"
-                      >
-                        View Report
-                      </button>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-green-50 text-green-700 text-sm font-bold rounded-lg border border-green-200">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Assessment Complete
+                        </span>
+                        <button
+                          onClick={() => router.push(`/parent/reports/${assignment.id}`)}
+                          className="px-4 py-2.5 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-all"
+                        >
+                          View Report
+                        </button>
+                      </div>
+                      <p className="text-xs text-slate-400">This assessment has been submitted and cannot be retaken.</p>
                     </div>
                   )}
                 </div>

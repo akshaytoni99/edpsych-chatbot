@@ -244,6 +244,12 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
         }
       } catch (err: unknown) {
         if (!active) return;
+        // Check if the assessment is already completed
+        if (axios.isAxiosError(err) && err.response?.status === 400 && err.response?.data?.detail?.includes('already been completed')) {
+          setIsCompleted(true);
+          addSystemMessage('This assessment has already been completed.');
+          return;
+        }
         addSystemMessage('Something went wrong. Please refresh the page to try again.');
       }
     }
@@ -370,6 +376,13 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
       } catch (err: unknown) {
         if (!mountedRef.current) return;
         clearSlowResponseTimer();
+
+        // Check if assessment was already completed
+        if (axios.isAxiosError(err) && err.response?.status === 400 && err.response?.data?.detail?.includes('already been completed')) {
+          setIsCompleted(true);
+          addSystemMessage('This assessment has already been completed.');
+          return;
+        }
 
         // Auto-retry on failure (up to MAX_RETRIES)
         if (retryAttempt < MAX_RETRIES) {
