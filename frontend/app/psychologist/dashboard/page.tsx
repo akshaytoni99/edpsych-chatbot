@@ -120,7 +120,7 @@ export default function PsychologistDashboard() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
@@ -208,7 +208,7 @@ export default function PsychologistDashboard() {
 
   const fetchGuardiansForStudent = async (studentId: string) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/student-guardians/student/${studentId}/guardians`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -235,7 +235,7 @@ export default function PsychologistDashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/student-guardians/`, {
         method: "POST",
         headers: {
@@ -280,7 +280,7 @@ export default function PsychologistDashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/student-guardians/${relationshipId}`, {
         method: "DELETE",
         headers: {
@@ -320,7 +320,7 @@ export default function PsychologistDashboard() {
     if (!selectedReport || !editedReport) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/reports/${selectedReport.id}/review`, {
         method: "PUT",
         headers: {
@@ -354,7 +354,7 @@ export default function PsychologistDashboard() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/reports/${selectedReport.id}/approve`, {
         method: "POST",
         headers: {
@@ -389,7 +389,7 @@ export default function PsychologistDashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/assignments/`, {
         method: "POST",
         headers: {
@@ -428,7 +428,7 @@ export default function PsychologistDashboard() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/assignments/${assignmentId}/cancel`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
@@ -458,7 +458,7 @@ export default function PsychologistDashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/student-guardians/invite-parent`, {
         method: "POST",
         headers: {
@@ -517,7 +517,7 @@ export default function PsychologistDashboard() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/students/`, {
         method: "POST",
         headers: {
@@ -571,7 +571,7 @@ export default function PsychologistDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     router.push("/login");
   };

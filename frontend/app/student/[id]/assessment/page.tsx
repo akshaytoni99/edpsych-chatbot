@@ -15,7 +15,7 @@ export default function AssessmentStartPage() {
     const startAssessment = async () => {
       try {
         console.log("Starting assessment for student:", studentId);
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("access_token");
         console.log("Token found:", !!token);
 
         if (!token) {
@@ -46,7 +46,7 @@ export default function AssessmentStartPage() {
           router.push(`/student/${studentId}/assessment/${session.resume_token}`);
         } else if (response.status === 401) {
           console.log("Unauthorized, redirecting to login");
-          localStorage.removeItem("token");
+          localStorage.removeItem("access_token");
           localStorage.removeItem("user");
           router.push("/login");
         } else {

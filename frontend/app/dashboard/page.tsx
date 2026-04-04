@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
@@ -83,7 +83,7 @@ export default function DashboardPage() {
         const data = await response.json();
         setAssignments(data);
       } else if (response.status === 401) {
-        localStorage.removeItem("token");
+        localStorage.removeItem("access_token");
         localStorage.removeItem("user");
         router.push("/login");
       }
@@ -151,7 +151,7 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     router.push("/login");
   };

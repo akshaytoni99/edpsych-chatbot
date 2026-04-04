@@ -40,7 +40,7 @@ export default function ReportsPage() {
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     if (!token) {
       router.push("/login");
       return;
@@ -87,7 +87,7 @@ export default function ReportsPage() {
   const handleGenerateReport = async (sessionId: number) => {
     setGenerating(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/reports/generate`, {
         method: "POST",
         headers: {

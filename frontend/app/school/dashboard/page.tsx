@@ -36,7 +36,7 @@ export default function SchoolDashboard() {
   const [filterGrade, setFilterGrade] = useState<string>("all");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
@@ -93,7 +93,7 @@ export default function SchoolDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     router.push("/login");
   };

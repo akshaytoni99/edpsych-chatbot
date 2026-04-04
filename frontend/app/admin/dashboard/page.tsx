@@ -41,7 +41,7 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     const userData = localStorage.getItem("user");
 
     if (!token || !userData) {
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/admin/users/${userId}/toggle-status`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     router.push("/login");
   };

@@ -39,7 +39,7 @@ export default function AssessmentPage() {
   const [answer, setAnswer] = useState<string>("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     if (!token) {
       router.push("/login");
       return;
@@ -127,7 +127,7 @@ export default function AssessmentPage() {
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       const currentQuestion = progress?.next_question;
 
       if (!currentQuestion) {
