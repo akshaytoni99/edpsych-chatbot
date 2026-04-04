@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@layer base {
+  body {
+    @apply font-body bg-background text-on-background antialiased;
+  }
+}
+
+@layer utilities {
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .premium-gradient {
+    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  }
+
+  .floating-label-group {
+    @apply relative;
+  }
+
+  .floating-label-group input:focus ~ label,
+  .floating-label-group input:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    color: #3B82F6;
+    background: #F1F5F9;
+    padding: 0 0.25rem;
+  }
+
+  .floating-label-group label {
+    @apply absolute top-4 left-4 transition-all duration-200 pointer-events-none text-slate-500;
+  }
+
+  .editorial-shadow {
+    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+  }
+
+  .brand-accent {
+    background: linear-gradient(to right, #3B82F6, #6366F1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+/* ============================================
+   Chat-specific styles & animations
+   ============================================ */
+
+/* Chat animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce-dots {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}
+
+.chat-message-enter {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.chat-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.typing-dot {
+  animation: bounce-dots 1.4s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+/* Progress bar smooth transition */
+.progress-bar-fill {
+  transition: width 0.5s ease-in-out;
+}
+
+/* MCQ stagger animation */
+.mcq-option-enter {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+.mcq-option-enter:nth-child(1) { animation-delay: 0s; }
+.mcq-option-enter:nth-child(2) { animation-delay: 0.05s; }
+.mcq-option-enter:nth-child(3) { animation-delay: 0.1s; }
+.mcq-option-enter:nth-child(4) { animation-delay: 0.15s; }
+.mcq-option-enter:nth-child(5) { animation-delay: 0.2s; }
+
+/* Safe area for iOS bottom bar */
+.chat-input-area {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Scrollbar styling for chat */
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* New chat animations */
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
