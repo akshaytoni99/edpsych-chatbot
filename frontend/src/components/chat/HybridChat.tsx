@@ -450,7 +450,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
   const showTextInput =
     !isCompleted && (currentQuestion?.allow_text || !currentQuestion?.options);
 
-  const inputPlaceholder = currentQuestion?.text_prompt || 'Type your answer here...';
+  const inputPlaceholder = 'Type your answer...';
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 via-gray-50 to-gray-100/80">
