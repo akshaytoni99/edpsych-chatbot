@@ -33,6 +33,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
   const [value, setValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const recognitionRef = useRef<any>(null);
   const prefixTextRef = useRef('');
 
@@ -44,7 +45,6 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
-    // Capture the text that exists before speech starts
     prefixTextRef.current = value;
 
     const recognition = new SpeechRecognition();
@@ -56,7 +56,6 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
       let finalTranscript = '';
       let interimTranscript = '';
 
-      // Rebuild from ALL results every time, not just from resultIndex
       for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
@@ -104,7 +103,6 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
     }
   }, [isListening, startListening, stopListening]);
 
-  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -142,13 +140,13 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
   );
 
   return (
-    <div className="bg-white border-t border-gray-200 px-3 py-2 sm:px-6 sm:py-3 shadow-lg">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/60 px-3 py-2.5 sm:px-6 sm:py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+      <div className="max-w-3xl mx-auto">
         {/* Validation feedback */}
         {validationFeedback && (
-          <div className="mb-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg animate-slide-up">
-            <p className="text-xs text-amber-700 flex items-center gap-1.5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+          <div className="mb-2.5 px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-xl animate-slide-up">
+            <p className="text-xs text-amber-700 flex items-center gap-2 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 flex-shrink-0 text-amber-500">
                 <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
               </svg>
               Please provide more detail for a better assessment
@@ -158,40 +156,45 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
 
         {/* Listening indicator */}
         {isListening && (
-          <div className="mb-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+          <div className="mb-2.5 px-3.5 py-2.5 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/80 rounded-xl flex items-center gap-2.5 animate-slide-up">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
             </span>
-            <p className="text-xs text-red-700 font-medium">Listening... speak now</p>
+            <p className="text-xs text-red-700 font-semibold">Listening... speak now</p>
             <button
               type="button"
               onClick={stopListening}
-              className="ml-auto text-xs text-red-600 font-bold hover:text-red-800"
+              className="ml-auto text-[11px] text-red-600 font-bold hover:text-red-800 bg-red-100 hover:bg-red-200 px-2.5 py-1 rounded-lg transition-colors"
             >
               Stop
             </button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3 items-end">
+        <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-2.5 items-end">
           <div className="flex-1 relative">
             <textarea
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               placeholder={placeholder}
               disabled={disabled}
               rows={1}
               aria-label="Type your message"
-              className={`w-full min-h-[44px] max-h-[120px] border-2 rounded-2xl px-5 py-2.5
-                focus:outline-none focus:ring-2
+              className={`w-full min-h-[46px] max-h-[120px] rounded-2xl px-5 py-3
+                focus:outline-none
                 disabled:opacity-50 disabled:cursor-not-allowed
                 text-gray-800 placeholder-gray-400 text-sm
-                resize-none overflow-hidden transition-colors
+                resize-none overflow-hidden
+                transition-all duration-200
                 ${isListening
-                  ? 'border-red-300 focus:border-red-400 focus:ring-red-100 bg-red-50/30'
-                  : 'border-gray-200 focus:border-indigo-400 focus:ring-indigo-100'
+                  ? 'border-2 border-red-300 bg-red-50/30 shadow-sm shadow-red-100/50'
+                  : isFocused
+                  ? 'border-2 border-indigo-400 bg-white shadow-md shadow-indigo-100/30'
+                  : 'border-2 border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-white'
                 }`}
               style={{ height: 'auto' }}
               onInput={(e) => {
@@ -201,7 +204,9 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
               }}
             />
             {value.length > 0 && (
-              <span className="absolute right-3 bottom-2 text-[10px] text-gray-400">
+              <span className={`absolute right-3.5 bottom-2 text-[10px] font-medium tabular-nums transition-colors ${
+                value.length > 500 ? 'text-amber-500' : 'text-gray-300'
+              }`}>
                 {value.length}
               </span>
             )}
@@ -214,11 +219,11 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
               onClick={toggleListening}
               disabled={disabled}
               aria-label={isListening ? 'Stop listening' : 'Start voice input'}
-              className={`min-h-[44px] min-w-[44px] flex items-center justify-center
-                rounded-full transition-all duration-200
+              className={`min-h-[46px] min-w-[46px] flex items-center justify-center
+                rounded-2xl transition-all duration-200
                 ${isListening
-                  ? 'bg-red-500 hover:bg-red-600 text-white shadow-md animate-pulse'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800'
+                  ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-200/50 animate-pulse'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 shadow-sm'
                 }
                 disabled:opacity-40 disabled:cursor-not-allowed`}
             >
@@ -234,12 +239,14 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
             type="submit"
             disabled={disabled || !value.trim()}
             aria-label="Send message"
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center
-              bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white
-              rounded-full px-5 py-2.5
-              shadow-md hover:shadow-lg
+            className={`min-h-[46px] min-w-[46px] flex items-center justify-center
+              rounded-2xl px-5 py-3
               transition-all duration-200
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:from-gray-400 disabled:to-gray-400"
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1
+              ${value.trim() && !disabled
+                ? 'bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:via-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200/40 hover:shadow-xl hover:shadow-indigo-200/50 hover:-translate-y-0.5 active:translate-y-0'
+                : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+              }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

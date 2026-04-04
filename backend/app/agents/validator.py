@@ -192,7 +192,19 @@ class InputValidatorAgent(BaseAgent):
                 "confidence": 0.9,
             }
 
-        # Relevance check — only reject clearly off-topic input
+        # ── Strict relevance checks ─────────────────────────────────────
+
+        # 1. Excessive length check — real answers are typically under 100 words
+        if word_count > 100:
+            # Check if it looks like a copy-paste (very long, impersonal)
+            if self._is_copy_paste(text):
+                return {
+                    "is_sufficient": False,
+                    "feedback": f"That looks like it might be copied text. Could you describe {student_name}'s experience in your own words instead?",
+                    "confidence": 0.9,
+                }
+
+        # 2. Keyword-based irrelevance (zero overlap with child/education topics)
         if self._is_irrelevant(text, category):
             prompt = RELEVANCE_PROMPTS.get(category, RELEVANCE_PROMPTS["general"])
             return {
@@ -200,6 +212,18 @@ class InputValidatorAgent(BaseAgent):
                 "feedback": prompt.replace("{student_name}", student_name),
                 "confidence": 0.75,
             }
+
+        # 3. LLM-based relevance check for longer inputs (>30 words)
+        #    Short personal answers are trusted; longer ones get verified
+        if word_count > 30 and question_context:
+            llm_result = await self._llm_relevance_check(text, question_context, student_name)
+            if llm_result is not None and not llm_result:
+                prompt = RELEVANCE_PROMPTS.get(category, RELEVANCE_PROMPTS["general"])
+                return {
+                    "is_sufficient": False,
+                    "feedback": prompt.replace("{student_name}", student_name),
+                    "confidence": 0.85,
+                }
 
         # 4-8 words - borderline, accept but note it's brief
         if word_count < 8:
@@ -250,6 +274,106 @@ class InputValidatorAgent(BaseAgent):
                 return True
 
         return False
+
+    @staticmethod
+    def _is_copy_paste(text: str) -> bool:
+        """
+        Detect copy-pasted content (Wikipedia articles, news, essays, etc.)
+        Real parent answers are personal and conversational. Copy-paste text is:
+        - Very long (100+ words)
+        - Lacks personal pronouns about a child (my, his, her, their child/son/daughter)
+        - Contains formal/encyclopedic markers
+        """
+        words = text.lower().split()
+        word_count = len(words)
+
+        if word_count < 50:
+            return False
+
+        text_lower = text.lower()
+
+        # Personal child references — parents almost always use these
+        personal_child_refs = [
+            "my child", "my son", "my daughter", "my kid",
+            "his ", "her ", "he ", "she ", "they ",
+            "my boy", "my girl", "our child", "our son", "our daughter",
+        ]
+        has_personal_ref = any(ref in text_lower for ref in personal_child_refs)
+
+        # Encyclopedic/formal markers — strong signal of copy-paste
+        formal_markers = [
+            "wikipedia", "encyclopedia", "according to", "citation",
+            "references", "published", "founded in", "established in",
+            "million", "billion", "organization", "organisation",
+            "government", "corporation", "company", "technology",
+            "www.", "http", ".com", ".org", ".net",
+            "article", "journal", "research shows", "studies have",
+            "[edit]", "[citation", "isbn", "doi:",
+        ]
+        formal_count = sum(1 for marker in formal_markers if marker in text_lower)
+
+        # Sentence count — copy-paste text tends to have many sentences
+        sentences = re.split(r'[.!?]+', text)
+        sentence_count = len([s for s in sentences if s.strip()])
+
+        # Decision logic:
+        # 1. Very long + no personal refs = very likely copy-paste
+        if word_count > 80 and not has_personal_ref:
+            return True
+
+        # 2. Contains formal/encyclopedic markers
+        if formal_count >= 2:
+            return True
+
+        # 3. Extremely long regardless (200+ words) — no assessment answer needs this
+        if word_count > 200:
+            return True
+
+        # 4. Many sentences (10+) without personal refs
+        if sentence_count >= 10 and not has_personal_ref:
+            return True
+
+        return False
+
+    async def _llm_relevance_check(
+        self, text: str, question: str, student_name: str
+    ) -> Optional[bool]:
+        """
+        Use LLM to check if the response is relevant to the assessment question.
+        Returns True if relevant, False if not, None if LLM call failed.
+        """
+        # Truncate very long input to save tokens
+        truncated = text[:500] if len(text) > 500 else text
+
+        prompt = f"""You are validating a parent's response in a child educational assessment.
+
+QUESTION ASKED: "{question}"
+
+PARENT'S RESPONSE: "{truncated}"
+
+Is this response a genuine, personal answer about their child that relates to the question?
+A valid answer talks about the child's specific experiences, behaviors, or situations.
+An INVALID answer is: copied text, random content, off-topic text, Wikipedia articles, news, jokes, or anything not about the child.
+
+Reply with ONLY one word: YES or NO"""
+
+        try:
+            result = await self.call_llm(
+                prompt,
+                format_json=False,
+                max_tokens=5,
+                temperature=0.1,
+            )
+            if result:
+                answer = result.strip().upper()
+                if "YES" in answer:
+                    return True
+                if "NO" in answer:
+                    return False
+        except Exception as e:
+            logger.warning(f"[InputValidator] LLM relevance check failed: {e}")
+
+        return None  # LLM failed — don't block the user
 
     @staticmethod
     def _is_irrelevant(text: str, category: str) -> bool:

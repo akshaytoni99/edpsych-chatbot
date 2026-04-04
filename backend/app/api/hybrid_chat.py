@@ -827,12 +827,18 @@ async def _handle_free_text(
             if peek_node:
                 next_question_text = peek_node.get("question", "")
 
+    # Get the current question text for relevance validation
+    current_question_text = ""
+    if current_node:
+        current_question_text = current_node.get("question", "") or current_node.get("text_prompt", "")
+
     # Run multi-agent pipeline (validates input first)
     result = await orchestrator.process_free_text(
         user_input=message_input.content,
         context_data=session.context_data,
         current_category=current_category,
         next_question=next_question_text,
+        current_question=current_question_text,
     )
 
     # Handle validation feedback (input too short/vague/gibberish) - do NOT advance

@@ -39,6 +39,7 @@ class OrchestratorAgent:
         context_data: dict,
         current_category: str = "general",
         next_question: str = "",
+        current_question: str = "",
     ) -> dict:
         """
         Process a free-text parent response through the multi-agent pipeline.
@@ -54,11 +55,12 @@ class OrchestratorAgent:
         student_name = context_data.get("user_profile", {}).get("student_name", "your child")
         context_summary = self._summarize_context(context_data)
 
-        # Step 1: Validate input (fast - heuristics only)
+        # Step 1: Validate input (heuristics + LLM for long inputs)
         validation = await self.validator.validate(
             user_input=user_input,
             category=current_category,
             student_name=student_name,
+            question_context=current_question,
         )
 
         if not validation["is_sufficient"]:
