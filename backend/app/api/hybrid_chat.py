@@ -1172,6 +1172,47 @@ async def get_session_data(
     )
     all_messages = msg_result.scalars().all()
 
+    # Auto-build Q&A pairs from messages if not already stored (for old sessions)
+    qa_pairs = session.context_data.get("completed_qa_pairs", [])
+    if not qa_pairs and all_messages:
+        bot_question_buffer = None
+        for msg in all_messages:
+            if msg.role == "bot":
+                bot_question_buffer = {
+                    "node_id": (msg.message_metadata or {}).get("node_id"),
+                    "category": (msg.message_metadata or {}).get("category"),
+                    "question": msg.content,
+                    "message_type": msg.message_type,
+                    "timestamp": msg.timestamp.isoformat(),
+                }
+            elif msg.role == "user" and bot_question_buffer:
+                qa_pairs.append({
+                    "question_node_id": bot_question_buffer.get("node_id"),
+                    "category": bot_question_buffer.get("category"),
+                    "question_text": bot_question_buffer["question"],
+                    "question_type": bot_question_buffer["message_type"],
+                    "answer_text": msg.content,
+                    "answer_type": msg.message_type,
+                    "selected_option": (msg.message_metadata or {}).get("selected_option"),
+                    "timestamp": msg.timestamp.isoformat(),
+                })
+                bot_question_buffer = None
+            elif msg.role == "user":
+                qa_pairs.append({
+                    "question_node_id": None,
+                    "category": None,
+                    "question_text": None,
+                    "question_type": None,
+                    "answer_text": msg.content,
+                    "answer_type": msg.message_type,
+                    "selected_option": (msg.message_metadata or {}).get("selected_option"),
+                    "timestamp": msg.timestamp.isoformat(),
+                })
+
+        # Save the rebuilt pairs back to the session so next time it's instant
+        session.context_data["completed_qa_pairs"] = qa_pairs
+        await db.commit()
+
     return {
         "session_id": str(session.id),
         "status": session.status,
@@ -1188,7 +1229,7 @@ async def get_session_data(
             "completed_at": session.completed_at.isoformat() if session.completed_at else None,
             "duration_minutes": session.duration_minutes,
         },
-        "qa_pairs": session.context_data.get("completed_qa_pairs", []),
+        "qa_pairs": qa_pairs,
         "assessment_data": session.context_data.get("assessment_data", {}),
         "completion_summary": session.context_data.get("completion_summary", {}),
         "full_conversation": [
