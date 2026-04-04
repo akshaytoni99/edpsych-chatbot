@@ -1091,6 +1091,122 @@ async def get_chat_session(
 
 
 # ============================================================================
+# VIEW ASSESSMENT DATA (for psychologist / admin)
+# ============================================================================
+
+@router.get("/completed-sessions")
+async def list_completed_sessions(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    List all completed assessment sessions with summary info.
+    Parents see their own; psychologists/admins see all.
+    """
+    query = select(ChatSession).where(
+        ChatSession.status == ChatSessionStatus.COMPLETED.value
+    ).order_by(ChatSession.completed_at.desc())
+
+    # Parents can only see their own
+    if current_user.role == UserRole.PARENT:
+        query = query.where(ChatSession.user_id == current_user.id)
+
+    result = await db.execute(query)
+    sessions = result.scalars().all()
+
+    output = []
+    for s in sessions:
+        summary = s.context_data.get("completion_summary", {})
+        output.append({
+            "session_id": str(s.id),
+            "assignment_id": str(s.assignment_id),
+            "student_name": summary.get("student_name", "Unknown"),
+            "student_age": summary.get("student_age"),
+            "total_questions": summary.get("total_questions", 0),
+            "categories_covered": summary.get("categories_covered", []),
+            "duration_minutes": s.duration_minutes,
+            "completed_at": s.completed_at.isoformat() if s.completed_at else None,
+            "started_at": s.started_at.isoformat() if s.started_at else None,
+        })
+
+    return {"total": len(output), "sessions": output}
+
+
+@router.get("/sessions/{session_id}/data")
+async def get_session_data(
+    session_id: UUID,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get the full stored assessment data for a completed session.
+    Returns all Q&A pairs, assessment_data, and completion_summary as JSON.
+    Parents see their own; psychologists/admins can see any.
+    """
+    result = await db.execute(select(ChatSession).where(ChatSession.id == session_id))
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Access control: parents can only see their own
+    if current_user.role == UserRole.PARENT and session.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # Get student info
+    assignment_result = await db.execute(
+        select(AssessmentAssignment).where(AssessmentAssignment.id == session.assignment_id)
+    )
+    assignment = assignment_result.scalar_one_or_none()
+
+    student = None
+    if assignment:
+        student_result = await db.execute(select(Student).where(Student.id == assignment.student_id))
+        student = student_result.scalar_one_or_none()
+
+    # Get all messages
+    msg_result = await db.execute(
+        select(ChatMessage)
+        .where(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.timestamp)
+    )
+    all_messages = msg_result.scalars().all()
+
+    return {
+        "session_id": str(session.id),
+        "status": session.status,
+        "student": {
+            "name": f"{student.first_name} {student.last_name}" if student else "Unknown",
+            "age": session.context_data.get("user_profile", {}).get("student_age"),
+            "school": student.school_name if student else None,
+            "year_group": student.year_group if student else None,
+            "date_of_birth": student.date_of_birth.isoformat() if student and student.date_of_birth else None,
+            "gender": student.gender if student else None,
+        } if student else None,
+        "timing": {
+            "started_at": session.started_at.isoformat() if session.started_at else None,
+            "completed_at": session.completed_at.isoformat() if session.completed_at else None,
+            "duration_minutes": session.duration_minutes,
+        },
+        "qa_pairs": session.context_data.get("completed_qa_pairs", []),
+        "assessment_data": session.context_data.get("assessment_data", {}),
+        "completion_summary": session.context_data.get("completion_summary", {}),
+        "full_conversation": [
+            {
+                "role": msg.role,
+                "type": msg.message_type,
+                "content": msg.content,
+                "metadata": msg.message_metadata,
+                "classification": msg.intent_classification,
+                "timestamp": msg.timestamp.isoformat(),
+            }
+            for msg in all_messages
+        ],
+        "total_messages": len(all_messages),
+    }
+
+
+# ============================================================================
 # SESSION RESET ("Start Over")
 # ============================================================================
 
