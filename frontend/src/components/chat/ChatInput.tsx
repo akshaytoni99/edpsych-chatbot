@@ -29,56 +29,106 @@ function getSpeechRecognition(): (new () => any) | null {
   );
 }
 
+function isMobile(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 export default function ChatInput({ onSend, disabled, placeholder, validationFeedback }: ChatInputProps) {
   const [value, setValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const prefixTextRef = useRef('');
+  // Accumulated final transcript from speech
+  const accumulatedTextRef = useRef('');
+  // Whether we intentionally want to keep listening (for auto-restart on mobile)
+  const wantListeningRef = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setSpeechSupported(!!getSpeechRecognition());
   }, []);
 
+  // Auto-resize textarea when value changes (handles speech input too)
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  }, [value]);
+
   const startListening = useCallback(() => {
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
-    prefixTextRef.current = value;
+    // Store current text as the base before speech starts
+    accumulatedTextRef.current = value;
+    wantListeningRef.current = true;
 
+    const mobile = isMobile();
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
+    // Mobile: use non-continuous mode + auto-restart to avoid duplication
+    // Desktop: use continuous mode
+    recognition.continuous = !mobile;
     recognition.interimResults = true;
     recognition.lang = 'en-GB';
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalTranscript = '';
-      let interimTranscript = '';
+      let sessionFinal = '';
+      let sessionInterim = '';
 
       for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript;
+          sessionFinal += transcript;
         } else {
-          interimTranscript += transcript;
+          sessionInterim += transcript;
         }
       }
 
-      const prefix = prefixTextRef.current;
-      const separator = prefix.length > 0 && !prefix.endsWith(' ') ? ' ' : '';
-      const newValue = (prefix + separator + finalTranscript + interimTranscript).trimStart();
+      // On mobile (non-continuous), each session is independent
+      // sessionFinal is the complete final text from this recognition session
+      // On desktop (continuous), we rebuild from all results each time
+      const base = accumulatedTextRef.current;
+      const separator = base.length > 0 && !base.endsWith(' ') ? ' ' : '';
+      const newValue = (base + separator + sessionFinal + sessionInterim).trimStart();
       setValue(newValue);
+
+      // When we get a final result on mobile, update the accumulated base
+      // so the next auto-restart session doesn't repeat it
+      if (mobile && sessionFinal) {
+        accumulatedTextRef.current = (base + separator + sessionFinal).trimStart();
+      }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (event.error !== 'no-speech') {
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
         console.warn('Speech recognition error:', event.error);
       }
-      setIsListening(false);
+      // Don't stop listening state on 'no-speech' — let onend handle restart
+      if (event.error !== 'no-speech') {
+        wantListeningRef.current = false;
+        setIsListening(false);
+      }
     };
 
     recognition.onend = () => {
+      // On mobile, auto-restart if user hasn't manually stopped
+      if (mobile && wantListeningRef.current) {
+        try {
+          // Small delay to avoid rapid restart loops
+          setTimeout(() => {
+            if (wantListeningRef.current && recognitionRef.current) {
+              recognitionRef.current.start();
+            }
+          }, 300);
+          return; // Don't set isListening to false
+        } catch {
+          // If restart fails, fall through to stop
+        }
+      }
+      wantListeningRef.current = false;
       setIsListening(false);
     };
 
@@ -88,8 +138,13 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
   }, [value]);
 
   const stopListening = useCallback(() => {
+    wantListeningRef.current = false;
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // already stopped
+      }
       recognitionRef.current = null;
     }
     setIsListening(false);
@@ -105,8 +160,9 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
 
   useEffect(() => {
     return () => {
+      wantListeningRef.current = false;
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try { recognitionRef.current.stop(); } catch { /* */ }
       }
     };
   }, []);
@@ -140,11 +196,11 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
   );
 
   return (
-    <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/60 px-3 py-2.5 sm:px-6 sm:py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+    <div className="bg-white/95 backdrop-blur-md border-t border-gray-200/60 px-3 py-2 sm:px-6 sm:py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
       <div className="max-w-3xl mx-auto">
         {/* Validation feedback */}
         {validationFeedback && (
-          <div className="mb-2.5 px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-xl animate-slide-up">
+          <div className="mb-2 px-3 py-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-xl animate-slide-up">
             <p className="text-xs text-amber-700 flex items-center gap-2 font-medium">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 flex-shrink-0 text-amber-500">
                 <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
@@ -156,7 +212,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
 
         {/* Listening indicator */}
         {isListening && (
-          <div className="mb-2.5 px-3.5 py-2.5 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/80 rounded-xl flex items-center gap-2.5 animate-slide-up">
+          <div className="mb-2 px-3 py-2 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/80 rounded-xl flex items-center gap-2.5 animate-slide-up">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -172,9 +228,10 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-2.5 items-end">
-          <div className="flex-1 relative">
+        <form onSubmit={handleSubmit} className="flex gap-1.5 sm:gap-2.5 items-end">
+          <div className="flex-1 relative min-w-0">
             <textarea
+              ref={textareaRef}
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -184,11 +241,11 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
               disabled={disabled}
               rows={1}
               aria-label="Type your message"
-              className={`w-full min-h-[46px] max-h-[120px] rounded-2xl px-5 py-3
+              className={`w-full min-h-[42px] sm:min-h-[46px] max-h-[120px] rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3
                 focus:outline-none
                 disabled:opacity-50 disabled:cursor-not-allowed
                 text-gray-800 placeholder-gray-400 text-sm
-                resize-none overflow-hidden
+                resize-none
                 transition-all duration-200
                 ${isListening
                   ? 'border-2 border-red-300 bg-red-50/30 shadow-sm shadow-red-100/50'
@@ -196,15 +253,10 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
                   ? 'border-2 border-indigo-400 bg-white shadow-md shadow-indigo-100/30'
                   : 'border-2 border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-white'
                 }`}
-              style={{ height: 'auto' }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-              }}
+              style={{ overflowY: 'auto' }}
             />
             {value.length > 0 && (
-              <span className={`absolute right-3.5 bottom-2 text-[10px] font-medium tabular-nums transition-colors ${
+              <span className={`absolute right-3 bottom-1.5 text-[10px] font-medium tabular-nums transition-colors ${
                 value.length > 500 ? 'text-amber-500' : 'text-gray-300'
               }`}>
                 {value.length}
@@ -219,7 +271,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
               onClick={toggleListening}
               disabled={disabled}
               aria-label={isListening ? 'Stop listening' : 'Start voice input'}
-              className={`min-h-[46px] min-w-[46px] flex items-center justify-center
+              className={`h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] flex items-center justify-center flex-shrink-0
                 rounded-2xl transition-all duration-200
                 ${isListening
                   ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-200/50 animate-pulse'
@@ -239,8 +291,8 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
             type="submit"
             disabled={disabled || !value.trim()}
             aria-label="Send message"
-            className={`min-h-[46px] min-w-[46px] flex items-center justify-center
-              rounded-2xl px-5 py-3
+            className={`h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] flex items-center justify-center flex-shrink-0
+              rounded-2xl
               transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1
               ${value.trim() && !disabled
