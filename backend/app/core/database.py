@@ -13,10 +13,12 @@ db_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
 # Handle Neon's sslmode parameter
 connect_args = {}
-if "sslmode=" in db_url:
-    db_url = db_url.split("?")[0]  # Remove query params
-    connect_args["ssl"] = "require"
-elif "neon.tech" in db_url:
+if "sslmode=" in db_url or "neon.tech" in db_url:
+    # Remove only sslmode param, keep others
+    if "?" in db_url:
+        base, params = db_url.split("?", 1)
+        filtered = "&".join(p for p in params.split("&") if not p.startswith("sslmode="))
+        db_url = f"{base}?{filtered}" if filtered else base
     connect_args["ssl"] = "require"
 
 # Create async engine
