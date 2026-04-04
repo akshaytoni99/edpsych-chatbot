@@ -1094,18 +1094,22 @@ async def get_chat_session(
 # VIEW ASSESSMENT DATA (for psychologist / admin)
 # ============================================================================
 
-@router.get("/completed-sessions")
-async def list_completed_sessions(
+@router.get("/all-sessions")
+async def list_all_sessions(
+    status_filter: Optional[str] = None,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    List all completed assessment sessions with summary info.
+    List all assessment sessions (completed, in-progress, paused).
+    Use ?status_filter=active or ?status_filter=completed to filter.
     Parents see their own; psychologists/admins see all.
     """
-    query = select(ChatSession).where(
-        ChatSession.status == ChatSessionStatus.COMPLETED.value
-    ).order_by(ChatSession.completed_at.desc())
+    query = select(ChatSession).order_by(ChatSession.last_interaction_at.desc())
+
+    # Optional status filter
+    if status_filter:
+        query = query.where(ChatSession.status == status_filter)
 
     # Parents can only see their own
     if current_user.role == UserRole.PARENT:
@@ -1116,17 +1120,23 @@ async def list_completed_sessions(
 
     output = []
     for s in sessions:
-        summary = s.context_data.get("completion_summary", {})
+        student_name = s.context_data.get("user_profile", {}).get("student_name", "Unknown")
+        answered = s.context_data.get("answered_node_ids", [])
+        progress = flow_engine.calculate_progress(s.flow_type, answered)
+
         output.append({
             "session_id": str(s.id),
             "assignment_id": str(s.assignment_id),
-            "student_name": summary.get("student_name", "Unknown"),
-            "student_age": summary.get("student_age"),
-            "total_questions": summary.get("total_questions", 0),
-            "categories_covered": summary.get("categories_covered", []),
-            "duration_minutes": s.duration_minutes,
-            "completed_at": s.completed_at.isoformat() if s.completed_at else None,
+            "status": s.status,
+            "student_name": student_name,
+            "student_age": s.context_data.get("user_profile", {}).get("student_age"),
+            "progress_percentage": progress,
+            "questions_answered": len(answered),
+            "categories_covered": s.context_data.get("explored_areas", []),
             "started_at": s.started_at.isoformat() if s.started_at else None,
+            "last_interaction": s.last_interaction_at.isoformat() if s.last_interaction_at else None,
+            "completed_at": s.completed_at.isoformat() if s.completed_at else None,
+            "duration_minutes": s.duration_minutes,
         })
 
     return {"total": len(output), "sessions": output}
