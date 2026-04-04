@@ -47,3 +47,4 @@ build/
 *.key
 credentials.json
 redis-data/
+backend/.env.render
