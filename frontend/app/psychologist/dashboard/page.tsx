@@ -628,7 +628,7 @@ export default function PsychologistDashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-black text-on-background tracking-tight">EdPsych AI</h1>
+                <h1 className="text-xl font-black text-on-background tracking-tight">The EdPsych</h1>
                 <p className="text-xs text-slate-500 font-medium">Psychologist Dashboard</p>
               </div>
             </div>
@@ -660,7 +660,7 @@ export default function PsychologistDashboard() {
           </h2>
           <p className="text-slate-500 text-lg">
             {activeTab === "reports"
-              ? "Review and approve AI-generated assessment reports."
+              ? "Review and approve generated assessment reports."
               : activeTab === "assignments"
               ? "Assign assessments to parents and schools."
               : "Manage student profiles and information."}

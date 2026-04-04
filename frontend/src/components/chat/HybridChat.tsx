@@ -492,7 +492,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
           {/* Title */}
           <div className="flex-1 min-w-0">
             <h1 className="text-sm sm:text-base font-semibold text-gray-900 tracking-tight truncate">
-              EdPsych Assessment
+              The EdPsych Assessment
             </h1>
             <p className="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:block">
               Educational Psychology - Confidential

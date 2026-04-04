@@ -74,21 +74,21 @@ class EmpathyAgent(BaseAgent):
     ) -> str:
         """Generate a very short acknowledgment. Always returns something."""
 
-        prompt = f"""A parent just answered an assessment question about their child.
+        prompt = f"""A parent just answered a question about their child.
 
 Parent said: "{user_input}"
-Topic: {category}
 
-Write a ONE sentence acknowledgment (max 10 words). Rules:
-- Be natural and human — like a real person listening, not a chatbot
-- NEVER say "thank you for sharing" or "I understand your concerns"
-- NEVER mention AI, assessment, or psychology
-- NEVER ask a follow-up question
-- Just briefly acknowledge what they said
-- Vary your style: sometimes just "Got it", sometimes reference what they said
-- Keep it under 10 words
+Write ONE short sentence (max 8 words) to acknowledge their answer. Strict rules:
+- Sound like a real person, NOT a chatbot
+- BANNED words/phrases: "consistently", "you mentioned", "thank you for sharing", "I understand", "appreciate", "that's really", "it sounds like", "concerns", "assessment", "AI", "psychology", "valuable"
+- NEVER repeat any word the parent just said
+- NEVER ask a question
+- NEVER use the child's name
+- Each response must feel completely different from the last
+- Keep it casual and brief — 3-8 words max
 
-Examples: "Got it, that's helpful." / "Right, makes sense." / "Noted — useful context." / "Okay, good to know.\""""
+Good: "Got it." / "Right, noted." / "Okay, clear." / "Makes sense." / "Fair enough." / "Understood." / "Good to know."
+Bad: "You mentioned that consistently..." / "Thank you for sharing that about..." / "I understand your concerns..."\""""
 
         response = await self.call_llm(prompt, temperature=0.7)
 

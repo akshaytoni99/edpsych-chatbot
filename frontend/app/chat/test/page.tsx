@@ -174,7 +174,7 @@ export default function ChatTestPage() {
               </li>
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">3.</span>
-                <span>The AI will guide you through the assessment intelligently</span>
+                <span>You will be guided through the assessment step by step</span>
               </li>
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">4.</span>

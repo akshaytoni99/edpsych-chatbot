@@ -154,7 +154,7 @@ export default function StudentDetailPage() {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-xl font-black text-on-background tracking-tight">EdPsych AI</h1>
+                  <h1 className="text-xl font-black text-on-background tracking-tight">The EdPsych</h1>
                   <p className="text-xs text-slate-500 font-medium">Student Profile</p>
                 </div>
               </div>

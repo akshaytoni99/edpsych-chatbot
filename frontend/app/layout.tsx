@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EdPsych AI | Educational Psychology Platform",
-  description: "AI-powered educational psychology assessment and report generation",
+  title: "The EdPsych | Educational Psychology Platform",
+  description: "Educational psychology assessment and report generation",
 };
 
 export default function RootLayout({

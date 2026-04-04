@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-black text-on-background tracking-tight">EdPsych AI</h1>
+                <h1 className="text-xl font-black text-on-background tracking-tight">The EdPsych</h1>
                 <p className="text-xs text-red-600 font-bold">ADMIN DASHBOARD</p>
               </div>
             </div>

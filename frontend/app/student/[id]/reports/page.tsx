@@ -200,7 +200,7 @@ export default function ReportsPage() {
                   <h1 className="text-xl font-black text-on-background tracking-tight">
                     {student?.first_name}'s Reports
                   </h1>
-                  <p className="text-xs text-slate-500 font-medium">AI-Generated Assessments</p>
+                  <p className="text-xs text-slate-500 font-medium">Generated Assessments</p>
                 </div>
               </div>
             </div>
@@ -217,7 +217,7 @@ export default function ReportsPage() {
             </svg>
             <h3 className="text-xl font-bold text-on-background mb-2">No reports yet</h3>
             <p className="text-slate-500 mb-6 max-w-md mx-auto">
-              Complete an assessment first, then generate an AI-powered report to get professional insights.
+              Complete an assessment first, then generate a professional report to get professional insights.
             </p>
             <button
               onClick={() => router.push(`/student/${studentId}/assessment`)}
