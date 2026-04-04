@@ -19,7 +19,8 @@ interface SpeechRecognitionErrorEvent {
   error: string;
 }
 
-function getSpeechRecognition(): (new () => SpeechRecognition) | null {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSpeechRecognition(): (new () => any) | null {
   if (typeof window === 'undefined') return null;
   return (
     (window as any).SpeechRecognition ||
