@@ -20,6 +20,85 @@ INSUFFICIENT_PATTERNS = [
 
 INSUFFICIENT_COMPILED = [re.compile(p, re.IGNORECASE) for p in INSUFFICIENT_PATTERNS]
 
+# ── Relevance-checking word sets ──────────────────────────────────────────────
+# Generic child / education / parenting words — if ANY of these appear the input
+# is almost certainly on-topic regardless of category.
+CHILD_EDUCATION_WORDS = {
+    "child", "children", "kid", "kids", "son", "daughter", "boy", "girl",
+    "student", "learner", "pupil", "toddler", "teen", "teenager", "baby",
+    "school", "class", "classroom", "teacher", "tutor", "homework", "lesson",
+    "lessons", "grade", "grades", "exam", "exams", "test", "tests",
+    "learn", "learning", "study", "studying", "read", "reading", "write",
+    "writing", "math", "maths", "science", "english", "subject",
+    "focus", "attention", "concentrate", "concentration", "distract", "distracted",
+    "friend", "friends", "peer", "peers", "bully", "bullying", "social",
+    "behavior", "behaviour", "behave", "misbehave", "tantrum", "tantrums",
+    "feel", "feeling", "feelings", "emotion", "emotions", "emotional",
+    "angry", "anger", "anxious", "anxiety", "sad", "sadness", "happy", "upset",
+    "cry", "crying", "worried", "worry", "scared", "fear",
+    "parent", "parenting", "mom", "mum", "dad", "father", "mother",
+    "sibling", "brother", "sister", "family",
+    "therapist", "therapy", "counselor", "counsellor", "psychologist",
+    "diagnosis", "adhd", "asd", "autism", "dyslexia", "iep", "504",
+    "special", "needs", "support", "accommodation",
+    "play", "playing", "recess", "sport", "sports",
+    "struggle", "struggling", "difficult", "difficulty", "challenge",
+    "improve", "improving", "progress", "regression",
+    "he", "she", "him", "her", "his", "they", "them", "their",
+}
+
+# Per-category keyword sets — extra topic-specific words
+CATEGORY_KEYWORDS = {
+    "attention": {
+        "focus", "attention", "concentrate", "distract", "distracted", "fidget",
+        "fidgeting", "squirm", "hyperactive", "impulsive", "impulse", "wander",
+        "daydream", "daydreaming", "zone", "zoning", "task", "off-task",
+        "listen", "listening", "forgetful", "forget", "careless", "rushing",
+        "sit", "sitting", "still", "restless", "calm", "patient", "impatient",
+    },
+    "social": {
+        "friend", "friends", "peer", "peers", "social", "interact", "interaction",
+        "play", "share", "sharing", "cooperate", "cooperation", "turn", "turns",
+        "conflict", "argue", "arguing", "fight", "fighting", "bully", "bullying",
+        "shy", "withdrawn", "lonely", "group", "team", "include", "exclude",
+        "empathy", "kind", "kindness", "communicate", "communication", "talk",
+    },
+    "emotional": {
+        "feel", "feeling", "feelings", "emotion", "emotional", "mood", "moods",
+        "angry", "anger", "anxious", "anxiety", "sad", "sadness", "happy",
+        "upset", "cry", "crying", "tantrum", "meltdown", "frustrated",
+        "frustration", "worried", "worry", "scared", "fear", "overwhelmed",
+        "calm", "regulate", "regulation", "self-control", "cope", "coping",
+        "sensitive", "irritable", "confident", "confidence", "self-esteem",
+    },
+    "academic": {
+        "read", "reading", "write", "writing", "math", "maths", "spell",
+        "spelling", "homework", "assignment", "test", "exam", "grade", "grades",
+        "score", "scores", "subject", "class", "lesson", "learn", "learning",
+        "study", "studying", "tutor", "tutoring", "comprehension", "fluency",
+        "vocabulary", "science", "english", "history", "project", "report",
+        "performance", "achievement", "behind", "ahead", "struggle", "pass", "fail",
+    },
+    "behavioral": {
+        "behavior", "behaviour", "behave", "misbehave", "tantrum", "tantrums",
+        "defiant", "defiance", "oppose", "oppositional", "aggressive", "aggression",
+        "hit", "hitting", "kick", "kicking", "bite", "biting", "throw",
+        "rule", "rules", "consequence", "consequences", "discipline", "timeout",
+        "comply", "compliance", "refuse", "refusing", "listen", "obey",
+        "disruptive", "outburst", "impulse", "impulsive", "destructive",
+    },
+}
+
+# Friendly relevance prompts per category
+RELEVANCE_PROMPTS = {
+    "attention": "I'd love to hear more about {student_name}'s experience with this. Could you share something specific about how they handle focusing or paying attention?",
+    "social": "I'd love to hear more about {student_name}'s experience with this. Could you share something specific about how they interact with other children?",
+    "emotional": "I'd love to hear more about {student_name}'s experience with this. Could you share something specific about how they handle their emotions?",
+    "academic": "I'd love to hear more about {student_name}'s experience with this. Could you share something specific about how they manage schoolwork or learning?",
+    "behavioral": "I'd love to hear more about {student_name}'s experience with this. Could you share something specific about their behaviour at home or school?",
+    "general": "I'd love to hear more about {student_name}'s experience with this. Could you share something related to their day-to-day life at home or school?",
+}
+
 # Common English words used to detect gibberish
 # If a message has very few real words, it's likely nonsense
 COMMON_WORDS = {
@@ -113,6 +192,15 @@ class InputValidatorAgent(BaseAgent):
                 "confidence": 0.9,
             }
 
+        # Relevance check — only reject clearly off-topic input
+        if self._is_irrelevant(text, category):
+            prompt = RELEVANCE_PROMPTS.get(category, RELEVANCE_PROMPTS["general"])
+            return {
+                "is_sufficient": False,
+                "feedback": prompt.replace("{student_name}", student_name),
+                "confidence": 0.75,
+            }
+
         # 4-8 words - borderline, accept but note it's brief
         if word_count < 8:
             return {
@@ -162,3 +250,39 @@ class InputValidatorAgent(BaseAgent):
                 return True
 
         return False
+
+    @staticmethod
+    def _is_irrelevant(text: str, category: str) -> bool:
+        """
+        Detect clearly off-topic input using keyword overlap.
+
+        Strategy: be very generous — only flag input that has ZERO overlap with
+        both the broad child/education word list AND the category-specific list.
+        Short inputs (< 8 words) are given the benefit of the doubt and always
+        accepted, since brevity doesn't imply irrelevance.
+        """
+        words = set(re.findall(r"[a-zA-Z']+", text.lower()))
+
+        # Short responses are hard to judge — let them through
+        if len(words) < 8:
+            return False
+
+        # Accept if ANY word matches the broad child/education set
+        if words & CHILD_EDUCATION_WORDS:
+            return False
+
+        # Accept if ANY word matches category-specific keywords
+        cat_keywords = CATEGORY_KEYWORDS.get(category)
+        if cat_keywords and (words & cat_keywords):
+            return False
+
+        # Also accept if the union of ALL category keywords has a match
+        # (covers cases where the category label is wrong or "general")
+        all_category_words: set[str] = set()
+        for kw_set in CATEGORY_KEYWORDS.values():
+            all_category_words |= kw_set
+        if words & all_category_words:
+            return False
+
+        # No relevant signal at all — flag as irrelevant
+        return True

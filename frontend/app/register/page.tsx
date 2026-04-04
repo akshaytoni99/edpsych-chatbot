@@ -65,7 +65,8 @@ export default function RegisterPage() {
     if (!emailRegex.test(formData.email)) errs.email = "Please enter a valid email address";
     if (formData.password.length < 8) errs.password = "Password must be at least 8 characters";
     if (formData.password !== formData.confirmPassword) errs.confirmPassword = "Passwords do not match";
-    if (!formData.phone.trim()) errs.phone = "Phone number is required";
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (!formData.phone.trim() || phoneDigits.length < 10) errs.phone = "Please enter a valid phone number (at least 10 digits)";
     if (!formData.relationship) errs.relationship = "Please select your relationship to the child";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -76,9 +77,7 @@ export default function RegisterPage() {
     if (!formData.student_first_name.trim()) errs.student_first_name = "Child's first name is required";
     if (!formData.student_last_name.trim()) errs.student_last_name = "Child's last name is required";
     if (!formData.date_of_birth) errs.date_of_birth = "Date of birth is required";
-    if (!formData.gender) errs.gender = "Please select a gender";
-    if (!formData.school_name.trim()) errs.school_name = "School name is required";
-    if (!formData.year_group) errs.year_group = "Please select a year/grade";
+    // Gender, School Name, and Year/Grade are optional — no validation needed
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -200,7 +199,7 @@ export default function RegisterPage() {
   const renderStep1 = () => (
     <div className="space-y-4">
       <div>
-        <label htmlFor="full_name" className={labelCls}>Full Name</label>
+        <label htmlFor="full_name" className={labelCls}>Full Name <span className="text-red-500">*</span></label>
         <input
           type="text"
           id="full_name"
@@ -214,7 +213,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="email" className={labelCls}>Email Address</label>
+        <label htmlFor="email" className={labelCls}>Email Address <span className="text-red-500">*</span></label>
         <input
           type="email"
           id="email"
@@ -228,7 +227,7 @@ export default function RegisterPage() {
       </div>
 
       <div className="relative">
-        <label htmlFor="password" className={labelCls}>Password</label>
+        <label htmlFor="password" className={labelCls}>Password <span className="text-red-500">*</span></label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -260,7 +259,7 @@ export default function RegisterPage() {
       </div>
 
       <div className="relative">
-        <label htmlFor="confirmPassword" className={labelCls}>Confirm Password</label>
+        <label htmlFor="confirmPassword" className={labelCls}>Confirm Password <span className="text-red-500">*</span></label>
         <div className="relative">
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -292,12 +291,13 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="phone" className={labelCls}>Phone Number</label>
+        <label htmlFor="phone" className={labelCls}>Phone Number <span className="text-red-500">*</span></label>
         <input
           type="tel"
           id="phone"
+          pattern="[0-9]*"
           value={formData.phone}
-          onChange={(e) => update("phone", e.target.value)}
+          onChange={(e) => update("phone", e.target.value.replace(/\D/g, ""))}
           className={inputCls("phone")}
           placeholder="+44 7700 900000"
           required
@@ -306,7 +306,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="relationship" className={labelCls}>Relationship to Child</label>
+        <label htmlFor="relationship" className={labelCls}>Relationship to Child <span className="text-red-500">*</span></label>
         <select
           id="relationship"
           value={formData.relationship}
@@ -330,7 +330,7 @@ export default function RegisterPage() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="student_first_name" className={labelCls}>Child&apos;s First Name</label>
+          <label htmlFor="student_first_name" className={labelCls}>Child&apos;s First Name <span className="text-red-500">*</span></label>
           <input
             type="text"
             id="student_first_name"
@@ -343,7 +343,7 @@ export default function RegisterPage() {
           {errors.student_first_name && <p className={errorCls}>{errors.student_first_name}</p>}
         </div>
         <div>
-          <label htmlFor="student_last_name" className={labelCls}>Child&apos;s Last Name</label>
+          <label htmlFor="student_last_name" className={labelCls}>Child&apos;s Last Name <span className="text-red-500">*</span></label>
           <input
             type="text"
             id="student_last_name"
@@ -358,7 +358,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="date_of_birth" className={labelCls}>Date of Birth</label>
+        <label htmlFor="date_of_birth" className={labelCls}>Date of Birth <span className="text-red-500">*</span></label>
         <input
           type="date"
           id="date_of_birth"
@@ -377,7 +377,6 @@ export default function RegisterPage() {
           value={formData.gender}
           onChange={(e) => update("gender", e.target.value)}
           className={selectCls("gender")}
-          required
         >
           <option value="">Select gender...</option>
           <option value="Male">Male</option>
@@ -385,7 +384,6 @@ export default function RegisterPage() {
           <option value="Other">Other</option>
           <option value="Prefer not to say">Prefer not to say</option>
         </select>
-        {errors.gender && <p className={errorCls}>{errors.gender}</p>}
       </div>
 
       <div>
@@ -397,9 +395,7 @@ export default function RegisterPage() {
           onChange={(e) => update("school_name", e.target.value)}
           className={inputCls("school_name")}
           placeholder="Enter school name"
-          required
         />
-        {errors.school_name && <p className={errorCls}>{errors.school_name}</p>}
       </div>
 
       <div>
@@ -409,14 +405,12 @@ export default function RegisterPage() {
           value={formData.year_group}
           onChange={(e) => update("year_group", e.target.value)}
           className={selectCls("year_group")}
-          required
         >
           <option value="">Select year group...</option>
           {YEAR_OPTIONS.map((y) => (
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
-        {errors.year_group && <p className={errorCls}>{errors.year_group}</p>}
       </div>
     </div>
   );

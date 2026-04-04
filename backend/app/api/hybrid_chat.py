@@ -352,6 +352,30 @@ async def start_chat_session(
         answered = existing.context_data.get("answered_node_ids", [])
         progress = flow_engine.calculate_progress(existing.flow_type, answered)
 
+        # Build current_question from flow engine so frontend can restore MCQ options
+        current_question = None
+        if existing.current_node_id and existing.status != ChatSessionStatus.COMPLETED.value:
+            current_node = flow_engine.get_node(existing.flow_type, existing.current_node_id)
+            if current_node:
+                student_name = existing.context_data.get("user_profile", {}).get("student_name", "your child")
+                cq_content = (current_node.get("content") or current_node.get("question", "")).replace("{student_name}", student_name)
+                cq_metadata: Dict[str, Any] = {
+                    "node_id": existing.current_node_id,
+                    "category": current_node.get("category"),
+                    "allow_text": current_node.get("allow_text", False),
+                    "text_prompt": current_node.get("text_prompt"),
+                }
+                if current_node.get("type") == "mcq":
+                    cq_metadata["options"] = [
+                        {"value": opt["value"], "label": opt["label"]}
+                        for opt in current_node.get("options", [])
+                    ]
+                current_question = {
+                    "message_type": current_node["type"],
+                    "content": cq_content,
+                    "metadata": cq_metadata,
+                }
+
         response.status_code = status.HTTP_200_OK
         return {
             "session_id": str(existing.id),
@@ -359,6 +383,7 @@ async def start_chat_session(
             "progress_percentage": progress,
             "resumed": True,
             "bot_message": None,
+            "current_question": current_question,
             "messages": [
                 {
                     "id": str(m.id),

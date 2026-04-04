@@ -159,11 +159,16 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
           );
           setMessages(restored);
 
-          const lastBotWithMeta = [...restored]
-            .reverse()
-            .find((m) => m.role === 'bot' && m.metadata?.options);
-          if (lastBotWithMeta?.metadata) {
-            setCurrentQuestion(lastBotWithMeta.metadata);
+          // Prefer current_question from backend (has options from flow engine)
+          if (data.current_question?.metadata) {
+            setCurrentQuestion(data.current_question.metadata as QuestionMetadata);
+          } else {
+            const lastBotWithMeta = [...restored]
+              .reverse()
+              .find((m) => m.role === 'bot' && m.metadata?.options);
+            if (lastBotWithMeta?.metadata) {
+              setCurrentQuestion(lastBotWithMeta.metadata);
+            }
           }
         }
 
@@ -209,11 +214,16 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
           );
           setMessages(restored);
 
-          const lastBotWithMeta = [...restored]
-            .reverse()
-            .find((m) => m.role === 'bot' && m.metadata?.options);
-          if (lastBotWithMeta?.metadata) {
-            setCurrentQuestion(lastBotWithMeta.metadata);
+          // Prefer current_question from backend (has options from flow engine)
+          if (data.current_question?.metadata) {
+            setCurrentQuestion(data.current_question.metadata as QuestionMetadata);
+          } else {
+            const lastBotWithMeta = [...restored]
+              .reverse()
+              .find((m) => m.role === 'bot' && m.metadata?.options);
+            if (lastBotWithMeta?.metadata) {
+              setCurrentQuestion(lastBotWithMeta.metadata);
+            }
           }
 
           setProgress(data.progress_percentage || 0);
@@ -443,32 +453,48 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
   const inputPlaceholder = currentQuestion?.text_prompt || 'Type your answer here...';
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 to-gray-100">
+    <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 via-gray-50 to-gray-100/80">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-3 py-2 sm:px-6 sm:py-3 shadow-sm">
-        <div className="max-w-4xl mx-auto flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-4 h-4 sm:w-5 sm:h-5">
-              <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 20.97V18.5a48.648 48.648 0 0 1-1.087-.058C2.99 18.22 1.5 16.614 1.5 14.656V6.385c0-1.866 1.369-3.477 3.413-3.727ZM17.04 7.008a48.114 48.114 0 0 0-7.832 0C7.548 7.186 6.5 8.67 6.5 10.2v4.287c0 1.53 1.048 3.013 2.708 3.191a46.604 46.604 0 0 0 3.063.215l3.26 3.026a.75.75 0 0 0 1.27-.543v-2.323c1.66-.178 2.708-1.66 2.708-3.191V10.2c-.001-1.53-1.05-3.014-2.469-3.192Z" />
+      <header className="relative bg-white/95 backdrop-blur-md border-b border-gray-200/60 px-3 py-2.5 sm:px-6 sm:py-3 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="max-w-3xl mx-auto flex items-center gap-2.5 sm:gap-3">
+          {/* Logo / Avatar */}
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-indigo-200/50">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-[22px] sm:h-[22px]">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7Z" />
+              <path d="M10 21h4" />
+              <path d="M12 6v4" />
+              <path d="M10 10h4" />
             </svg>
           </div>
+          {/* Title */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Assessment Chat</h1>
-            <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">AI-powered educational psychology assessment</p>
+            <h1 className="text-sm sm:text-base font-semibold text-gray-900 tracking-tight truncate">
+              EdPsych Assessment
+            </h1>
+            <p className="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:block">
+              Educational Psychology - Confidential
+            </p>
           </div>
+          {/* Category badge */}
           {currentCategory && (
-            <div className="hidden sm:block">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 capitalize">
+            <div className="hidden sm:flex items-center">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 capitalize">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
                 {currentCategory}
               </span>
             </div>
           )}
+          {/* Save & Exit */}
           {!isCompleted && (
             <button
               onClick={handleSaveAndExit}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-medium rounded-lg transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2
+                bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50
+                text-gray-600 hover:text-gray-800
+                text-xs sm:text-sm font-medium rounded-lg
+                transition-all duration-150 shadow-sm hover:shadow"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
                 <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6.879a1.5 1.5 0 0 1 1.06.44l4.122 4.12A1.5 1.5 0 0 1 17 7.622V16.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16.5v-13Z" />
               </svg>
               <span className="hidden sm:inline">Save & Exit</span>
@@ -476,7 +502,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
             </button>
           )}
         </div>
-      </div>
+      </header>
 
       <ProgressBar percentage={progress} currentCategory={currentCategory} />
 
@@ -484,12 +510,17 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
 
       {/* Retry Button */}
       {lastFailedMessage && !loading && (
-        <div className="px-4 py-2 bg-amber-50 border-t border-amber-200">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <span className="text-sm text-amber-700">Message failed to send</span>
+        <div className="px-4 py-2.5 bg-amber-50/80 backdrop-blur-sm border-t border-amber-200/60 animate-slide-up">
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-amber-500 flex-shrink-0">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm text-amber-800 font-medium truncate">Message failed to send</span>
+            </div>
             <button
               onClick={handleRetry}
-              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-full transition-colors"
+              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm flex-shrink-0"
             >
               Retry
             </button>

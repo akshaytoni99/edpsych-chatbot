@@ -6,41 +6,61 @@ interface CompletionBannerProps {
 
 export default function CompletionBanner({ onNavigate }: CompletionBannerProps) {
   return (
-    <div className="px-4 py-6 sm:px-6 animate-slide-up">
-      <div className="max-w-md mx-auto bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl px-6 py-6 text-center shadow-lg">
-        <div className="flex justify-center mb-3">
-          <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="white"
-              className="w-8 h-8"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                clipRule="evenodd"
-              />
-            </svg>
+    <div className="px-4 py-8 sm:px-6 sm:py-10 animate-scale-in">
+      <div className="max-w-sm mx-auto text-center">
+        {/* Success icon */}
+        <div className="flex justify-center mb-5">
+          <div className="relative">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl rotate-3 flex items-center justify-center shadow-lg shadow-emerald-200/50">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-8 h-8"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" className="animate-check-draw" />
+              </svg>
+            </div>
+            {/* Decorative ring */}
+            <div className="absolute -inset-2 rounded-2xl rotate-3 border-2 border-emerald-200/50 animate-subtle-pulse" />
           </div>
         </div>
-        <p className="text-xl font-bold text-gray-900 mb-1">
+
+        {/* Text */}
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 tracking-tight">
           Assessment Complete
-        </p>
-        <p className="text-sm text-gray-600 mb-5">
+        </h2>
+        <p className="text-sm sm:text-base text-gray-500 leading-relaxed mb-7 max-w-xs mx-auto">
           Thank you for completing the assessment. A comprehensive report is being generated based on your responses.
         </p>
+
+        {/* CTA Button */}
         <button
           onClick={onNavigate}
           aria-label="Return to Dashboard"
-          className="min-h-[44px] bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white
-            px-8 py-2.5 rounded-full font-medium
-            shadow-md hover:shadow-lg
-            transition-all duration-200"
+          className="inline-flex items-center gap-2 min-h-[48px]
+            bg-gradient-to-r from-indigo-500 to-indigo-600
+            hover:from-indigo-600 hover:to-indigo-700
+            text-white px-8 py-3 rounded-xl font-semibold text-sm sm:text-base
+            shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:shadow-indigo-200/60
+            transition-all duration-200 hover:-translate-y-0.5
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+            <path fillRule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 10.414l-7-7-7 7A1 1 0 0 1 1.586 9.293l7-7ZM2 17.5A1.5 1.5 0 0 1 3.5 16h13a1.5 1.5 0 0 1 0 3h-13A1.5 1.5 0 0 1 2 17.5Z" clipRule="evenodd" />
+          </svg>
           Return to Dashboard
         </button>
+
+        {/* Subtle reassurance */}
+        <p className="mt-4 text-[11px] text-gray-400 font-medium">
+          Your responses have been securely saved
+        </p>
       </div>
     </div>
   );

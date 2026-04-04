@@ -48,3 +48,4 @@ build/
 credentials.json
 redis-data/
 backend/.env.render
+storage/

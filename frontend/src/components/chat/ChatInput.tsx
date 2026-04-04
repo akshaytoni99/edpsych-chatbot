@@ -34,6 +34,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const prefixTextRef = useRef('');
 
   useEffect(() => {
     setSpeechSupported(!!getSpeechRecognition());
@@ -43,28 +44,32 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
     const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
+    // Capture the text that exists before speech starts
+    prefixTextRef.current = value;
+
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-GB';
 
-    let finalTranscript = '';
-
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      // Rebuild from ALL results every time, not just from resultIndex
+      for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += transcript;
         } else {
-          interim = transcript;
+          interimTranscript += transcript;
         }
       }
-      setValue((prev) => {
-        const base = prev.endsWith(' ') || prev === '' ? prev : prev + ' ';
-        return (base + finalTranscript + interim).trimStart();
-      });
-      finalTranscript = '';
+
+      const prefix = prefixTextRef.current;
+      const separator = prefix.length > 0 && !prefix.endsWith(' ') ? ' ' : '';
+      const newValue = (prefix + separator + finalTranscript + interimTranscript).trimStart();
+      setValue(newValue);
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -81,7 +86,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
-  }, []);
+  }, [value]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
