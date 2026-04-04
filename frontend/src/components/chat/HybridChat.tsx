@@ -467,6 +467,8 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 via-gray-50 to-gray-100/80">
+      {/* Sticky header + progress bar wrapper */}
+      <div className="sticky top-0 z-30 flex-shrink-0">
       {/* Header */}
       <header className="relative bg-white/95 backdrop-blur-md border-b border-gray-200/60 px-3 py-2.5 sm:px-6 sm:py-3 shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
         {/* Subtle animated shine */}
@@ -528,6 +530,15 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
       </header>
 
       <ProgressBar percentage={progress} currentCategory={currentCategory} />
+      </div>{/* end sticky wrapper */}
+
+      {/* Encryption notice */}
+      <div className="flex items-center justify-center gap-1.5 py-1.5 bg-amber-50/60 border-b border-amber-100/50">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3 text-amber-500">
+          <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clipRule="evenodd" />
+        </svg>
+        <span className="text-[10px] text-amber-600 font-medium">End-to-end encrypted - Your responses are confidential</span>
+      </div>
 
       <MessageList messages={messages} isTyping={isTyping} />
 
