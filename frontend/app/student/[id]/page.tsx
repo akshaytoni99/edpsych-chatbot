@@ -197,15 +197,24 @@ export default function StudentDetailPage() {
                 </div>
               </div>
             </div>
-            <button
-              onClick={handleStartAssessment}
-              className="px-8 py-4 bg-on-background text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 transition-all flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              New Assessment
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => router.push(`/student/${studentId}/workspace`)}
+                className="px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-teal-600 transition-all flex items-center gap-2"
+              >
+                <span role="img" aria-label="clipboard">📋</span>
+                Open Reports Workspace
+              </button>
+              <button
+                onClick={handleStartAssessment}
+                className="px-8 py-4 bg-on-background text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                New Assessment
+              </button>
+            </div>
           </div>
         </div>
 

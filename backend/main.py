@@ -12,8 +12,8 @@ import logging
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import auth, students, chatbot, assignments, student_guardians, hybrid_chat, psychologist
-from app.models import user, student, assessment, report, assignment, student_guardian, chat, magic_link, verification_token  # Import all models
+from app.api import auth, students, chatbot, assignments, student_guardians, hybrid_chat, psychologist, psychologist_reports
+from app.models import user, student, assessment, report, assignment, student_guardian, chat, magic_link, verification_token, upload, psychologist_report  # Import all models
 
 # Optional imports - these may fail in chatbot-only deployment
 try:
@@ -130,6 +130,7 @@ app.include_router(assignments.router, prefix="/api/v1", tags=["Assignments"])
 app.include_router(student_guardians.router, prefix="/api/v1", tags=["Student-Guardians"])
 app.include_router(hybrid_chat.router, prefix="/api/v1", tags=["Hybrid Chat"])
 app.include_router(psychologist.router, prefix="/api/v1", tags=["Psychologist"])
+app.include_router(psychologist_reports.router, prefix="/api/v1", tags=["Psychologist Reports"])
 if HAS_FULL_PIPELINE:
     app.include_router(verification.router, prefix="/api/v1", tags=["Verification"])
 
