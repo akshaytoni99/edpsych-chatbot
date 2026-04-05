@@ -39,6 +39,52 @@ export default function AdminDashboard() {
   const [filterRole, setFilterRole] = useState<string>("all");
   const [showAddUser, setShowAddUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [createForm, setCreateForm] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    role: "PSYCHOLOGIST",
+    phone: "",
+    organization: "",
+  });
+  const [createError, setCreateError] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError("");
+    setCreating(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`${API_BASE}/admin/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: createForm.email,
+          password: createForm.password,
+          full_name: createForm.full_name,
+          role: createForm.role,
+          phone: createForm.phone || null,
+          organization: createForm.organization || null,
+        }),
+      });
+      if (response.ok) {
+        setShowAddUser(false);
+        setCreateForm({ full_name: "", email: "", password: "", role: "PSYCHOLOGIST", phone: "", organization: "" });
+        fetchAdminData(token!);
+      } else {
+        const data = await response.json().catch(() => null);
+        setCreateError(data?.detail || "Failed to create user");
+      }
+    } catch (err) {
+      setCreateError("Network error. Please try again.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -490,21 +536,125 @@ export default function AdminDashboard() {
         )}
       </main>
 
-      {/* Add/Edit User Modal Placeholder */}
-      {(showAddUser || selectedUser) && (
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-extrabold text-on-background mb-2">Add New User</h3>
+            <p className="text-slate-500 text-sm mb-6">
+              Create an account for a psychologist, school, parent, or admin.
+            </p>
+
+            {createError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+                {createError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Role *</label>
+                <select
+                  value={createForm.role}
+                  onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                >
+                  <option value="PSYCHOLOGIST">Psychologist</option>
+                  <option value="SCHOOL">School</option>
+                  <option value="PARENT">Parent</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={createForm.full_name}
+                  onChange={(e) => setCreateForm({ ...createForm, full_name: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                  placeholder="Dr. Jane Smith"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                  placeholder="jane@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Temporary Password *</label>
+                <input
+                  type="text"
+                  required
+                  minLength={8}
+                  value={createForm.password}
+                  onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm font-mono"
+                  placeholder="Min 8 characters"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">Share this with the user; they should change it on first login.</p>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Phone</label>
+                <input
+                  type="tel"
+                  value={createForm.phone}
+                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                  placeholder="+44 7700 900000"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Organization</label>
+                <input
+                  type="text"
+                  value={createForm.organization}
+                  onChange={(e) => setCreateForm({ ...createForm, organization: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                  placeholder="Clinic or practice name"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddUser(false);
+                    setCreateError("");
+                  }}
+                  className="flex-1 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 py-3 bg-on-background text-white font-bold rounded-xl hover:bg-slate-800 transition-all text-sm disabled:opacity-50"
+                >
+                  {creating ? "Creating..." : "Create User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal (placeholder — edit flow not implemented yet) */}
+      {selectedUser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8">
-            <h3 className="text-2xl font-extrabold text-on-background mb-4">
-              {showAddUser ? "Add New User" : "Edit User"}
-            </h3>
+            <h3 className="text-2xl font-extrabold text-on-background mb-4">Edit User</h3>
             <p className="text-slate-500 mb-6">
-              User management form would go here. This requires backend endpoints.
+              Inline editing is not yet implemented. Use Activate/Deactivate or Delete for now.
             </p>
             <button
-              onClick={() => {
-                setShowAddUser(false);
-                setSelectedUser(null);
-              }}
+              onClick={() => setSelectedUser(null)}
               className="w-full px-4 py-3 bg-on-background text-white font-bold rounded-xl hover:bg-slate-800 transition-all"
             >
               Close

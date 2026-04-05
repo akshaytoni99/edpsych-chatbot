@@ -10,11 +10,12 @@ from typing import List
 from uuid import UUID
 
 from app.core.database import get_db
-from app.core.security import get_current_active_user
+from app.core.security import get_current_active_user, get_password_hash
 from app.models.user import User, UserRole
 from app.models.student import Student
 from app.models.assessment import AssessmentSession
 from app.models.report import GeneratedReport
+from app.schemas.user import UserCreate, UserResponse
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -27,6 +28,36 @@ def require_admin(current_user: User = Depends(get_current_active_user)) -> User
             detail="Admin access required"
         )
     return current_user
+
+
+@router.post("/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def create_user(
+    user_data: UserCreate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a user with any role (admin only). Used to onboard psychologists."""
+    result = await db.execute(select(User).where(User.email == user_data.email))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered",
+        )
+
+    new_user = User(
+        email=user_data.email,
+        password_hash=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        role=user_data.role,
+        phone=user_data.phone,
+        organization=user_data.organization,
+        is_active=True,
+        is_verified=True,  # admin-vouched
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    return new_user
 
 
 @router.get("/users")

@@ -31,13 +31,19 @@ router = APIRouter()
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     """
-    Register a new user
+    Self-register a new user.
 
-    - **email**: Valid email address
-    - **password**: Minimum 8 characters
-    - **full_name**: User's full name
-    - **role**: parent, school, psychologist, or admin
+    Only PARENT and SCHOOL roles may self-register. PSYCHOLOGIST and ADMIN
+    accounts must be created by an existing admin via POST /admin/users.
     """
+    # Block self-registration for privileged roles
+    from app.models.user import UserRole
+    if user_data.role not in (UserRole.PARENT, UserRole.SCHOOL):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Psychologist and admin accounts can only be created by an administrator.",
+        )
+
     # Check if user already exists
     result = await db.execute(select(User).where(User.email == user_data.email))
     existing_user = result.scalar_one_or_none()
