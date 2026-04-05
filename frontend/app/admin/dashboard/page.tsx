@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api";
+import DataExplorer from "@/src/components/admin/DataExplorer";
 
 interface User {
   id: string;
@@ -534,6 +535,15 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* Data Explorer */}
+        <div className="mt-12">
+          <h3 className="text-xl font-bold text-on-background mb-4">Data Explorer</h3>
+          <p className="text-sm text-slate-500 mb-6">
+            Read-only view of all records in the database. All admin access is logged.
+          </p>
+          <DataExplorer />
+        </div>
       </main>
 
       {/* Add User Modal */}
