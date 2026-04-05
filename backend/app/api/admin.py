@@ -22,7 +22,7 @@ from app.models.upload import IQTestUpload, CognitiveProfile
 from app.models.report import GeneratedReport
 from app.schemas.user import UserCreate, UserResponse
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(tags=["admin"])
 
 
 def require_admin(current_user: User = Depends(get_current_active_user)) -> User:
