@@ -674,27 +674,37 @@ async def _handle_mcq_choice(session: ChatSession, message_input: ChatMessageInp
 
         if final_node:
             next_category = final_node.get("category", "general")
-            context_summary = orchestrator._summarize_context(session.context_data)
 
-            # Generate AI acknowledgment/transition (makes flow feel conversational)
-            next_q_text = final_node.get("question", "")
-            try:
-                ai_transition = await orchestrator.generate_transition(
-                    user_choice=user_choice_label,
-                    current_category=current_category,
-                    next_category=next_category,
-                    student_name=student_name,
-                    context_summary=context_summary,
-                    next_question=next_q_text,
-                )
-            except Exception as e:
-                logger.warning(f"AI transition failed, using simple ack: {e}")
-                ai_transition = "Thank you for sharing that."
+            # Only show acknowledgment every 5th answer to reduce chattiness
+            answer_count = len(session.context_data.get("answered_node_ids", []))
+            show_feedback = answer_count > 0 and answer_count % 5 == 0
 
             msg_data = flow_engine.format_bot_message(final_node, student_name, final_id)
-            # Prepend AI acknowledgment before the next question
-            msg_data["content"] = ai_transition + "\n\n" + msg_data["content"]
-            msg_data["generation_source"] = "ai_transition"
+
+            if show_feedback:
+                context_summary = orchestrator._summarize_context(session.context_data)
+                next_q_text = final_node.get("question", "")
+                try:
+                    ai_transition = await orchestrator.generate_transition(
+                        user_choice=user_choice_label,
+                        current_category=current_category,
+                        next_category=next_category,
+                        student_name=student_name,
+                        context_summary=context_summary,
+                        next_question=next_q_text,
+                    )
+                except Exception as e:
+                    logger.warning(f"AI transition failed, skipping ack: {e}")
+                    ai_transition = ""
+
+                if ai_transition:
+                    msg_data["content"] = ai_transition + "\n\n" + msg_data["content"]
+                    msg_data["generation_source"] = "ai_transition"
+                else:
+                    msg_data["generation_source"] = "flow_engine"
+            else:
+                msg_data["generation_source"] = "flow_engine"
+
             return msg_data
 
     # Fallback: re-present current question
@@ -903,10 +913,16 @@ async def _handle_free_text(
             session.current_node_id = final_id
 
             if final_node:
-                # Combine AI empathetic response with next question
+                # Only show empathetic acknowledgment every 5th answer
+                answer_count = len(session.context_data.get("answered_node_ids", []))
+                show_feedback = answer_count > 0 and answer_count % 5 == 0
+
                 msg_data = flow_engine.format_bot_message(final_node, student_name, final_id)
-                msg_data["content"] = result["content"] + "\n\n" + msg_data["content"]
-                msg_data["generation_source"] = "ai_empathetic"
+                if show_feedback and result.get("content"):
+                    msg_data["content"] = result["content"] + "\n\n" + msg_data["content"]
+                    msg_data["generation_source"] = "ai_empathetic"
+                else:
+                    msg_data["generation_source"] = "flow_engine"
                 return msg_data, None
 
     # No next node (end of flow or standalone text) - just return AI response
