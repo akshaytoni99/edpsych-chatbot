@@ -22,12 +22,18 @@ if "sslmode=" in db_url or "neon.tech" in db_url:
     connect_args["ssl"] = "require"
 
 # Create async engine
+# pool_pre_ping: test connections before use (required for Neon which closes
+# idle connections after a few minutes — without this, random 500s from
+# "connection is closed" errors).
+# pool_recycle: proactively recycle connections older than 5 min.
 engine = create_async_engine(
     db_url,
     echo=settings.DEBUG_MODE,
     future=True,
     pool_size=5,
     max_overflow=2,
+    pool_pre_ping=True,
+    pool_recycle=300,
     connect_args=connect_args,
 )
 
