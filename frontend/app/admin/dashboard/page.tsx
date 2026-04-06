@@ -142,17 +142,17 @@ function StatCard({
   return (
     <button
       onClick={onClick}
-      className="group bg-white rounded-2xl border border-slate-100 p-5 text-left hover:border-slate-200 hover:shadow-md transition-all duration-200 w-full"
+      className="group bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-5 text-left hover:bg-white/10 hover:border-white/20 transition-all duration-200 w-full"
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
           {icon}
         </div>
-        <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
-      <p className="text-3xl font-bold text-on-background tracking-tight">{value}</p>
+      <p className="text-3xl font-bold text-white tracking-tight">{value}</p>
       <p className="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wide">{label}</p>
     </button>
   );
@@ -361,10 +361,10 @@ export default function AdminDashboard() {
   /* ─── Loading state ─── */
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-slate-400">Loading dashboard...</p>
+          <div className="w-10 h-10 border-[3px] border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-500">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -377,42 +377,39 @@ export default function AdminDashboard() {
   const ReportIcon = <svg className="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* ── Sidebar / Top Nav ── */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* ── Header ── */}
+      <header className="bg-slate-900/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-sm">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               </div>
               <div>
-                <h1 className="text-base font-bold text-on-background leading-none">EdPsych</h1>
-                <p className="text-[10px] font-medium text-primary tracking-widest uppercase">Admin Console</p>
+                <h1 className="text-sm font-bold text-white leading-none">EdPsych</h1>
+                <p className="text-[9px] font-medium text-blue-400 tracking-widest uppercase">Admin Console</p>
               </div>
             </div>
 
-            {/* Nav Tabs */}
-            <nav className="hidden sm:flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-              <button onClick={() => setActiveTab("users")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "users" ? "bg-white text-on-background shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+            <nav className="hidden sm:flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
+              <button onClick={() => setActiveTab("users")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "users" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
                 Overview
               </button>
-              <button onClick={() => setActiveTab("explorer")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "explorer" ? "bg-white text-on-background shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+              <button onClick={() => setActiveTab("explorer")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "explorer" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
                 Data Explorer
               </button>
             </nav>
 
-            {/* User menu */}
             <div className="flex items-center gap-3">
               <div className="hidden md:block text-right">
-                <p className="text-sm font-semibold text-on-background leading-none">{user?.full_name}</p>
+                <p className="text-sm font-medium text-white leading-none">{user?.full_name}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">{user?.email}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-[11px] font-bold">
                 {(user?.full_name || "A").charAt(0).toUpperCase()}
               </div>
-              <button onClick={handleLogout} className="text-xs font-medium text-slate-400 hover:text-red-500 transition-colors ml-1">
+              <button onClick={handleLogout} className="text-xs font-medium text-slate-500 hover:text-red-400 transition-colors">
                 Sign out
               </button>
             </div>
@@ -421,9 +418,9 @@ export default function AdminDashboard() {
       </header>
 
       {/* ── Mobile tab bar ── */}
-      <div className="sm:hidden flex border-b border-slate-100 bg-white">
-        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "users" ? "border-primary text-primary" : "border-transparent text-slate-400"}`}>Overview</button>
-        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "explorer" ? "border-primary text-primary" : "border-transparent text-slate-400"}`}>Data Explorer</button>
+      <div className="sm:hidden flex border-b border-white/5 bg-slate-900/60">
+        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "users" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Overview</button>
+        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "explorer" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Data Explorer</button>
       </div>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -431,17 +428,17 @@ export default function AdminDashboard() {
           <>
             {/* ── Page Header ── */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-on-background">Dashboard</h2>
+              <h2 className="text-2xl font-bold text-white">Dashboard</h2>
               <p className="text-sm text-slate-400 mt-1">Platform overview and user management</p>
             </div>
 
             {/* ── Stats Grid ── */}
             {stats && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-blue-50" onClick={() => handleStatClick("Total Users")} />
-                <StatCard label="Students" value={stats.total_students} icon={StudentIcon} color="bg-emerald-50" onClick={() => handleStatClick("Total Students")} />
-                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-indigo-50" onClick={() => handleStatClick("Assessments")} />
-                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-violet-50" onClick={() => handleStatClick("Reports")} />
+                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-blue-500/15" onClick={() => handleStatClick("Total Users")} />
+                <StatCard label="Students" value={stats.total_students} icon={StudentIcon} color="bg-emerald-500/15" onClick={() => handleStatClick("Total Students")} />
+                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-indigo-500/15" onClick={() => handleStatClick("Assessments")} />
+                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-violet-500/15" onClick={() => handleStatClick("Reports")} />
               </div>
             )}
 
@@ -449,17 +446,17 @@ export default function AdminDashboard() {
             {stats && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
                 {([
-                  { key: "PARENT" as const, label: "Parents", color: "border-l-emerald-400 bg-emerald-50/40", textColor: "text-emerald-700" },
-                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-violet-400 bg-violet-50/40", textColor: "text-violet-700" },
-                  { key: "SCHOOL" as const, label: "Schools", color: "border-l-sky-400 bg-sky-50/40", textColor: "text-sky-700" },
-                  { key: "ADMIN" as const, label: "Admins", color: "border-l-slate-400 bg-slate-50/40", textColor: "text-slate-700" },
+                  { key: "PARENT" as const, label: "Parents", color: "border-l-emerald-500 bg-emerald-500/10", textColor: "text-emerald-400" },
+                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-violet-500 bg-violet-500/10", textColor: "text-violet-400" },
+                  { key: "SCHOOL" as const, label: "Schools", color: "border-l-sky-500 bg-sky-500/10", textColor: "text-sky-400" },
+                  { key: "ADMIN" as const, label: "Admins", color: "border-l-amber-500 bg-amber-500/10", textColor: "text-amber-400" },
                 ] as const).map((r) => (
                   <button
                     key={r.key}
                     onClick={() => handleStatClick(r.label)}
-                    className={`text-left px-4 py-3 rounded-xl border border-slate-100 border-l-[3px] ${r.color} hover:shadow-sm transition-all`}
+                    className={`text-left px-4 py-3 rounded-xl border border-white/5 border-l-[3px] ${r.color} hover:bg-white/10 transition-all`}
                   >
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{r.label}</p>
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{r.label}</p>
                     <p className={`text-2xl font-bold ${r.textColor}`}>{stats.users_by_role[r.key]}</p>
                   </button>
                 ))}
@@ -467,18 +464,18 @@ export default function AdminDashboard() {
             )}
 
             {/* ── User Management ── */}
-            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
               {/* Table Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4 border-b border-slate-100">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4 border-b border-white/5">
                 <div>
-                  <h3 className="text-base font-semibold text-on-background">User Management</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}</p>
+                  <h3 className="text-base font-semibold text-white">User Management</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">{filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value)}
-                    className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-600 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="h-9 px-3 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-slate-300 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all [&>option]:bg-slate-800 [&>option]:text-white"
                   >
                     <option value="all">All Roles</option>
                     <option value="PARENT">Parents</option>
@@ -488,7 +485,7 @@ export default function AdminDashboard() {
                   </select>
                   <button
                     onClick={() => setShowAddUser(true)}
-                    className="h-9 px-4 bg-primary text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                    className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     Add User
@@ -499,67 +496,67 @@ export default function AdminDashboard() {
               {/* Table */}
               {filteredUsers.length === 0 ? (
                 <div className="py-16 text-center">
-                  <svg className="w-12 h-12 text-slate-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
-                  <p className="text-sm font-medium text-slate-400">No users match the selected filter</p>
+                  <svg className="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+                  <p className="text-sm font-medium text-slate-500">No users match the selected filter</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-50">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider">User</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Role</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Organization</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider hidden md:table-cell">Phone</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider hidden md:table-cell">Joined</th>
-                        <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                      <tr className="border-b border-white/5">
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">User</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Role</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Organization</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Phone</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Joined</th>
+                        <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-white/5">
                       {filteredUsers.map((u) => (
-                        <tr key={u.id} className="hover:bg-slate-50/60 transition-colors group">
+                        <tr key={u.id} className="hover:bg-white/5 transition-colors group">
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-500 shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold text-slate-300 shrink-0">
                                 {(u.full_name || u.email).charAt(0).toUpperCase()}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-on-background truncate">{u.full_name}</p>
-                                <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                                <p className="text-sm font-medium text-white truncate">{u.full_name}</p>
+                                <p className="text-[11px] text-slate-500 truncate">{u.email}</p>
                               </div>
                             </div>
                           </td>
                           <td className="px-5 py-3.5"><RoleBadge role={u.role} /></td>
                           <td className="px-5 py-3.5 hidden lg:table-cell">
-                            <span className="text-sm text-slate-500">{u.organization || "-"}</span>
+                            <span className="text-sm text-slate-400">{u.organization || "-"}</span>
                           </td>
                           <td className="px-5 py-3.5 hidden md:table-cell">
-                            <span className="text-sm text-slate-500 font-mono">{u.phone || "-"}</span>
+                            <span className="text-sm text-slate-400 font-mono">{u.phone || "-"}</span>
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-1.5">
-                              <div className={`w-1.5 h-1.5 rounded-full ${u.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
-                              <span className="text-xs text-slate-500">{u.is_active ? "Active" : "Inactive"}</span>
+                              <div className={`w-1.5 h-1.5 rounded-full ${u.is_active ? "bg-emerald-400" : "bg-slate-600"}`} />
+                              <span className="text-xs text-slate-400">{u.is_active ? "Active" : "Inactive"}</span>
                             </div>
                           </td>
                           <td className="px-5 py-3.5 hidden md:table-cell">
-                            <span className="text-xs text-slate-400">{new Date(u.created_at).toLocaleDateString()}</span>
+                            <span className="text-xs text-slate-500">{new Date(u.created_at).toLocaleDateString()}</span>
                           </td>
                           <td className="px-5 py-3.5">
-                            <div className="flex items-center justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
+                            <div className="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
                                 {u.is_active ? "Deactivate" : "Activate"}
                               </button>
                               {u.role === "PARENT" && (
-                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-amber-200 text-amber-600 hover:bg-amber-50 transition-colors disabled:opacity-40" title="Reset assessment">
+                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-colors disabled:opacity-40" title="Reset assessment">
                                   {resetting === u.id ? "..." : "Reset"}
                                 </button>
                               )}
-                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors" title="Edit user">
+                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors" title="Edit user">
                                 Edit
                               </button>
-                              <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center text-[11px] font-medium rounded-md border border-red-200 text-red-500 hover:bg-red-50 transition-colors" title="Delete user">
+                              <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors" title="Delete user">
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               </button>
                             </div>
@@ -576,7 +573,7 @@ export default function AdminDashboard() {
           /* ── Data Explorer Tab ── */
           <div>
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-on-background">Data Explorer</h2>
+              <h2 className="text-2xl font-bold text-white">Data Explorer</h2>
               <p className="text-sm text-slate-400 mt-1">Read-only view of all database records</p>
             </div>
             <DataExplorer />
