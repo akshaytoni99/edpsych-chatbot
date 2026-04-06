@@ -31,6 +31,80 @@ interface SystemStats {
   };
 }
 
+// --- Reusable dialog component (replaces native confirm/alert) ---
+function Dialog({
+  open,
+  title,
+  message,
+  variant = "info",
+  confirmLabel = "OK",
+  cancelLabel,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  title: string;
+  message: string;
+  variant?: "info" | "warning" | "danger" | "success";
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+}) {
+  if (!open) return null;
+  const colors = {
+    info: "bg-blue-600 hover:bg-blue-700",
+    warning: "bg-amber-600 hover:bg-amber-700",
+    danger: "bg-red-600 hover:bg-red-700",
+    success: "bg-emerald-600 hover:bg-emerald-700",
+  };
+  const icons = {
+    info: (
+      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    ),
+    warning: (
+      <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    ),
+    danger: (
+      <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+    ),
+    success: (
+      <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    ),
+  };
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+            {icons[variant]}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-on-background">{title}</h3>
+            <p className="text-sm text-slate-600 mt-1 whitespace-pre-line">{message}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end mt-6">
+          {cancelLabel && onCancel && (
+            <button
+              onClick={onCancel}
+              className="px-5 py-2.5 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all text-sm"
+            >
+              {cancelLabel}
+            </button>
+          )}
+          <button
+            onClick={onConfirm}
+            className={`px-5 py-2.5 text-white font-bold rounded-xl transition-all text-sm ${colors[variant]}`}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
@@ -60,6 +134,41 @@ export default function AdminDashboard() {
   const [editError, setEditError] = useState("");
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState<string | null>(null);
+
+  // Dialog state (replaces native confirm/alert)
+  const [dialog, setDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    variant: "info" | "warning" | "danger" | "success";
+    confirmLabel: string;
+    cancelLabel?: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+  }>({ open: false, title: "", message: "", variant: "info", confirmLabel: "OK", onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, variant: "info" | "warning" | "danger" | "success" = "info") => {
+    setDialog({ open: true, title, message, variant, confirmLabel: "OK", onConfirm: () => setDialog((d) => ({ ...d, open: false })) });
+  };
+
+  const showConfirm = (
+    title: string,
+    message: string,
+    variant: "warning" | "danger",
+    confirmLabel: string,
+    onConfirm: () => void,
+  ) => {
+    setDialog({
+      open: true,
+      title,
+      message,
+      variant,
+      confirmLabel,
+      cancelLabel: "Cancel",
+      onConfirm: () => { setDialog((d) => ({ ...d, open: false })); onConfirm(); },
+      onCancel: () => setDialog((d) => ({ ...d, open: false })),
+    });
+  };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,55 +263,57 @@ export default function AdminDashboard() {
     setStats(stats);
   };
 
-  const handleToggleUserStatus = async (userId: string, currentStatus: boolean) => {
-    const confirmed = confirm(
-      `Are you sure you want to ${currentStatus ? "deactivate" : "activate"} this user?`
+  const handleToggleUserStatus = (userId: string, currentStatus: boolean) => {
+    showConfirm(
+      currentStatus ? "Deactivate User" : "Activate User",
+      `Are you sure you want to ${currentStatus ? "deactivate" : "activate"} this user?`,
+      "warning",
+      currentStatus ? "Deactivate" : "Activate",
+      async () => {
+        try {
+          const token = localStorage.getItem("access_token");
+          const response = await fetch(`${API_BASE}/admin/users/${userId}/toggle-status`, {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            fetchAdminData(token!);
+          } else {
+            showAlert("Error", "Failed to update user status", "danger");
+          }
+        } catch (error) {
+          console.error("Error toggling user status:", error);
+          showAlert("Error", "An error occurred", "danger");
+        }
+      },
     );
-    if (!confirmed) return;
-
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_BASE}/admin/users/${userId}/toggle-status`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        // Refresh users list
-        fetchAdminData(token!);
-      } else {
-        alert("Failed to update user status");
-      }
-    } catch (error) {
-      console.error("Error toggling user status:", error);
-      alert("An error occurred");
-    }
   };
 
-  const handleDeleteUser = async (userId: string) => {
-    const confirmed = confirm(
-      "Are you sure you want to delete this user? This action cannot be undone."
+  const handleDeleteUser = (userId: string) => {
+    showConfirm(
+      "Delete User",
+      "Are you sure you want to delete this user? This action cannot be undone.",
+      "danger",
+      "Delete",
+      async () => {
+        try {
+          const token = localStorage.getItem("access_token");
+          const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            fetchAdminData(token!);
+            showAlert("Deleted", "User deleted successfully.", "success");
+          } else {
+            showAlert("Error", "Failed to delete user", "danger");
+          }
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          showAlert("Error", "An error occurred", "danger");
+        }
+      },
     );
-    if (!confirmed) return;
-
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        // Refresh users list
-        fetchAdminData(token!);
-        alert("User deleted successfully");
-      } else {
-        alert("Failed to delete user");
-      }
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("An error occurred");
-    }
   };
 
   const openEditModal = (u: User) => {
@@ -263,49 +374,54 @@ export default function AdminDashboard() {
     setResetting(u.id);
     try {
       const token = localStorage.getItem("access_token");
-      // Fetch students for this parent
       const studentsRes = await fetch(`${API_BASE}/admin/students`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!studentsRes.ok) {
-        alert("Failed to fetch students");
+        showAlert("Error", "Failed to fetch students", "danger");
+        setResetting(null);
         return;
       }
       const allStudents = await studentsRes.json();
-      // Match students whose primary_guardian_email matches this user's email
       const matched = allStudents.filter(
         (s: any) => s.primary_guardian_email === u.email
       );
       if (matched.length === 0) {
-        alert("No students found for this parent.");
+        showAlert("No Students", "No students found for this parent.", "info");
+        setResetting(null);
         return;
       }
 
-      const names = matched.map((s: any) => `${s.first_name} ${s.last_name}`).join(", ");
-      const confirmed = confirm(
-        `This will reset assessments for the following student(s):\n${names}\n\nAll chat history will be deleted. Continue?`
+      const names = matched.map((s: any) => `${s.first_name} ${s.last_name}`).join("\n");
+      setResetting(null);
+      showConfirm(
+        "Reset Assessment",
+        `This will reset assessments for:\n${names}\n\nAll chat history will be deleted.`,
+        "danger",
+        "Reset All",
+        async () => {
+          setResetting(u.id);
+          let totalReset = 0;
+          for (const s of matched) {
+            const res = await fetch(`${API_BASE}/admin/students/${s.id}/reset-assessment`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+              const data = await res.json();
+              totalReset += data.sessions_reset;
+            } else {
+              const err = await res.json().catch(() => null);
+              showAlert("Reset Failed", `Failed to reset for ${s.first_name}: ${err?.detail || "Unknown error"}`, "danger");
+            }
+          }
+          showAlert("Reset Complete", `${totalReset} session(s) reset successfully.`, "success");
+          fetchAdminData(token!);
+          setResetting(null);
+        },
       );
-      if (!confirmed) return;
-
-      let totalReset = 0;
-      for (const s of matched) {
-        const res = await fetch(`${API_BASE}/admin/students/${s.id}/reset-assessment`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          totalReset += data.sessions_reset;
-        } else {
-          const err = await res.json().catch(() => null);
-          alert(`Failed to reset for ${s.first_name}: ${err?.detail || "Unknown error"}`);
-        }
-      }
-      alert(`Assessment reset complete. ${totalReset} session(s) reset.`);
-      fetchAdminData(token!);
     } catch (err) {
-      alert("Network error during reset.");
-    } finally {
+      showAlert("Network Error", "Network error during reset.", "danger");
       setResetting(null);
     }
   };
@@ -868,6 +984,18 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Custom Dialog (replaces native confirm/alert) */}
+      <Dialog
+        open={dialog.open}
+        title={dialog.title}
+        message={dialog.message}
+        variant={dialog.variant}
+        confirmLabel={dialog.confirmLabel}
+        cancelLabel={dialog.cancelLabel}
+        onConfirm={dialog.onConfirm}
+        onCancel={dialog.onCancel}
+      />
     </div>
   );
 }
