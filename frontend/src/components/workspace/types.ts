@@ -39,13 +39,27 @@ export interface ParsedScores {
 export interface LatestSession {
   id: string;
   status: string;
-  completed_at: string | null;
-  has_assessment_data: boolean;
+  context_data?: Record<string, unknown> | null;
+  completed_at?: string | null;
+  has_assessment_data?: boolean;
   [key: string]: unknown;
 }
 
+export interface GroupedReports {
+  background_summary: Report[];
+  cognitive_report: Report[];
+  unified_insights: Report[];
+  [key: string]: Report[];
+}
+
 export interface WorkspaceResponse {
-  latest_session: LatestSession | null;
-  reports: Report[];
+  student: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    [key: string]: unknown;
+  };
+  latest_completed_session: LatestSession | null;
+  reports: GroupedReports;
   cognitive_profiles: CognitiveProfile[];
 }

@@ -10,15 +10,8 @@ import type {
   CognitiveProfile,
   Report,
   WorkspaceResponse,
+  GroupedReports,
 } from "@/src/components/workspace/types";
-
-interface StudentInfo {
-  id: string | number;
-  first_name: string;
-  last_name: string;
-  grade_level?: string;
-  school_name?: string;
-}
 
 export default function ReportsWorkspacePage() {
   const router = useRouter();
@@ -26,7 +19,6 @@ export default function ReportsWorkspacePage() {
   const studentId = params.id as string;
 
   const [workspace, setWorkspace] = useState<WorkspaceResponse | null>(null);
-  const [student, setStudent] = useState<StudentInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,14 +31,10 @@ export default function ReportsWorkspacePage() {
     setLoading(true);
     setError(null);
     try {
-      const [wsRes, studentRes] = await Promise.all([
-        fetch(`${API_BASE}/psychologist-reports/students/${studentId}/workspace`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${API_BASE}/students/${studentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
+      const wsRes = await fetch(
+        `${API_BASE}/psychologist-reports/students/${studentId}/workspace`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       if (wsRes.status === 401) {
         localStorage.removeItem("access_token");
@@ -66,10 +54,6 @@ export default function ReportsWorkspacePage() {
 
       const ws = (await wsRes.json()) as WorkspaceResponse;
       setWorkspace(ws);
-
-      if (studentRes.ok) {
-        setStudent(await studentRes.json());
-      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load workspace.");
     } finally {
@@ -82,15 +66,15 @@ export default function ReportsWorkspacePage() {
   }, [loadWorkspace]);
 
   const backgroundReport = useMemo(
-    () => workspace?.reports.find((r) => r.report_type === "background_summary") ?? null,
+    () => workspace?.reports?.background_summary?.[0] ?? null,
     [workspace]
   );
   const cognitiveReport = useMemo(
-    () => workspace?.reports.find((r) => r.report_type === "cognitive_report") ?? null,
+    () => workspace?.reports?.cognitive_report?.[0] ?? null,
     [workspace]
   );
   const unifiedReport = useMemo(
-    () => workspace?.reports.find((r) => r.report_type === "unified_insights") ?? null,
+    () => workspace?.reports?.unified_insights?.[0] ?? null,
     [workspace]
   );
   const cognitiveProfile: CognitiveProfile | null = useMemo(
@@ -98,13 +82,19 @@ export default function ReportsWorkspacePage() {
     [workspace]
   );
 
-  const hasParentData = Boolean(workspace?.latest_session);
+  const hasParentData = Boolean(workspace?.latest_completed_session);
 
   const upsertReport = (incoming: Report) => {
     setWorkspace((prev) => {
       if (!prev) return prev;
-      const others = prev.reports.filter((r) => r.report_type !== incoming.report_type);
-      return { ...prev, reports: [...others, incoming] };
+      const key = incoming.report_type as keyof GroupedReports;
+      return {
+        ...prev,
+        reports: {
+          ...prev.reports,
+          [key]: [incoming],
+        },
+      };
     });
   };
 
@@ -165,7 +155,9 @@ export default function ReportsWorkspacePage() {
     );
   }
 
-  const studentName = student ? `${student.first_name} ${student.last_name}` : "Student";
+  const studentName = workspace?.student
+    ? `${workspace.student.first_name} ${workspace.student.last_name}`
+    : "Student";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/30">
