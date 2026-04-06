@@ -187,7 +187,11 @@ async def delete_user(
             detail="Cannot delete your own account"
         )
 
-    await db.delete(user)
+    # Use raw SQL DELETE so the database ON DELETE CASCADE handles child rows
+    # directly, avoiding SQLAlchemy's ORM-level FK nullification which crashes
+    # on NOT NULL columns.
+    from sqlalchemy import delete as sql_delete
+    await db.execute(sql_delete(User).where(User.id == user_id))
     await db.commit()
 
     return {"message": "User deleted successfully"}
