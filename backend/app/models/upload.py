@@ -39,7 +39,7 @@ class IQTestUpload(Base):
 
     # Relationships
     student = relationship("Student", backref="iq_test_uploads")
-    uploaded_by = relationship("User", backref="iq_test_uploads")
+    uploaded_by = relationship("User", backref="iq_test_uploads", passive_deletes=True)
 
     def __repr__(self):
         return f"<IQTestUpload {self.file_name} - {self.upload_status}>"

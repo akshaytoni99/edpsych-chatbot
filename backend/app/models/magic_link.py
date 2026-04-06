@@ -25,7 +25,7 @@ class MagicLinkToken(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationship to user
-    user = relationship("User", backref="magic_links")
+    user = relationship("User", backref="magic_links", passive_deletes=True)
 
     def is_valid(self) -> bool:
         """Check if token is still valid"""

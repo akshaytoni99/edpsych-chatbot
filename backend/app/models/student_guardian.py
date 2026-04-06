@@ -34,7 +34,7 @@ class StudentGuardian(Base):
 
     # Relationships
     student = relationship("Student", backref="guardians")
-    guardian = relationship("User", foreign_keys=[guardian_user_id], backref="students_under_care")
+    guardian = relationship("User", foreign_keys=[guardian_user_id], backref="students_under_care", passive_deletes=True)
     created_by = relationship("User", foreign_keys=[created_by_user_id])
 
     # Ensure a guardian can only be linked to a student once

@@ -48,7 +48,7 @@ class AssessmentSession(Base):
 
     # Relationships
     student = relationship("Student", backref="assessment_sessions")
-    parent = relationship("User", backref="assessment_sessions")
+    parent = relationship("User", backref="assessment_sessions", passive_deletes=True)
 
     def __repr__(self):
         return f"<AssessmentSession {self.id} - {self.status}>"

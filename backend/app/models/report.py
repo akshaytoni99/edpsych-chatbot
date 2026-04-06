@@ -120,7 +120,7 @@ class ReportReview(Base):
 
     # Relationships
     report = relationship("GeneratedReport", backref="reviews")
-    reviewed_by = relationship("User", backref="report_reviews")
+    reviewed_by = relationship("User", backref="report_reviews", passive_deletes=True)
 
     def __repr__(self):
         return f"<ReportReview {self.id} - {self.review_status}>"
@@ -148,8 +148,8 @@ class FinalReport(Base):
     student = relationship("Student", backref="final_reports")
     report = relationship("GeneratedReport", backref="final_reports")
     review = relationship("ReportReview", backref="final_reports")
-    generated_by = relationship("User", foreign_keys=[generated_by_user_id], backref="generated_final_reports")
-    approved_by = relationship("User", foreign_keys=[approved_by_user_id], backref="approved_final_reports")
+    generated_by = relationship("User", foreign_keys=[generated_by_user_id], backref="generated_final_reports", passive_deletes=True)
+    approved_by = relationship("User", foreign_keys=[approved_by_user_id], backref="approved_final_reports", passive_deletes=True)
 
     def __repr__(self):
         return f"<FinalReport {self.id} - {self.status}>"

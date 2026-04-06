@@ -83,15 +83,23 @@ async def add_process_time_header(request: Request, call_next):
 
 
 # Global exception handler
+# Must include CORS headers so the browser can read the error instead of
+# reporting a misleading "CORS blocked" message.
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Global exception: {exc}", exc_info=True)
+    origin = request.headers.get("origin", "")
+    headers = {}
+    if origin and origin in settings.cors_origins_list:
+        headers["access-control-allow-origin"] = origin
+        headers["access-control-allow-credentials"] = "true"
     return JSONResponse(
         status_code=500,
         content={
             "detail": "Internal server error",
             "error": str(exc) if settings.DEBUG_MODE else "An error occurred"
-        }
+        },
+        headers=headers,
     )
 
 

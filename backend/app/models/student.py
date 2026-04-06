@@ -27,7 +27,7 @@ class Student(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # Relationships
-    created_by = relationship("User", backref="students")
+    created_by = relationship("User", backref="students", passive_deletes=True)
 
     def __repr__(self):
         return f"<Student {self.first_name} {self.last_name}>"

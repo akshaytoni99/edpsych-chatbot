@@ -61,7 +61,7 @@ class PsychologistReport(Base):
 
     # Relationships
     student = relationship("Student", backref="psychologist_reports")
-    created_by = relationship("User", backref="authored_psychologist_reports")
+    created_by = relationship("User", backref="authored_psychologist_reports", passive_deletes=True)
 
     def __repr__(self):
         return f"<PsychologistReport {self.report_type} student={self.student_id} status={self.status}>"
