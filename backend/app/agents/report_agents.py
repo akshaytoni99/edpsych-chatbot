@@ -30,8 +30,8 @@ class BackgroundSummaryAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="BackgroundSummaryAgent",
-            timeout=45.0,
-            max_tokens=2000,
+            timeout=60.0,
+            max_tokens=3000,
         )
 
     async def generate(self, context_data: dict, student_name: str) -> str:
@@ -57,37 +57,65 @@ class BackgroundSummaryAgent(BaseAgent):
             assessment_json = json.dumps(assessment_data, indent=2, default=str)
             qa_json = json.dumps(completed_qa_pairs, indent=2, default=str)
 
-            prompt = f"""You are an experienced educational psychologist writing the BACKGROUND section of a clinical report about {student_name}, drawing on a detailed parent-completed questionnaire.
+            # Extract child's first name for natural prose
+            first_name = student_name.split()[0] if student_name else "the child"
 
-PARENT-REPORTED USER PROFILE:
+            prompt = f"""You are a Chartered Educational Psychologist writing the BACKGROUND INFORMATION section of a confidential diagnostic assessment report for {student_name}. This section synthesises information gathered from a pre-assessment parental questionnaire completed by the parent/guardian.
+
+Write in the professional clinical narrative style used in UK educational psychology reports — the kind produced by practitioners registered with the HCPC and BPS. Study these style characteristics carefully:
+
+STYLE REQUIREMENTS:
+- Write in third person, past tense: "{first_name} was described as...", "{first_name}'s parents reported that...", "It was noted that..."
+- NEVER use phrases like "parent-reported data suggests" or "the parent indicated" repeatedly — vary your language naturally
+- Integrate parent observations seamlessly into flowing clinical prose, as though you conducted a clinical interview
+- Use professional phrasing: "presents with difficulties in...", "demonstrates relative strengths in...", "was observed to...", "concerns were raised regarding...", "areas of need include..."
+- Include developmental context where available (age, family structure, school history, health)
+- Discuss functional impact — how difficulties affect daily life, learning and relationships
+- Where the data supports it, note both strengths AND areas of concern within each domain
+- Each section should be 4-8 sentences of substantive clinical narrative, not superficial summaries
+- Do NOT use vague hedge language like "some difficulties" or "some resilience" — be specific about what the data actually says
+- Do NOT repeat the same sentence structure across sections
+
+PARENT/GUARDIAN QUESTIONNAIRE DATA:
+
+User Profile:
 {profile_json}
 
-ASSESSMENT DATA (structured parent responses):
+Assessment Responses:
 {assessment_json}
 
-COMPLETED QUESTION-AND-ANSWER PAIRS (what the parent actually said):
+Completed Q&A Pairs:
 {qa_json}
 
-Write a professional clinical narrative in markdown organised under EXACTLY these headings, in this order:
+Organise the report under EXACTLY these headings, in this order:
 
-## Attention
-## Social
-## Emotional
-## Academic
-## Behavioral
+## Background and Developmental History
+Synthesise available information about {first_name}'s family context, developmental milestones, health history, and educational history. Include age, school year, and any relevant contextual factors.
+
+## Attention and Concentration
+Describe {first_name}'s attentional profile as reported — sustained attention, distractibility, task completion, ability to follow instructions, concentration in structured vs unstructured settings.
+
+## Social Communication and Interaction
+Describe {first_name}'s social functioning — peer relationships, social confidence, ability to initiate and maintain friendships, social awareness, group participation.
+
+## Emotional Wellbeing and Regulation
+Describe {first_name}'s emotional profile — mood regulation, anxiety, emotional sensitivity, resilience, self-esteem, response to frustration or change.
+
+## Academic Functioning
+Describe {first_name}'s learning profile — engagement with academic tasks, areas of strength and difficulty across subjects, attitude to learning, homework, and independent study.
+
+## Behavioural Presentation
+Describe {first_name}'s behavioural patterns — compliance, routines, flexibility, self-regulation, any challenging behaviours, and strategies that help.
 
 Strict rules:
-- Professional clinical tone — as if writing for a psychological report.
-- Reference SPECIFIC parent-reported observations in prose (paraphrase; do not invent).
 - Prose only — NO bullet lists, NO numbered lists, NO tables.
-- Do not refer to yourself, to AI, to "the assistant", or to "this report".
-- Do not invent facts not present in the data; if a category has no data, write a short honest sentence stating that.
-- Use {student_name} by name where natural, otherwise "the child".
-- Each section should be 2-5 sentences of flowing narrative.
-- Begin your response directly with "## Attention" — no preamble.
+- Do NOT refer to yourself, AI, "the assistant", or "this report".
+- Do NOT fabricate information not present in the data. If a category has insufficient data, write: "Insufficient information was available from the parental questionnaire to draw conclusions in this area. This should be explored further during direct assessment."
+- Use {first_name} naturally throughout, alternating with "{student_name}" and "the child" for variety.
+- Begin your response directly with "## Background and Developmental History" — no preamble or title.
 """
 
-            result = await self.call_llm(prompt, max_tokens=2000, temperature=0.3)
+            result = await self.call_llm(prompt, max_tokens=3000, temperature=0.3)
             if result and len(result.strip()) > 0:
                 return result.strip()
 
