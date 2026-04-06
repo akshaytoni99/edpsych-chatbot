@@ -50,6 +50,16 @@ export default function AdminDashboard() {
   });
   const [createError, setCreateError] = useState("");
   const [creating, setCreating] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    organization: "",
+    role: "",
+  });
+  const [editError, setEditError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState<string | null>(null);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,6 +202,111 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("An error occurred");
+    }
+  };
+
+  const openEditModal = (u: User) => {
+    setSelectedUser(u);
+    setEditForm({
+      full_name: u.full_name || "",
+      email: u.email || "",
+      phone: u.phone || "",
+      organization: u.organization || "",
+      role: u.role || "",
+    });
+    setEditError("");
+  };
+
+  const handleSaveUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    setEditError("");
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      // Only send changed fields
+      const body: Record<string, string> = {};
+      if (editForm.full_name !== (selectedUser.full_name || "")) body.full_name = editForm.full_name;
+      if (editForm.email !== (selectedUser.email || "")) body.email = editForm.email;
+      if (editForm.phone !== (selectedUser.phone || "")) body.phone = editForm.phone;
+      if (editForm.organization !== (selectedUser.organization || "")) body.organization = editForm.organization;
+      if (editForm.role !== (selectedUser.role || "")) body.role = editForm.role;
+
+      if (Object.keys(body).length === 0) {
+        setSelectedUser(null);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE}/admin/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        setSelectedUser(null);
+        fetchAdminData(token!);
+      } else {
+        const data = await response.json().catch(() => null);
+        setEditError(data?.detail || "Failed to update user");
+      }
+    } catch (err) {
+      setEditError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleResetAssessment = async (u: User) => {
+    setResetting(u.id);
+    try {
+      const token = localStorage.getItem("access_token");
+      // Fetch students for this parent
+      const studentsRes = await fetch(`${API_BASE}/admin/students`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!studentsRes.ok) {
+        alert("Failed to fetch students");
+        return;
+      }
+      const allStudents = await studentsRes.json();
+      // Match students whose primary_guardian_email matches this user's email
+      const matched = allStudents.filter(
+        (s: any) => s.primary_guardian_email === u.email
+      );
+      if (matched.length === 0) {
+        alert("No students found for this parent.");
+        return;
+      }
+
+      const names = matched.map((s: any) => `${s.first_name} ${s.last_name}`).join(", ");
+      const confirmed = confirm(
+        `This will reset assessments for the following student(s):\n${names}\n\nAll chat history will be deleted. Continue?`
+      );
+      if (!confirmed) return;
+
+      let totalReset = 0;
+      for (const s of matched) {
+        const res = await fetch(`${API_BASE}/admin/students/${s.id}/reset-assessment`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          totalReset += data.sessions_reset;
+        } else {
+          const err = await res.json().catch(() => null);
+          alert(`Failed to reset for ${s.first_name}: ${err?.detail || "Unknown error"}`);
+        }
+      }
+      alert(`Assessment reset complete. ${totalReset} session(s) reset.`);
+      fetchAdminData(token!);
+    } catch (err) {
+      alert("Network error during reset.");
+    } finally {
+      setResetting(null);
     }
   };
 
@@ -514,8 +629,17 @@ export default function AdminDashboard() {
                           >
                             {u.is_active ? "Deactivate" : "Activate"}
                           </button>
+                          {u.role === "PARENT" && (
+                            <button
+                              onClick={() => handleResetAssessment(u)}
+                              disabled={resetting === u.id}
+                              className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-lg hover:bg-orange-200 transition-all disabled:opacity-50"
+                            >
+                              {resetting === u.id ? "Resetting..." : "Reset"}
+                            </button>
+                          )}
                           <button
-                            onClick={() => setSelectedUser(u)}
+                            onClick={() => openEditModal(u)}
                             className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg hover:bg-blue-200 transition-all"
                           >
                             Edit
@@ -655,20 +779,92 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Edit User Modal (placeholder — edit flow not implemented yet) */}
+      {/* Edit User Modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8">
-            <h3 className="text-2xl font-extrabold text-on-background mb-4">Edit User</h3>
-            <p className="text-slate-500 mb-6">
-              Inline editing is not yet implemented. Use Activate/Deactivate or Delete for now.
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-extrabold text-on-background mb-2">Edit User</h3>
+            <p className="text-slate-500 text-sm mb-6">
+              Update details for {selectedUser.full_name}.
             </p>
-            <button
-              onClick={() => setSelectedUser(null)}
-              className="w-full px-4 py-3 bg-on-background text-white font-bold rounded-xl hover:bg-slate-800 transition-all"
-            >
-              Close
-            </button>
+
+            {editError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveUser} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Name</label>
+                <input
+                  type="text"
+                  value={editForm.full_name}
+                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Phone</label>
+                <input
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Organization</label>
+                <input
+                  type="text"
+                  value={editForm.organization}
+                  onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Role</label>
+                <select
+                  value={editForm.role}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                >
+                  <option value="PARENT">Parent</option>
+                  <option value="PSYCHOLOGIST">Psychologist</option>
+                  <option value="SCHOOL">School</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedUser(null);
+                    setEditError("");
+                  }}
+                  className="flex-1 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 py-3 bg-on-background text-white font-bold rounded-xl hover:bg-slate-800 transition-all text-sm disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

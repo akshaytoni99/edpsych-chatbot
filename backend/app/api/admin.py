@@ -5,9 +5,11 @@ Handles admin-only operations: user management, system monitoring
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
-from typing import List
+from sqlalchemy import select, func, and_, delete as sql_delete
+from typing import List, Optional
 from uuid import UUID
+from pydantic import BaseModel
+from datetime import datetime, timezone
 
 from app.core.database import get_db
 from app.core.security import get_current_active_user, get_password_hash
@@ -16,11 +18,19 @@ from app.models.student import Student
 from app.models.student_guardian import StudentGuardian
 from app.models.assessment import AssessmentSession
 from app.models.assignment import AssessmentAssignment
-from app.models.chat import ChatSession
+from app.models.chat import ChatSession, ChatMessage
 from app.models.psychologist_report import PsychologistReport
 from app.models.upload import IQTestUpload, CognitiveProfile
 from app.models.report import GeneratedReport
 from app.schemas.user import UserCreate, UserResponse
+
+
+class AdminUserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    organization: Optional[str] = None
+    role: Optional[str] = None  # "PARENT", "PSYCHOLOGIST", "SCHOOL", "ADMIN"
 
 router = APIRouter(tags=["admin"])
 
@@ -63,6 +73,57 @@ async def create_user(
     await db.commit()
     await db.refresh(new_user)
     return new_user
+
+
+@router.patch("/users/{user_id}")
+async def update_user(
+    user_id: UUID,
+    update_data: AdminUserUpdate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update user fields (admin only)"""
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    # Prevent admin from changing their own role away from ADMIN
+    if update_data.role and user.id == current_user.id and update_data.role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change your own role away from ADMIN",
+        )
+
+    if update_data.full_name is not None:
+        user.full_name = update_data.full_name
+    if update_data.email is not None:
+        user.email = update_data.email
+    if update_data.phone is not None:
+        user.phone = update_data.phone
+    if update_data.organization is not None:
+        user.organization = update_data.organization
+    if update_data.role is not None:
+        user.role = UserRole(update_data.role)
+
+    await db.commit()
+    await db.refresh(user)
+
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "role": user.role.value,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "organization": user.organization,
+        "is_active": user.is_active,
+        "is_verified": user.is_verified,
+        "created_at": user.created_at.isoformat(),
+    }
 
 
 @router.get("/users")
@@ -579,3 +640,112 @@ async def admin_list_iq_uploads(
         }
         for r in rows
     ]
+
+
+@router.get("/students-with-assessments")
+async def admin_list_students_with_assessments(
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """List students with their latest chat session status."""
+
+    # Get all students with their latest chat session status
+    result = await db.execute(select(Student).order_by(Student.created_at.desc()))
+    students = result.scalars().all()
+
+    out = []
+    for s in students:
+        # Find assignments for this student
+        assign_result = await db.execute(
+            select(AssessmentAssignment).where(AssessmentAssignment.student_id == s.id)
+        )
+        assignments = assign_result.scalars().all()
+
+        latest_status = None
+        session_count = 0
+        for assignment in assignments:
+            sess_result = await db.execute(
+                select(ChatSession)
+                .where(ChatSession.assignment_id == assignment.id)
+                .order_by(ChatSession.last_interaction_at.desc())
+            )
+            sessions = sess_result.scalars().all()
+            session_count += len(sessions)
+            if sessions and latest_status is None:
+                latest_status = sessions[0].status
+
+        # Get guardian info
+        guard_result = await db.execute(
+            select(StudentGuardian.guardian_user_id)
+            .where(StudentGuardian.student_id == s.id)
+        )
+        guardian_ids = [row[0] for row in guard_result.all()]
+
+        guardian_email = None
+        if guardian_ids:
+            gu_result = await db.execute(
+                select(User.email).where(User.id == guardian_ids[0])
+            )
+            guardian_email = gu_result.scalar_one_or_none()
+
+        out.append({
+            "id": str(s.id),
+            "first_name": s.first_name,
+            "last_name": s.last_name,
+            "guardian_email": guardian_email,
+            "latest_session_status": latest_status,
+            "session_count": session_count,
+        })
+
+    return out
+
+
+@router.post("/students/{student_id}/reset-assessment")
+async def reset_student_assessment(
+    student_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Reset all assessment chat sessions for a student."""
+
+    # Find all assignments for this student
+    result = await db.execute(
+        select(AssessmentAssignment).where(AssessmentAssignment.student_id == student_id)
+    )
+    assignments = result.scalars().all()
+
+    if not assignments:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No assessment assignments found for this student",
+        )
+
+    sessions_reset = 0
+    now = datetime.now(timezone.utc)
+
+    for assignment in assignments:
+        sess_result = await db.execute(
+            select(ChatSession).where(ChatSession.assignment_id == assignment.id)
+        )
+        sessions = sess_result.scalars().all()
+
+        for session in sessions:
+            # Delete all chat messages for this session
+            await db.execute(
+                sql_delete(ChatMessage).where(ChatMessage.session_id == session.id)
+            )
+
+            # Reset session state
+            session.status = "active"
+            session.current_step = 0
+            session.current_node_id = None
+            session.context_data = {}
+            session.completed_at = None
+            session.duration_minutes = None
+            session.last_interaction_at = now
+
+            sessions_reset += 1
+
+    await db.commit()
+
+    return {"message": "Assessment reset successfully", "sessions_reset": sessions_reset}
