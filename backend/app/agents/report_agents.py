@@ -14,6 +14,7 @@ Architecture:
 Each agent inherits from BaseAgent and uses Groq/Ollama via call_llm / call_llm_json.
 """
 
+import asyncio
 import json
 import logging
 from typing import Optional
@@ -66,20 +67,31 @@ Completed Q&A Pairs:
 {qa_json}"""
 
             # ── STAGE 1: Data Analyst ──
+            logger.info(f"[BackgroundSummaryAgent] Stage 1/3: Data Analyst for {student_name}")
             analyst_output = await self._run_data_analyst(
                 raw_data_block, student_name, first_name
             )
             if not analyst_output:
                 analyst_output = f"Raw data available for {student_name}. Data extraction inconclusive — proceed with direct interpretation of source material."
 
+            # Wait for Groq rate limit to reset (free tier: 6000 TPM)
+            logger.info(f"[BackgroundSummaryAgent] Stage 1 complete, waiting for rate limit reset...")
+            await asyncio.sleep(20)
+
             # ── STAGE 2: Clinical Interpreter ──
+            logger.info(f"[BackgroundSummaryAgent] Stage 2/3: Clinical Interpreter for {student_name}")
             interpreter_output = await self._run_clinical_interpreter(
                 raw_data_block, analyst_output, student_name, first_name
             )
             if not interpreter_output:
                 interpreter_output = f"Clinical interpretation unavailable — synthesizer should work directly from analyst output and raw data."
 
+            # Wait for Groq rate limit to reset
+            logger.info(f"[BackgroundSummaryAgent] Stage 2 complete, waiting for rate limit reset...")
+            await asyncio.sleep(20)
+
             # ── STAGE 3: Report Synthesizer ──
+            logger.info(f"[BackgroundSummaryAgent] Stage 3/3: Report Synthesizer for {student_name}")
             final_report = await self._run_report_synthesizer(
                 raw_data_block, analyst_output, interpreter_output,
                 student_name, first_name
@@ -355,11 +367,16 @@ class CognitiveReportAgent(BaseAgent):
             first_name = student_name.split()[0] if student_name else "the child"
 
             # Stage 1: Score Interpreter — classify each score clinically
+            logger.info(f"[CognitiveReportAgent] Stage 1/2: Score Interpreter for {student_name}")
             interpretation = await self._interpret_scores(scores_json, student_name, first_name)
             if not interpretation:
                 interpretation = "Score interpretation unavailable — proceed with direct analysis."
 
+            # Wait for Groq rate limit
+            await asyncio.sleep(20)
+
             # Stage 2: Report Writer — produce the final clinical narrative
+            logger.info(f"[CognitiveReportAgent] Stage 2/2: Report Writer for {student_name}")
             report = await self._write_report(
                 scores_json, interpretation, student_name, first_name
             )
@@ -456,13 +473,18 @@ class UnifiedInsightsAgent(BaseAgent):
             first_name = student_name.split()[0] if student_name else "the child"
 
             # Stage 1: Pattern Analyst — find convergences and divergences
+            logger.info(f"[UnifiedInsightsAgent] Stage 1/2: Pattern Analyst for {student_name}")
             analysis = await self._analyse_patterns(
                 background_summary, cognitive_report, student_name, first_name
             )
             if not analysis:
                 analysis = "Pattern analysis unavailable — proceed with direct synthesis."
 
+            # Wait for Groq rate limit
+            await asyncio.sleep(20)
+
             # Stage 2: Synthesizer — write the final unified report
+            logger.info(f"[UnifiedInsightsAgent] Stage 2/2: Synthesis Writer for {student_name}")
             report = await self._write_synthesis(
                 background_summary, cognitive_report, analysis,
                 student_name, first_name

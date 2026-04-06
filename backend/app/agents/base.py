@@ -3,8 +3,10 @@ Base Agent - Common LLM integration with robust error handling
 All agents inherit from this for Ollama and Groq communication.
 """
 
+import asyncio
 import json
 import logging
+import re
 import httpx
 from typing import Optional
 from app.core.config import settings
@@ -42,7 +44,7 @@ class BaseAgent:
         max_tokens: Optional[int] = None,
         temperature: float = 0.3,
     ) -> Optional[str]:
-        """Call Groq API. Returns raw text or None on failure."""
+        """Call Groq API with automatic retry on rate limits. Returns raw text or None."""
         tokens = max_tokens or self.max_tokens
 
         messages = []
@@ -64,21 +66,50 @@ class BaseAgent:
             "Content-Type": "application/json",
         }
 
-        try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                resp = await client.post(
-                    f"{settings.GROQ_BASE_URL}/chat/completions",
-                    json=payload,
-                    headers=headers,
-                )
-                if resp.status_code == 200:
-                    return resp.json()["choices"][0]["message"]["content"].strip()
-                logger.warning(f"[{self.name}] Groq returned {resp.status_code}: {resp.text}")
-        except httpx.TimeoutException:
-            logger.warning(f"[{self.name}] Groq timeout after {self.timeout}s")
-        except Exception as e:
-            logger.warning(f"[{self.name}] Groq LLM call failed: {e}")
+        max_retries = 4
+        for attempt in range(max_retries):
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
+                    resp = await client.post(
+                        f"{settings.GROQ_BASE_URL}/chat/completions",
+                        json=payload,
+                        headers=headers,
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()["choices"][0]["message"]["content"].strip()
 
+                    if resp.status_code == 429:
+                        # Parse retry-after from response
+                        wait_seconds = 15.0  # default
+                        try:
+                            body = resp.json()
+                            msg = body.get("error", {}).get("message", "")
+                            match = re.search(r"try again in (\d+\.?\d*)s", msg, re.IGNORECASE)
+                            if match:
+                                wait_seconds = float(match.group(1)) + 1.0
+                        except Exception:
+                            pass
+                        wait_seconds = min(wait_seconds, 60.0)
+                        logger.info(
+                            f"[{self.name}] Groq rate limited (attempt {attempt + 1}/{max_retries}), "
+                            f"waiting {wait_seconds:.1f}s..."
+                        )
+                        await asyncio.sleep(wait_seconds)
+                        continue
+
+                    logger.warning(f"[{self.name}] Groq returned {resp.status_code}: {resp.text}")
+                    return None
+
+            except httpx.TimeoutException:
+                logger.warning(f"[{self.name}] Groq timeout after {self.timeout}s (attempt {attempt + 1})")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(5.0)
+                    continue
+            except Exception as e:
+                logger.warning(f"[{self.name}] Groq LLM call failed: {e}")
+                return None
+
+        logger.warning(f"[{self.name}] Groq exhausted all {max_retries} retries")
         return None
 
     async def _call_ollama(

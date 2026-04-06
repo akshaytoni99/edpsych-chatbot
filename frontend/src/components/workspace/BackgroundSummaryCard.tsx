@@ -138,7 +138,7 @@ export default function BackgroundSummaryCard({
           <div className="h-4 bg-slate-200 rounded animate-pulse w-5/6" />
           <div className="h-4 bg-slate-200 rounded animate-pulse w-4/6" />
           <p className="text-xs text-slate-500 mt-2">
-            Generating from parent data — this usually takes 10–20 seconds.
+            Generating using multi-agent clinical pipeline — this takes 60–90 seconds.
           </p>
         </div>
       ) : !existingReport ? (
