@@ -65,6 +65,8 @@ Assessment Responses:
 
 Completed Q&A Pairs:
 {qa_json}"""
+            # Truncate raw data to fit within Groq free tier token limits
+            raw_data_block = raw_data_block[:4000]
 
             # ── STAGE 1: Data Analyst ──
             logger.info(f"[BackgroundSummaryAgent] Stage 1/3: Data Analyst for {student_name}")
@@ -73,27 +75,32 @@ Completed Q&A Pairs:
             )
             if not analyst_output:
                 analyst_output = f"Raw data available for {student_name}. Data extraction inconclusive — proceed with direct interpretation of source material."
+            # Truncate to stay within Groq TPM limits
+            analyst_output = analyst_output[:3000]
 
             # Wait for Groq rate limit to reset (free tier: 6000 TPM)
-            logger.info(f"[BackgroundSummaryAgent] Stage 1 complete, waiting for rate limit reset...")
-            await asyncio.sleep(20)
+            logger.info(f"[BackgroundSummaryAgent] Stage 1 complete, waiting 35s for rate limit...")
+            await asyncio.sleep(35)
 
             # ── STAGE 2: Clinical Interpreter ──
+            # Stage 2 receives ONLY the analyst output (not raw data again) to stay under TPM
             logger.info(f"[BackgroundSummaryAgent] Stage 2/3: Clinical Interpreter for {student_name}")
             interpreter_output = await self._run_clinical_interpreter(
-                raw_data_block, analyst_output, student_name, first_name
+                analyst_output, student_name, first_name
             )
             if not interpreter_output:
-                interpreter_output = f"Clinical interpretation unavailable — synthesizer should work directly from analyst output and raw data."
+                interpreter_output = f"Clinical interpretation unavailable — synthesizer should work directly from analyst output."
+            interpreter_output = interpreter_output[:3000]
 
             # Wait for Groq rate limit to reset
-            logger.info(f"[BackgroundSummaryAgent] Stage 2 complete, waiting for rate limit reset...")
-            await asyncio.sleep(20)
+            logger.info(f"[BackgroundSummaryAgent] Stage 2 complete, waiting 35s for rate limit...")
+            await asyncio.sleep(35)
 
             # ── STAGE 3: Report Synthesizer ──
+            # Stage 3 receives ONLY the two summaries (not raw data) to stay under TPM
             logger.info(f"[BackgroundSummaryAgent] Stage 3/3: Report Synthesizer for {student_name}")
             final_report = await self._run_report_synthesizer(
-                raw_data_block, analyst_output, interpreter_output,
+                analyst_output, interpreter_output,
                 student_name, first_name
             )
 
@@ -154,15 +161,15 @@ BEHAVIOURAL:
 - Challenging behaviours and triggers
 - Strategies that work
 
-IMPORTANT: Extract the ACTUAL data. If a parent answered "often" to a question about focus difficulties, record "Parent reported focus difficulties occur 'often'". If the data for a category is thin, still extract what exists — even a single data point matters. Do NOT write "no data available" — instead note what CAN be inferred from adjacent responses."""
+IMPORTANT: Extract the ACTUAL data. If a parent answered "often" to a question about focus difficulties, record "Parent reported focus difficulties occur 'often'". If the data for a category is thin, still extract what exists — even a single data point matters. Do NOT write "no data available" — instead note what CAN be inferred from adjacent responses. Be concise — use short bullet points, not long paragraphs."""
 
-        return await self.call_llm(prompt, max_tokens=2000, temperature=0.2)
+        return await self.call_llm(prompt, max_tokens=1500, temperature=0.2)
 
     async def _run_clinical_interpreter(
-        self, raw_data: str, analyst_output: str,
+        self, analyst_output: str,
         student_name: str, first_name: str
     ) -> Optional[str]:
-        prompt = f"""You are a senior clinical educational psychologist reviewing extracted data about {student_name}. A data analyst has already organised the raw questionnaire responses. Your job is to provide CLINICAL INTERPRETATION — what does this data mean developmentally and educationally?
+        prompt = f"""You are a senior clinical educational psychologist reviewing extracted data about {student_name}. A data analyst has organised the raw questionnaire responses below. Provide CLINICAL INTERPRETATION — what does this mean developmentally and educationally?
 
 DATA ANALYST'S EXTRACTION:
 {analyst_output}
@@ -198,77 +205,36 @@ KEY CLINICAL HYPOTHESES:
 - List 2-4 clinical hypotheses that could explain the overall pattern
 - Note which require further investigation through direct assessment
 
-Be bold in your interpretations. Draw on your clinical knowledge to connect dots the raw data alone cannot. Where data is sparse, use what IS available to make reasonable clinical inferences — this is what psychologists do in practice."""
+Be bold in your interpretations. Draw on your clinical knowledge to connect dots the raw data alone cannot. Where data is sparse, use what IS available to make reasonable clinical inferences. Be concise — focus on key clinical observations."""
 
-        return await self.call_llm(prompt, max_tokens=2000, temperature=0.4)
+        return await self.call_llm(prompt, max_tokens=1500, temperature=0.4)
 
     async def _run_report_synthesizer(
-        self, raw_data: str, analyst_output: str, interpreter_output: str,
+        self, analyst_output: str, interpreter_output: str,
         student_name: str, first_name: str
     ) -> Optional[str]:
-        prompt = f"""You are a Chartered Educational Psychologist (CPsychol, HCPC-registered) writing the BACKGROUND INFORMATION section of a Confidential Diagnostic Assessment Report for {student_name}.
+        prompt = f"""You are a Chartered Educational Psychologist writing the BACKGROUND INFORMATION section of a Confidential Diagnostic Assessment Report for {student_name}. Synthesise the analyst extraction and clinical interpretation below into a polished, publishable report section.
 
-You have two internal documents from your team:
-
-DOCUMENT 1 — DATA ANALYST'S STRUCTURED EXTRACTION:
+ANALYST EXTRACTION:
 {analyst_output}
 
-DOCUMENT 2 — CLINICAL PSYCHOLOGIST'S INTERPRETATION:
+CLINICAL INTERPRETATION:
 {interpreter_output}
 
-Now write the final published report section. This is the document that parents, schools, SENCOs, and tribunals will read. It must be indistinguishable from a report written by a senior educational psychologist at a top UK practice.
+Write in authoritative third-person clinical prose. NEVER say "data was insufficient" or "no information was available" — these are BANNED. If information is limited, frame gaps as areas for direct assessment. Use varied phrasing: "{first_name} was described as...", "Concerns were raised regarding...", "{first_name} presents with...", "Parental accounts indicate...". Each section: 4-8 sentences of substantive clinical content with functional impact.
 
-CRITICAL STYLE RULES:
-1. Write in fluent, authoritative third-person clinical prose
-2. NEVER say "data was insufficient", "no information was available", "the questionnaire did not provide" — these phrases are BANNED
-3. If information is limited in an area, write about what IS known and frame gaps as areas for direct assessment: "{first_name}'s profile in this domain will be further explored through direct assessment and classroom observation"
-4. Use varied professional phrasing throughout:
-   - "{first_name} was described by their parent/carer as..."
-   - "Concerns were raised regarding..."
-   - "{first_name} presents with..."
-   - "It was reported that..."
-   - "Parental accounts indicate that..."
-   - "{first_name} demonstrates relative strengths in..."
-   - "Observations suggest that..."
-   - "Of particular note is..."
-   - "{first_name}'s parent/carer described..."
-5. Every section MUST contain substantive clinical content — interpret, contextualise, and discuss functional impact
-6. Include developmental context and clinical reasoning, not just restated parent quotes
-7. Discuss what the observations MEAN for {first_name}'s learning, development, and wellbeing
-8. Where appropriate, reference typical developmental expectations for {first_name}'s age group
-9. Each section should be 5-10 sentences of flowing, connected narrative
-
-REPORT STRUCTURE — use EXACTLY these headings:
-
+Use EXACTLY these headings:
 ## Background and Developmental History
-Write about {first_name}'s context — age, school placement, family engagement, referral context. Frame the assessment purpose. Include any developmental or health information available. If details are sparse, contextualise what is known and note that further history will be gathered during assessment.
-
 ## Attention and Concentration
-Clinical narrative about {first_name}'s attentional profile. Discuss sustained attention, task completion, distractibility, and how these present across settings. Include functional impact on learning.
-
 ## Social Communication and Interaction
-Clinical narrative about {first_name}'s social functioning. Discuss peer relationships, social confidence, communication, and participation. Note strengths alongside difficulties.
-
 ## Emotional Wellbeing and Regulation
-Clinical narrative about {first_name}'s emotional presentation. Discuss mood, anxiety, self-esteem, emotional regulation, and response to challenge. Contextualise within developmental stage.
-
 ## Academic Functioning
-Clinical narrative about {first_name}'s engagement with learning. Discuss academic strengths and areas of need, attitude to learning, and any specific subject concerns. Relate to the broader profile.
-
 ## Behavioural Presentation
-Clinical narrative about {first_name}'s behavioural patterns. Discuss compliance, routines, flexibility, and self-regulation. Include what strategies support {first_name} and what triggers difficulties.
-
 ## Summary of Presenting Concerns
-A concise 3-5 sentence paragraph drawing together the key themes from above. Identify the primary areas of concern, note the strengths identified, and set the context for the direct assessment that follows.
 
-FORMAT RULES:
-- Prose only — NO bullet lists, NO numbered lists, NO tables
-- Do NOT mention AI, algorithms, data analysis, or "this report"
-- Do NOT use the word "insufficient" anywhere
-- Use {first_name} naturally, alternating with "{student_name}" for variety
-- Begin directly with "## Background and Developmental History" — no preamble or title page"""
+Prose only, no bullets/lists/tables. Do NOT mention AI. Use {first_name} naturally. Begin directly with ## Background and Developmental History."""
 
-        return await self.call_llm(prompt, max_tokens=3000, temperature=0.3)
+        return await self.call_llm(prompt, max_tokens=2500, temperature=0.3)
 
 
 # ============================================================================
