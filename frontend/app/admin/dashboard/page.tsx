@@ -135,6 +135,14 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState<string | null>(null);
 
+  // Stat detail popup state
+  const [statPopup, setStatPopup] = useState<{
+    open: boolean;
+    title: string;
+    items: { id: string; label: string; sub?: string }[];
+    loading: boolean;
+  }>({ open: false, title: "", items: [], loading: false });
+
   // Dialog state (replaces native confirm/alert)
   const [dialog, setDialog] = useState<{
     open: boolean;
@@ -227,15 +235,48 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async (token: string) => {
     try {
-      // Fetch all users
-      const usersResponse = await fetch(`${API_BASE}/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const headers = { Authorization: `Bearer ${token}` };
+      // Fetch users + real stats in parallel
+      const [usersRes, statsRes] = await Promise.all([
+        fetch(`${API_BASE}/admin/users`, { headers }),
+        fetch(`${API_BASE}/admin/stats`, { headers }).catch(() => null),
+      ]);
 
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
         setUsers(usersData);
-        calculateStats(usersData);
+
+        if (statsRes?.ok) {
+          const statsData = await statsRes.json();
+          setStats({
+            total_users: statsData.total_users ?? usersData.length,
+            total_students: statsData.total_students ?? 0,
+            total_assessments: statsData.total_assessments ?? 0,
+            total_reports: statsData.total_reports ?? 0,
+            active_sessions: 0,
+            users_by_role: statsData.users_by_role ?? {
+              PARENT: usersData.filter((u: User) => u.role === "PARENT").length,
+              PSYCHOLOGIST: usersData.filter((u: User) => u.role === "PSYCHOLOGIST").length,
+              SCHOOL: usersData.filter((u: User) => u.role === "SCHOOL").length,
+              ADMIN: usersData.filter((u: User) => u.role === "ADMIN").length,
+            },
+          });
+        } else {
+          // Fallback: derive from users only
+          setStats({
+            total_users: usersData.length,
+            total_students: 0,
+            total_assessments: 0,
+            total_reports: 0,
+            active_sessions: 0,
+            users_by_role: {
+              PARENT: usersData.filter((u: User) => u.role === "PARENT").length,
+              PSYCHOLOGIST: usersData.filter((u: User) => u.role === "PSYCHOLOGIST").length,
+              SCHOOL: usersData.filter((u: User) => u.role === "SCHOOL").length,
+              ADMIN: usersData.filter((u: User) => u.role === "ADMIN").length,
+            },
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching admin data:", error);
@@ -244,23 +285,83 @@ export default function AdminDashboard() {
     }
   };
 
-  const calculateStats = (usersData: User[]) => {
-    const usersByRole = {
-      PARENT: usersData.filter((u) => u.role === "PARENT").length,
-      PSYCHOLOGIST: usersData.filter((u) => u.role === "PSYCHOLOGIST").length,
-      SCHOOL: usersData.filter((u) => u.role === "SCHOOL").length,
-      ADMIN: usersData.filter((u) => u.role === "ADMIN").length,
-    };
+  const handleStatClick = async (statType: string) => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
 
-    const stats: SystemStats = {
-      total_users: usersData.length,
-      total_students: usersByRole.PARENT * 2, // Mock: avg 2 students per parent
-      total_assessments: usersByRole.PARENT * 3, // Mock data
-      total_reports: usersByRole.PARENT * 2, // Mock data
-      active_sessions: 5, // Mock data
-      users_by_role: usersByRole,
-    };
-    setStats(stats);
+    setStatPopup({ open: true, title: statType, items: [], loading: true });
+
+    try {
+      let items: { id: string; label: string; sub?: string }[] = [];
+
+      if (statType === "Total Users") {
+        items = users.map((u) => ({
+          id: u.id,
+          label: u.full_name || u.email,
+          sub: `${u.role} — ${u.email}`,
+        }));
+      } else if (statType === "Total Students") {
+        const res = await fetch(`${API_BASE}/admin/students`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          items = (data || []).map((s: any) => ({
+            id: s.id,
+            label: `${s.first_name || ""} ${s.last_name || ""}`.trim() || "Unnamed Student",
+            sub: [s.school_name, s.primary_guardian_name ? `Guardian: ${s.primary_guardian_name}` : null, s.date_of_birth ? `DOB: ${s.date_of_birth}` : null].filter(Boolean).join(" | "),
+          }));
+        }
+      } else if (statType === "Assessments") {
+        const res = await fetch(`${API_BASE}/admin/chat-sessions`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          items = (data || []).map((s: any) => ({
+            id: s.id,
+            label: s.student_name || s.parent_email || "Unknown",
+            sub: `Status: ${s.status || "unknown"}${s.started_at ? ` — ${new Date(s.started_at).toLocaleDateString()}` : ""}`,
+          }));
+        }
+      } else if (statType === "Reports Generated") {
+        const res = await fetch(`${API_BASE}/admin/psychologist-reports`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          items = (data || []).map((r: any) => ({
+            id: r.id,
+            label: r.student_name || "Unknown Student",
+            sub: `${(r.report_type || "report").replace(/_/g, " ")} — ${r.status || "draft"}${r.created_at ? ` — ${new Date(r.created_at).toLocaleDateString()}` : ""}`,
+          }));
+        }
+      } else if (statType === "Parents") {
+        items = users.filter((u) => u.role === "PARENT").map((u) => ({
+          id: u.id,
+          label: u.full_name || u.email,
+          sub: u.email,
+        }));
+      } else if (statType === "Psychologists") {
+        items = users.filter((u) => u.role === "PSYCHOLOGIST").map((u) => ({
+          id: u.id,
+          label: u.full_name || u.email,
+          sub: u.email,
+        }));
+      } else if (statType === "Schools") {
+        items = users.filter((u) => u.role === "SCHOOL").map((u) => ({
+          id: u.id,
+          label: u.full_name || u.email,
+          sub: u.organization || u.email,
+        }));
+      } else if (statType === "Admins") {
+        items = users.filter((u) => u.role === "ADMIN").map((u) => ({
+          id: u.id,
+          label: u.full_name || u.email,
+          sub: u.email,
+        }));
+      }
+
+      setStatPopup({ open: true, title: statType, items, loading: false });
+    } catch (error) {
+      console.error("Error fetching stat details:", error);
+      setStatPopup({ open: true, title: statType, items: [{ id: "err", label: "Failed to load details" }], loading: false });
+    }
   };
 
   const handleToggleUserStatus = (userId: string, currentStatus: boolean) => {
@@ -511,7 +612,7 @@ export default function AdminDashboard() {
         {/* System Statistics */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="glass-card p-6 rounded-2xl">
+            <div onClick={() => handleStatClick("Total Users")} className="glass-card p-6 rounded-2xl cursor-pointer hover:ring-2 hover:ring-blue-300 hover:shadow-lg transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
                   <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -525,7 +626,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-6 rounded-2xl">
+            <div onClick={() => handleStatClick("Total Students")} className="glass-card p-6 rounded-2xl cursor-pointer hover:ring-2 hover:ring-emerald-300 hover:shadow-lg transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
                   <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -539,7 +640,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-6 rounded-2xl">
+            <div onClick={() => handleStatClick("Assessments")} className="glass-card p-6 rounded-2xl cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:shadow-lg transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
                   <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -553,7 +654,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-6 rounded-2xl">
+            <div onClick={() => handleStatClick("Reports Generated")} className="glass-card p-6 rounded-2xl cursor-pointer hover:ring-2 hover:ring-purple-300 hover:shadow-lg transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
                   <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -572,7 +673,7 @@ export default function AdminDashboard() {
         {/* Users by Role */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="glass-card p-4 rounded-xl border-l-4 border-emerald-500">
+            <div onClick={() => handleStatClick("Parents")} className="glass-card p-4 rounded-xl border-l-4 border-emerald-500 cursor-pointer hover:ring-2 hover:ring-emerald-300 hover:shadow-lg transition-all">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase">Parents</p>
@@ -586,7 +687,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-4 rounded-xl border-l-4 border-purple-500">
+            <div onClick={() => handleStatClick("Psychologists")} className="glass-card p-4 rounded-xl border-l-4 border-purple-500 cursor-pointer hover:ring-2 hover:ring-purple-300 hover:shadow-lg transition-all">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase">Psychologists</p>
@@ -600,7 +701,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-4 rounded-xl border-l-4 border-blue-500">
+            <div onClick={() => handleStatClick("Schools")} className="glass-card p-4 rounded-xl border-l-4 border-blue-500 cursor-pointer hover:ring-2 hover:ring-blue-300 hover:shadow-lg transition-all">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase">Schools</p>
@@ -614,7 +715,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-4 rounded-xl border-l-4 border-red-500">
+            <div onClick={() => handleStatClick("Admins")} className="glass-card p-4 rounded-xl border-l-4 border-red-500 cursor-pointer hover:ring-2 hover:ring-red-300 hover:shadow-lg transition-all">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase">Admins</p>
@@ -981,6 +1082,47 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Stat Detail Popup */}
+      {statPopup.open && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[90] p-4" onClick={() => setStatPopup((s) => ({ ...s, open: false }))}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[70vh] flex flex-col animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-on-background">{statPopup.title}</h3>
+              <button onClick={() => setStatPopup((s) => ({ ...s, open: false }))} className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">
+                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 flex-1">
+              {statPopup.loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                  <span className="ml-3 text-slate-500 text-sm">Loading...</span>
+                </div>
+              ) : statPopup.items.length === 0 ? (
+                <p className="text-center text-slate-400 py-8">No records found</p>
+              ) : (
+                <ul className="space-y-2">
+                  {statPopup.items.map((item, idx) => (
+                    <li key={item.id || idx} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        {idx + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-on-background truncate">{item.label}</p>
+                        {item.sub && <p className="text-xs text-slate-500 truncate">{item.sub}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="p-4 border-t border-slate-100 text-center">
+              <span className="text-xs text-slate-400">{statPopup.items.length} record{statPopup.items.length !== 1 ? "s" : ""}</span>
+            </div>
           </div>
         </div>
       )}
