@@ -78,7 +78,7 @@ export default function LoginPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <span className="text-on-background text-2xl font-black tracking-tighter">The EdPsych</span>
+              <span className="text-on-background text-2xl font-black tracking-tighter">The EdPsych Practice</span>
             </div>
             <h1 className="text-on-background text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6">
               The <span className="brand-accent">Cognitive Sanctuary</span> for Educational Psychologists.
@@ -147,7 +147,7 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           </div>
-          <span className="text-on-background font-black text-xl tracking-tighter">The EdPsych</span>
+          <span className="text-on-background font-black text-xl tracking-tighter">The EdPsych Practice</span>
         </div>
 
         <div className="max-w-md w-full mt-16 lg:mt-0">
@@ -225,7 +225,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-3 lg:py-4 bg-on-background text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 text-sm lg:text-base"
             >
-              <span>{loading ? "Signing in..." : "Sign in to The EdPsych"}</span>
+              <span>{loading ? "Signing in..." : "Sign in to The EdPsych Practice"}</span>
             </button>
 
             <div className="relative py-4 lg:py-6">
@@ -253,7 +253,7 @@ export default function LoginPage() {
               <a href="#" className="hover:text-primary transition-colors">Privacy</a>
             </div>
             <div className="mt-6 lg:mt-8 text-[9px] lg:text-[10px] text-slate-400 font-medium">
-              © 2024 The EdPsych. All clinical data encrypted.
+              © 2024 The EdPsych Practice. All clinical data encrypted.
             </div>
           </footer>
         </div>

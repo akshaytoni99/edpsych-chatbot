@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The EdPsych | Educational Psychology Platform",
+  title: "The EdPsych Practice | Educational Psychology Platform",
   description: "Educational psychology assessment and report generation",
 };
 
