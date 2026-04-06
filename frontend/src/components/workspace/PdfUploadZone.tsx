@@ -177,7 +177,7 @@ export default function PdfUploadZone({
               </svg>
             </div>
             <p className="text-sm font-semibold text-slate-800">
-              Drop an IQ test PDF here, or <span className="text-primary underline">click to browse</span>
+              Drop a Cognitive Report PDF here, or <span className="text-primary underline">click to browse</span>
             </p>
             <p className="text-xs text-slate-500 mt-1">PDF, PNG, or JPEG · up to 10 MB</p>
           </>
