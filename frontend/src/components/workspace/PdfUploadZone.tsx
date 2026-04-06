@@ -76,7 +76,9 @@ export default function PdfUploadZone({
       setProgress(0);
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
-          const profile = JSON.parse(xhr.responseText) as CognitiveProfile;
+          const body = JSON.parse(xhr.responseText);
+          // Backend returns { ocr_used, confidence_score, cognitive_profile: {...} }
+          const profile = (body.cognitive_profile ?? body) as CognitiveProfile;
           onUploaded(profile);
         } catch {
           setError("Upload succeeded but response was invalid.");
