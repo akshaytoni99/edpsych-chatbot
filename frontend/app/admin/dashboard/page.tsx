@@ -506,8 +506,7 @@ export default function AdminDashboard() {
                       <tr className="border-b border-white/5">
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">User</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Organization</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Phone</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Details</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Joined</th>
                         <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
@@ -528,11 +527,20 @@ export default function AdminDashboard() {
                             </div>
                           </td>
                           <td className="px-5 py-3.5"><RoleBadge role={u.role} /></td>
-                          <td className="px-5 py-3.5 hidden lg:table-cell">
-                            <span className="text-sm text-slate-400">{u.organization || "-"}</span>
-                          </td>
                           <td className="px-5 py-3.5 hidden md:table-cell">
-                            <span className="text-sm text-slate-400 font-mono">{u.phone || "-"}</span>
+                            <div className="text-sm text-slate-400">
+                              {u.role === "PSYCHOLOGIST" || u.role === "SCHOOL" ? (
+                                <>
+                                  {u.organization && <p>{u.organization}</p>}
+                                  {u.phone && <p className="text-xs text-slate-500 font-mono">{u.phone}</p>}
+                                  {!u.organization && !u.phone && "-"}
+                                </>
+                              ) : (
+                                <>
+                                  {u.phone ? <p className="font-mono">{u.phone}</p> : <span className="text-slate-600">-</span>}
+                                </>
+                              )}
+                            </div>
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-1.5">
