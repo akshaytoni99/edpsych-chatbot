@@ -168,12 +168,12 @@ async def get_system_stats(
     result = await db.execute(select(func.count(Student.id)))
     total_students = result.scalar()
 
-    # Total assessments count
-    result = await db.execute(select(func.count(AssessmentSession.id)))
+    # Total assessments count (chat sessions = actual parent assessments)
+    result = await db.execute(select(func.count(ChatSession.id)))
     total_assessments = result.scalar()
 
-    # Total reports count
-    result = await db.execute(select(func.count(GeneratedReport.id)))
+    # Total reports count (psychologist reports)
+    result = await db.execute(select(func.count(PsychologistReport.id)))
     total_reports = result.scalar()
 
     # Users by role
