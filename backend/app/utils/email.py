@@ -1,5 +1,5 @@
 """
-Email utility for sending notifications via Resend API
+Email utility for sending notifications via Brevo (Sendinblue) API
 """
 
 import os
@@ -9,15 +9,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-EMAIL_FROM = os.getenv("EMAIL_FROM", "The EdPsych Practice <onboarding@resend.dev>")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+EMAIL_FROM_NAME = os.getenv("EMAIL_FROM_NAME", "The EdPsych Practice")
+EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM_ADDRESS", "akshaytoni99@gmail.com")
 
 
 class EmailService:
-    """Email service using Resend API"""
+    """Email service using Brevo (Sendinblue) API"""
 
     def __init__(self, **kwargs):
-        # Accept old kwargs for backwards compatibility but ignore them
         pass
 
     def send_email(
@@ -27,38 +27,42 @@ class EmailService:
         html_body: str,
         text_body: Optional[str] = None
     ) -> bool:
-        """Send an email via Resend API"""
+        """Send an email via Brevo API"""
         try:
-            if not RESEND_API_KEY:
+            if not BREVO_API_KEY:
                 logger.info(f"[EMAIL MODE: DEV] Would send email to {to_email}")
                 logger.info(f"Subject: {subject}")
                 logger.info(f"Body:\n{text_body or html_body[:200]}")
                 return True
 
             payload = {
-                "from": EMAIL_FROM,
-                "to": [to_email],
+                "sender": {
+                    "name": EMAIL_FROM_NAME,
+                    "email": EMAIL_FROM_ADDRESS,
+                },
+                "to": [{"email": to_email}],
                 "subject": subject,
-                "html": html_body,
+                "htmlContent": html_body,
             }
             if text_body:
-                payload["text"] = text_body
+                payload["textContent"] = text_body
 
             resp = requests.post(
-                "https://api.resend.com/emails",
+                "https://api.brevo.com/v3/smtp/email",
                 headers={
-                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "api-key": BREVO_API_KEY,
                     "Content-Type": "application/json",
+                    "Accept": "application/json",
                 },
                 json=payload,
                 timeout=10,
             )
 
             if resp.status_code in (200, 201):
-                logger.info(f"Email sent successfully to {to_email} via Resend")
+                logger.info(f"Email sent successfully to {to_email} via Brevo")
                 return True
             else:
-                logger.error(f"Resend API error {resp.status_code}: {resp.text}")
+                logger.error(f"Brevo API error {resp.status_code}: {resp.text}")
                 return False
 
         except Exception as e:
