@@ -163,7 +163,7 @@ async def create_student_with_parents(
                 student_id=student.id,
                 guardian_user_id=parent.id,
                 relationship_type=parent_data.relationship,
-                is_primary=parent_data.is_primary
+                is_primary="true" if parent_data.is_primary else "false"
             )
             db.add(guardian_link)
 
