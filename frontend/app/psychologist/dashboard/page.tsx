@@ -107,8 +107,11 @@ export default function PsychologistDashboard() {
     gender: "",
     school_name: "",
     year_group: "",
-    guardian_user_id: "",
-    relationship_type: "",
+    // Parent fields (inline entry, no dropdown)
+    parent_name: "",
+    parent_email: "",
+    parent_phone: "",
+    relationship_type: "Mother",
   });
   const [parentUsers, setParentUsers] = useState<any[]>([]);
 
@@ -518,39 +521,46 @@ export default function PsychologistDashboard() {
       alert("Please fill in all required fields (First Name, Last Name, Date of Birth)");
       return;
     }
+    if (!studentFormData.parent_name || !studentFormData.parent_email) {
+      alert("Please fill in parent name and email (required)");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_BASE}/students/`, {
+      const response = await fetch(`${API_BASE}/psychologist/students/create-with-parents`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(studentFormData),
+        body: JSON.stringify({
+          student_first_name: studentFormData.first_name,
+          student_last_name: studentFormData.last_name,
+          date_of_birth: studentFormData.date_of_birth,
+          gender: studentFormData.gender || null,
+          grade: studentFormData.year_group || null,
+          school_name: studentFormData.school_name || null,
+          parents: [
+            {
+              type: "parent",
+              full_name: studentFormData.parent_name,
+              email: studentFormData.parent_email,
+              phone: studentFormData.parent_phone || "",
+              relationship: studentFormData.relationship_type || "Mother",
+              is_primary: true,
+            },
+          ],
+        }),
       });
 
       if (response.ok) {
-        const newStudent = await response.json();
-
-        // If guardian was selected, create the relationship
-        if (studentFormData.guardian_user_id) {
-          await fetch(`${API_BASE}/student-guardians/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              student_id: newStudent.id,
-              guardian_user_id: studentFormData.guardian_user_id,
-              relationship_type: studentFormData.relationship_type || "Guardian",
-              is_primary: "true",
-            }),
-          });
-        }
-
-        alert("Student created successfully! " + (studentFormData.guardian_user_id ? "Guardian linked." : "Go to the Assignments tab to assign an assessment to a parent."));
+        const data = await response.json();
+        alert(
+          `Student "${data.student_name}" created successfully!\n\n` +
+          `Parent account created for ${studentFormData.parent_email}.\n` +
+          `They will receive an invitation email when you assign an assessment.`
+        );
         setShowStudentForm(false);
         setStudentFormData({
           first_name: "",
@@ -559,8 +569,10 @@ export default function PsychologistDashboard() {
           gender: "",
           school_name: "",
           year_group: "",
-          guardian_user_id: "",
-          relationship_type: "",
+          parent_name: "",
+          parent_email: "",
+          parent_phone: "",
+          relationship_type: "Mother",
         });
         fetchStudents(token!);
       } else {
@@ -1449,52 +1461,80 @@ export default function PsychologistDashboard() {
                     />
                   </div>
 
-                  {/* Parent/Guardian Selection */}
+                  {/* Parent/Guardian Section Header */}
+                  <div className="col-span-2 mt-2">
+                    <div className="border-t border-slate-200 pt-4">
+                      <h4 className="text-sm font-bold text-on-background uppercase tracking-wider text-slate-500">Parent / Guardian Details</h4>
+                    </div>
+                  </div>
+
+                  {/* Parent Name */}
                   <div>
                     <label className="block text-sm font-bold text-on-background mb-2">
-                      Parent/Guardian (Optional)
+                      Parent / Organisation Name *
                     </label>
-                    <select
-                      value={studentFormData.guardian_user_id}
+                    <input
+                      type="text"
+                      value={studentFormData.parent_name}
                       onChange={(e) =>
-                        setStudentFormData({ ...studentFormData, guardian_user_id: e.target.value })
+                        setStudentFormData({ ...studentFormData, parent_name: e.target.value })
                       }
                       className="w-full px-4 py-3 bg-surface border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    >
-                      <option value="">Select parent/guardian...</option>
-                      {parentUsers.map((parent) => (
-                        <option key={parent.id} value={parent.id}>
-                          {parent.name} ({parent.email})
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-slate-500 mt-1">
-                      You can add this later if not selected now
-                    </p>
+                      placeholder="Enter parent's full name"
+                    />
+                  </div>
+
+                  {/* Parent Email */}
+                  <div>
+                    <label className="block text-sm font-bold text-on-background mb-2">
+                      Parent Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={studentFormData.parent_email}
+                      onChange={(e) =>
+                        setStudentFormData({ ...studentFormData, parent_email: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-surface border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      placeholder="parent@example.com"
+                    />
+                  </div>
+
+                  {/* Parent Phone */}
+                  <div>
+                    <label className="block text-sm font-bold text-on-background mb-2">
+                      Phone Number (Optional)
+                    </label>
+                    <input
+                      type="tel"
+                      value={studentFormData.parent_phone}
+                      onChange={(e) =>
+                        setStudentFormData({ ...studentFormData, parent_phone: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-surface border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      placeholder="+44 7700 900000"
+                    />
                   </div>
 
                   {/* Relationship Type */}
-                  {studentFormData.guardian_user_id && (
-                    <div>
-                      <label className="block text-sm font-bold text-on-background mb-2">
-                        Relationship Type (Optional)
-                      </label>
-                      <select
-                        value={studentFormData.relationship_type}
-                        onChange={(e) =>
-                          setStudentFormData({ ...studentFormData, relationship_type: e.target.value })
-                        }
-                        className="w-full px-4 py-3 bg-surface border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                      >
-                        <option value="">Select relationship...</option>
-                        <option value="Mother">Mother</option>
-                        <option value="Father">Father</option>
-                        <option value="Guardian">Guardian</option>
-                        <option value="Grandparent">Grandparent</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                  )}
+                  <div>
+                    <label className="block text-sm font-bold text-on-background mb-2">
+                      Relationship to Child
+                    </label>
+                    <select
+                      value={studentFormData.relationship_type}
+                      onChange={(e) =>
+                        setStudentFormData({ ...studentFormData, relationship_type: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-surface border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                    >
+                      <option value="Mother">Mother</option>
+                      <option value="Father">Father</option>
+                      <option value="Guardian">Guardian</option>
+                      <option value="Grandparent">Grandparent</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Submit Button */}
