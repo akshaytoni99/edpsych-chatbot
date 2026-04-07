@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import date as date_type, datetime, timedelta
+from datetime import date as date_type, datetime, timedelta, timezone
 
 from app.core.database import get_db
 from app.core.security import (
@@ -360,7 +360,7 @@ async def magic_link_login(
         }
 
     # User has a password — consume the token and issue JWT
-    magic_link_record.used_at = datetime.utcnow()
+    magic_link_record.used_at = datetime.now(timezone.utc)
     await db.commit()
 
     access_token = create_access_token(data={"sub": str(user.id)})

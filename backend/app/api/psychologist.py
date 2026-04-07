@@ -301,7 +301,7 @@ async def resend_magic_link(
     from app.models.magic_link import MagicLinkToken
     from app.utils.magic_link import create_invite_magic_link
     from app.utils.email import send_assessment_assignment_email
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     # Verify assignment exists
     result = await db.execute(
@@ -332,7 +332,7 @@ async def resend_magic_link(
         update(MagicLinkToken)
         .where(MagicLinkToken.assignment_id == assignment_id)
         .where(MagicLinkToken.used_at.is_(None))
-        .values(used_at=datetime.utcnow())
+        .values(used_at=datetime.now(timezone.utc))
     )
 
     # Create new magic link

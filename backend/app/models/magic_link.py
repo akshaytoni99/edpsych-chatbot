@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.core.database import Base
 
@@ -33,7 +33,7 @@ class MagicLinkToken(Base):
         """Check if token is still valid"""
         if self.used_at is not None:
             return False
-        if datetime.utcnow() > self.expires_at:
+        if datetime.now(timezone.utc) > self.expires_at:
             return False
         return True
 

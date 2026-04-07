@@ -4,7 +4,7 @@ Generate and validate magic link tokens for passwordless authentication
 """
 
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -34,7 +34,7 @@ async def create_magic_link(
         MagicLinkToken object
     """
     token = generate_magic_token()
-    expires_at = datetime.utcnow() + timedelta(hours=expiry_hours)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=expiry_hours)
 
     magic_link = MagicLinkToken(
         user_id=user_id,
@@ -70,7 +70,7 @@ async def verify_magic_link(
         return None, None
 
     if consume:
-        magic_link.used_at = datetime.utcnow()
+        magic_link.used_at = datetime.now(timezone.utc)
         await db.commit()
 
     result = await db.execute(
@@ -89,7 +89,7 @@ async def create_invite_magic_link(
 ) -> MagicLinkToken:
     """Create a magic link tied to a specific assessment assignment."""
     token = generate_magic_token()
-    expires_at = datetime.utcnow() + timedelta(hours=expiry_hours)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=expiry_hours)
 
     magic_link = MagicLinkToken(
         user_id=user_id,
@@ -121,7 +121,7 @@ async def cleanup_expired_tokens(db: AsyncSession) -> int:
     # Delete tokens that are expired or already used
     result = await db.execute(
         delete(MagicLinkToken).where(
-            (MagicLinkToken.expires_at < datetime.utcnow()) |
+            (MagicLinkToken.expires_at < datetime.now(timezone.utc)) |
             (MagicLinkToken.used_at.isnot(None))
         )
     )
