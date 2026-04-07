@@ -1,32 +1,24 @@
 """
-Email utility for sending notifications
+Email utility for sending notifications via Resend API
 """
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import os
+import requests
 from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+EMAIL_FROM = os.getenv("EMAIL_FROM", "The EdPsych Practice <onboarding@resend.dev>")
+
 
 class EmailService:
-    """Email service for sending notifications"""
+    """Email service using Resend API"""
 
-    def __init__(
-        self,
-        smtp_server: str = "smtp.gmail.com",
-        smtp_port: int = 587,
-        sender_email: Optional[str] = None,
-        sender_password: Optional[str] = None,
-        use_tls: bool = True
-    ):
-        self.smtp_server = smtp_server
-        self.smtp_port = smtp_port
-        self.sender_email = sender_email
-        self.sender_password = sender_password
-        self.use_tls = use_tls
+    def __init__(self, **kwargs):
+        # Accept old kwargs for backwards compatibility but ignore them
+        pass
 
     def send_email(
         self,
@@ -35,50 +27,39 @@ class EmailService:
         html_body: str,
         text_body: Optional[str] = None
     ) -> bool:
-        """
-        Send an email
-
-        Args:
-            to_email: Recipient email address
-            subject: Email subject
-            html_body: HTML content of the email
-            text_body: Plain text fallback (optional)
-
-        Returns:
-            bool: True if email sent successfully, False otherwise
-        """
+        """Send an email via Resend API"""
         try:
-            # If no email configuration, just log the email (for development)
-            if not self.sender_email or not self.sender_password:
+            if not RESEND_API_KEY:
                 logger.info(f"[EMAIL MODE: DEV] Would send email to {to_email}")
                 logger.info(f"Subject: {subject}")
-                logger.info(f"Body:\n{text_body or html_body}")
+                logger.info(f"Body:\n{text_body or html_body[:200]}")
                 return True
 
-            # Create message
-            message = MIMEMultipart("alternative")
-            message["Subject"] = subject
-            message["From"] = self.sender_email
-            message["To"] = to_email
-
-            # Add text and HTML parts
+            payload = {
+                "from": EMAIL_FROM,
+                "to": [to_email],
+                "subject": subject,
+                "html": html_body,
+            }
             if text_body:
-                part1 = MIMEText(text_body, "plain")
-                message.attach(part1)
+                payload["text"] = text_body
 
-            part2 = MIMEText(html_body, "html")
-            message.attach(part2)
+            resp = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=10,
+            )
 
-            # Send email
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                if self.use_tls:
-                    server.starttls()
-
-                server.login(self.sender_email, self.sender_password)
-                server.sendmail(self.sender_email, to_email, message.as_string())
-
-            logger.info(f"Email sent successfully to {to_email}")
-            return True
+            if resp.status_code in (200, 201):
+                logger.info(f"Email sent successfully to {to_email} via Resend")
+                return True
+            else:
+                logger.error(f"Resend API error {resp.status_code}: {resp.text}")
+                return False
 
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
