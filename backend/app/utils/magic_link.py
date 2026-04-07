@@ -51,42 +51,59 @@ async def create_magic_link(
 
 async def verify_magic_link(
     db: AsyncSession,
-    token: str
-) -> User | None:
+    token: str,
+    consume: bool = True
+) -> tuple[User | None, MagicLinkToken | None]:
     """
-    Verify a magic link token and return the associated user
-
-    Args:
-        db: Database session
-        token: Magic link token to verify
-
-    Returns:
-        User object if valid, None otherwise
+    Verify a magic link token and return the associated user and token record.
+    When consume=False, the token is NOT marked as used (for password setup flow).
     """
-    # Find the token
     result = await db.execute(
         select(MagicLinkToken).where(MagicLinkToken.token == token)
     )
     magic_link = result.scalar_one_or_none()
 
     if not magic_link:
-        return None
+        return None, None
 
-    # Check if token is valid
     if not magic_link.is_valid():
-        return None
+        return None, None
 
-    # Mark token as used
-    magic_link.used_at = datetime.utcnow()
-    await db.commit()
+    if consume:
+        magic_link.used_at = datetime.utcnow()
+        await db.commit()
 
-    # Get and return the user
     result = await db.execute(
         select(User).where(User.id == magic_link.user_id)
     )
     user = result.scalar_one_or_none()
 
-    return user
+    return user, magic_link
+
+
+async def create_invite_magic_link(
+    db: AsyncSession,
+    user_id: str,
+    assignment_id: str,
+    expiry_hours: int = 48
+) -> MagicLinkToken:
+    """Create a magic link tied to a specific assessment assignment."""
+    token = generate_magic_token()
+    expires_at = datetime.utcnow() + timedelta(hours=expiry_hours)
+
+    magic_link = MagicLinkToken(
+        user_id=user_id,
+        token=token,
+        expires_at=expires_at,
+        assignment_id=assignment_id,
+        purpose="assessment_invite"
+    )
+
+    db.add(magic_link)
+    await db.commit()
+    await db.refresh(magic_link)
+
+    return magic_link
 
 
 async def cleanup_expired_tokens(db: AsyncSession) -> int:

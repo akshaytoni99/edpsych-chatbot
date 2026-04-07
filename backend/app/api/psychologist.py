@@ -14,9 +14,6 @@ from typing import List, Optional
 from uuid import UUID
 from datetime import datetime, timedelta
 from pydantic import BaseModel, EmailStr
-import secrets
-import random
-
 from app.core.database import get_db
 from app.core.security import get_current_active_user, get_password_hash
 from app.core.config import settings
@@ -26,7 +23,8 @@ from app.models.student_guardian import StudentGuardian
 from app.models.assignment import AssessmentAssignment, AssignmentStatus
 from app.models.upload import IQTestUpload, UploadStatus, CognitiveProfile
 from app.models.report import GeneratedReport, ReportStatus, FinalReport, FinalReportStatus
-from app.models.verification_token import VerificationToken
+from app.utils.magic_link import create_invite_magic_link
+from app.utils.email import send_assessment_assignment_email
 
 router = APIRouter(prefix="/psychologist", tags=["psychologist"])
 
@@ -79,15 +77,6 @@ class ReportApprovalRequest(BaseModel):
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
-
-def generate_otp() -> str:
-    """Generate 6-digit OTP"""
-    return ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-
-def generate_secure_password() -> str:
-    """Generate secure temporary password for new users"""
-    return secrets.token_urlsafe(12)
 
 
 def require_psychologist_or_admin(current_user: User = Depends(get_current_active_user)) -> User:
@@ -151,24 +140,21 @@ async def create_student_with_parents(
                 # Link existing user to student
                 parent = existing_user
             else:
-                # Create new parent account
-                temp_password = generate_secure_password()
-
+                # Create new parent account (no password - will set via magic link)
                 parent = User(
                     email=parent_data.email,
-                    password_hash=get_password_hash(temp_password),
+                    password_hash=None,
                     role=UserRole.PARENT if parent_data.type == "parent" else UserRole.SCHOOL,
                     full_name=parent_data.full_name,
                     phone=parent_data.phone,
                     is_active=True,
-                    is_verified=False  # Will verify via OTP later
+                    is_verified=False  # Will verify via magic link later
                 )
                 db.add(parent)
                 await db.flush()
 
                 created_parents.append({
                     "email": parent.email,
-                    "temporary_password": temp_password,
                     "full_name": parent.full_name
                 })
 
@@ -199,7 +185,7 @@ async def create_student_with_parents(
             "parents_created": len(created_parents),
             "parents_linked": len(data.parents),
             "message": "Student and parents created successfully",
-            "created_parents": created_parents  # Includes temp passwords for display
+            "created_parents": created_parents
         }
 
     except Exception as e:
@@ -272,46 +258,104 @@ async def assign_assessment_with_secure_link(
     db.add(new_assignment)
     await db.flush()
 
-    # Generate secure token and OTP
-    secure_token = secrets.token_urlsafe(32)
-    otp_code = generate_otp()
-
-    # Store verification token in database
-    verification = VerificationToken(
-        secure_token=secure_token,
-        otp_code=otp_code,
-        assignment_id=new_assignment.id,
-        student_id=assignment.student_id,
-        parent_user_id=assignment.parent_id,
-        expires_at=datetime.utcnow() + timedelta(days=7),
-        is_otp_verified=False,
-        is_dob_verified=False,
-        is_fully_verified=False
+    # Create magic link for parent access
+    magic_link_token = await create_invite_magic_link(
+        db, str(new_assignment.assigned_to_user_id), str(new_assignment.id),
+        expiry_hours=settings.MAGIC_LINK_EXPIRY_HOURS
     )
-    db.add(verification)
+    magic_link_url = f"{settings.FRONTEND_URL}/auth/magic/{magic_link_token.token}"
 
     await db.commit()
 
-    # Generate assessment link
-    assessment_link = f"{settings.FRONTEND_URL}/verify-access/{secure_token}"
-
-    # TODO: Send notifications
-    # await send_assessment_notification(
-    #     parent_email=parent.email,
-    #     parent_phone=parent.phone,
-    #     assessment_link=assessment_link,
-    #     otp_code=otp_code,
-    #     student_name=f"{student.first_name} {student.last_name}"
-    # )
+    # Send assessment assignment email with magic link
+    student_name = f"{student.first_name} {student.last_name}"
+    send_assessment_assignment_email(
+        parent_email=parent.email,
+        parent_name=parent.full_name or parent.email,
+        student_name=student_name,
+        psychologist_name=current_user.full_name or "Your Psychologist",
+        assessment_link=magic_link_url
+    )
 
     return {
         "success": True,
         "assignment_id": str(new_assignment.id),
-        "secure_link": assessment_link,
-        "otp_code": otp_code,  # For now, return OTP for testing
-        "expires_at": (datetime.utcnow() + timedelta(days=7)).isoformat(),
+        "magic_link": magic_link_url,
         "status": "assigned",
         "message": "Assessment assigned and notifications sent"
+    }
+
+
+# ============================================================================
+# RESEND MAGIC LINK FOR ASSIGNMENT
+# ============================================================================
+
+@router.post("/assignments/{assignment_id}/resend-link")
+async def resend_magic_link(
+    assignment_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_psychologist_or_admin)
+):
+    """Resend a magic link for an existing assignment."""
+    from app.models.assignment import AssessmentAssignment
+    from app.models.magic_link import MagicLinkToken
+    from app.utils.magic_link import create_invite_magic_link
+    from app.utils.email import send_assessment_assignment_email
+    from datetime import datetime
+
+    # Verify assignment exists
+    result = await db.execute(
+        select(AssessmentAssignment).where(AssessmentAssignment.id == assignment_id)
+    )
+    assignment = result.scalar_one_or_none()
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+
+    # Get assigned parent user
+    result = await db.execute(
+        select(User).where(User.id == assignment.assigned_to_user_id)
+    )
+    parent = result.scalar_one_or_none()
+    if not parent:
+        raise HTTPException(status_code=404, detail="Assigned parent not found")
+
+    # Get student
+    from app.models.student import Student
+    result = await db.execute(
+        select(Student).where(Student.id == assignment.student_id)
+    )
+    student = result.scalar_one_or_none()
+
+    # Invalidate existing unused magic links for this assignment
+    from sqlalchemy import update
+    await db.execute(
+        update(MagicLinkToken)
+        .where(MagicLinkToken.assignment_id == assignment_id)
+        .where(MagicLinkToken.used_at.is_(None))
+        .values(used_at=datetime.utcnow())
+    )
+
+    # Create new magic link
+    magic_link_token = await create_invite_magic_link(
+        db, str(parent.id), str(assignment.id),
+        expiry_hours=settings.MAGIC_LINK_EXPIRY_HOURS
+    )
+    magic_link_url = f"{settings.FRONTEND_URL}/auth/magic/{magic_link_token.token}"
+
+    # Send email
+    student_name = f"{student.first_name} {student.last_name}" if student else "your child"
+    send_assessment_assignment_email(
+        parent_email=parent.email,
+        parent_name=parent.full_name or parent.email,
+        student_name=student_name,
+        psychologist_name=current_user.full_name or "Your Psychologist",
+        assessment_link=magic_link_url
+    )
+
+    return {
+        "message": "Magic link resent successfully",
+        "magic_link": magic_link_url,
+        "sent_to": parent.email
     }
 
 

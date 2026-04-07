@@ -22,6 +22,8 @@ class MagicLinkToken(Base):
     token = Column(String(255), unique=True, nullable=False, index=True)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     used_at = Column(DateTime(timezone=True), nullable=True)
+    assignment_id = Column(UUID(as_uuid=True), ForeignKey("assessment_assignments.id", ondelete="SET NULL"), nullable=True)
+    purpose = Column(String(50), default="login")  # "login" | "assessment_invite" | "password_reset"
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationship to user

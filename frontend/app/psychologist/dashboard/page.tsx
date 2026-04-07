@@ -1263,14 +1263,44 @@ export default function PsychologistDashboard() {
                             {new Date(assignment.assigned_at).toLocaleDateString()}
                           </td>
                           <td className="py-4 px-4">
-                            {assignment.status !== "COMPLETED" && assignment.status !== "CANCELLED" && (
-                              <button
-                                onClick={() => handleCancelAssignment(assignment.id)}
-                                className="px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                              >
-                                Cancel
-                              </button>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {assignment.status === "ASSIGNED" && (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      const token = localStorage.getItem("access_token");
+                                      const res = await fetch(`${API_BASE}/psychologist/assignments/${assignment.id}/resend-link`, {
+                                        method: "POST",
+                                        headers: { Authorization: `Bearer ${token}` },
+                                      });
+                                      if (res.ok) {
+                                        const data = await res.json();
+                                        alert(`Link resent to ${data.sent_to || assignment.assigned_to?.email || "parent"}`);
+                                      } else {
+                                        const err = await res.json().catch(() => null);
+                                        alert(err?.detail || "Failed to resend invite link.");
+                                      }
+                                    } catch {
+                                      alert("An error occurred while resending the invite link.");
+                                    }
+                                  }}
+                                  className="px-4 py-2 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-all flex items-center gap-1"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                  </svg>
+                                  Resend Invite
+                                </button>
+                              )}
+                              {assignment.status !== "COMPLETED" && assignment.status !== "CANCELLED" && (
+                                <button
+                                  onClick={() => handleCancelAssignment(assignment.id)}
+                                  className="px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}

@@ -22,6 +22,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
+    if not hashed_password:
+        return False
     try:
         return bcrypt.checkpw(
             plain_password.encode('utf-8'),

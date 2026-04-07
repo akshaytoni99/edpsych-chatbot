@@ -228,22 +228,11 @@ export default function LoginPage() {
               <span>{loading ? "Signing in..." : "Sign in to The EdPsych Practice"}</span>
             </button>
 
-            <div className="relative py-4 lg:py-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-[9px] lg:text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400">
-                <span className="bg-background px-4">or</span>
-              </div>
+            <div className="mt-2 p-4 bg-surface border border-slate-200 rounded-xl">
+              <p className="text-xs lg:text-sm text-slate-500 text-center leading-relaxed">
+                <span className="font-bold text-slate-600">Parents:</span> Your psychologist will send you a magic link via email to set up your account.
+              </p>
             </div>
-
-            <button
-              type="button"
-              onClick={() => router.push("/register")}
-              className="w-full py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all text-sm lg:text-base"
-            >
-              Create New Account
-            </button>
           </form>
 
           <footer className="mt-12 lg:mt-16 text-center">

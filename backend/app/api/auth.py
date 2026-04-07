@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import date as date_type, timedelta
+from datetime import date as date_type, datetime, timedelta
 
 from app.core.database import get_db
 from app.core.security import (
@@ -36,6 +36,11 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     Only PARENT and SCHOOL roles may self-register. PSYCHOLOGIST and ADMIN
     accounts must be created by an existing admin via POST /admin/users.
     """
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Self-registration is disabled. Parent accounts are created by your psychologist."
+    )
+
     # Block self-registration for privileged roles
     from app.models.user import UserRole
     if user_data.role not in (UserRole.PARENT, UserRole.SCHOOL):
@@ -110,6 +115,11 @@ async def register_parent(input: ParentRegisterInput, db: AsyncSession = Depends
 
     Returns JWT token and assignment ID for immediate use.
     """
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Self-registration is disabled. Parent accounts are created by your psychologist."
+    )
+
     # 1. Check if email already exists
     result = await db.execute(select(User).where(User.email == input.email))
     existing_user = result.scalar_one_or_none()
@@ -209,7 +219,7 @@ async def login(user_credentials: UserLogin, db: AsyncSession = Depends(get_db))
     result = await db.execute(select(User).where(User.email == user_credentials.email))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(user_credentials.password, user.password_hash):
+    if not user or not user.password_hash or not verify_password(user_credentials.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -250,7 +260,7 @@ async def login_form(
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(form_data.password, user.password_hash):
+    if not user or not user.password_hash or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -306,7 +316,7 @@ class MagicLinkLogin(BaseModel):
     token: str
 
 
-@router.post("/magic-login", response_model=TokenResponse)
+@router.post("/magic-login")
 async def magic_link_login(
     magic_data: MagicLinkLogin,
     db: AsyncSession = Depends(get_db)
@@ -319,10 +329,11 @@ async def magic_link_login(
 
     - **token**: Magic link token from email
 
-    Returns JWT access token upon successful verification
+    Returns JWT access token upon successful verification, or a
+    password-setup prompt if the user has no password yet.
     """
-    # Verify the magic link token and get the user
-    user = await verify_magic_link(db, magic_data.token)
+    # Verify the magic link token and get the user (don't consume yet)
+    user, magic_link_record = await verify_magic_link(db, magic_data.token, consume=False)
 
     if not user:
         raise HTTPException(
@@ -337,15 +348,94 @@ async def magic_link_login(
             detail="User account is inactive"
         )
 
-    # Create access token
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires
-    )
+    assignment_id = str(magic_link_record.assignment_id) if magic_link_record.assignment_id else None
 
-    return TokenResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user=UserResponse.from_orm(user)
-    )
+    # If user has no password, prompt for password setup
+    if user.password_hash is None:
+        return {
+            "needs_password_setup": True,
+            "token": magic_data.token,
+            "user_email": user.email,
+            "assignment_id": assignment_id
+        }
+
+    # User has a password — consume the token and issue JWT
+    magic_link_record.used_at = datetime.utcnow()
+    await db.commit()
+
+    access_token = create_access_token(data={"sub": str(user.id)})
+
+    return {
+        "needs_password_setup": False,
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": str(user.id),
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role
+        },
+        "assignment_id": assignment_id
+    }
+
+
+class SetupPasswordRequest(BaseModel):
+    token: str
+    password: str
+    confirm_password: str
+
+
+@router.post("/setup-password")
+async def setup_password(
+    data: SetupPasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    First-time parent sets their password after clicking magic link.
+    """
+    if data.password != data.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Passwords do not match"
+        )
+    if len(data.password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters"
+        )
+
+    # Verify and consume the magic link token
+    user, magic_link_record = await verify_magic_link(db, data.token, consume=True)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired link. Please request a new one from your psychologist."
+        )
+
+    if user.password_hash is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password already set. Please use the login page."
+        )
+
+    # Set password and verify account
+    user.password_hash = get_password_hash(data.password)
+    user.is_verified = True
+    await db.commit()
+
+    # Generate JWT
+    access_token = create_access_token(data={"sub": str(user.id)})
+    assignment_id = str(magic_link_record.assignment_id) if magic_link_record.assignment_id else None
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": str(user.id),
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role
+        },
+        "assignment_id": assignment_id
+    }

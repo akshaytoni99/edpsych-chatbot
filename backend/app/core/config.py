@@ -57,6 +57,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-super-secret-key-change-this-in-production-min-32-chars"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    MAGIC_LINK_EXPIRY_HOURS: int = 48
 
     # ==================== CORS ====================
     CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3002,http://127.0.0.1:3002"

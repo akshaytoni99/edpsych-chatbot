@@ -17,7 +17,7 @@ from app.models import user, student, assessment, report, assignment, student_gu
 
 # Optional imports - these may fail in chatbot-only deployment
 try:
-    from app.api import uploads, reports, admin, verification
+    from app.api import uploads, reports, admin
     HAS_FULL_PIPELINE = True
 except ImportError:
     HAS_FULL_PIPELINE = False
@@ -139,8 +139,6 @@ app.include_router(student_guardians.router, prefix="/api/v1", tags=["Student-Gu
 app.include_router(hybrid_chat.router, prefix="/api/v1", tags=["Hybrid Chat"])
 app.include_router(psychologist.router, prefix="/api/v1", tags=["Psychologist"])
 app.include_router(psychologist_reports.router, prefix="/api/v1", tags=["Psychologist Reports"])
-if HAS_FULL_PIPELINE:
-    app.include_router(verification.router, prefix="/api/v1", tags=["Verification"])
 
 
 if __name__ == "__main__":

@@ -46,7 +46,7 @@ export default function CreateStudentPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [createdStudentId, setCreatedStudentId] = useState('');
-  const [temporaryPasswords, setTemporaryPasswords] = useState<any[]>([]);
+
 
   const addParent = () => {
     setParents([
@@ -122,7 +122,6 @@ export default function CreateStudentPage() {
 
       // Success!
       setCreatedStudentId(data.student_id);
-      setTemporaryPasswords(data.created_parents || []);
       setSuccess(true);
       setSubmitting(false);
 
@@ -154,59 +153,15 @@ export default function CreateStudentPage() {
                 </svg>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Student Created Successfully!</h2>
-              <p className="text-gray-600">
-                Student ID: <span className="font-mono text-sm">{createdStudentId}</span>
+              <p className="text-gray-600 max-w-md mx-auto">
+                The parent will receive an invitation email when you assign an assessment.
               </p>
             </div>
-
-            {temporaryPasswords.length > 0 && (
-              <div className="mb-8">
-                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-4">
-                  <div className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-yellow-600 mt-1 mr-3 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      />
-                    </svg>
-                    <div>
-                      <h3 className="text-lg font-bold text-yellow-900 mb-2">Important: Save These Credentials</h3>
-                      <p className="text-sm text-yellow-800 mb-4">
-                        Temporary passwords have been generated for new parent accounts. Please save these credentials and share them securely.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {temporaryPasswords.map((parent, index) => (
-                  <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                    <p className="font-semibold text-gray-900 mb-2">{parent.full_name}</p>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-gray-600">Email:</span>
-                        <p className="font-mono text-gray-900">{parent.email}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Temporary Password:</span>
-                        <p className="font-mono text-red-600 font-bold">{parent.temporary_password}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
 
             <div className="flex gap-4">
               <Link href="/psychologist/dashboard" className="flex-1">
                 <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
-                  Go to Dashboard
+                  Back to Dashboard
                 </button>
               </Link>
               <button

@@ -171,7 +171,7 @@ def send_assessment_assignment_email(
     </head>
     <body>
         <div class="header">
-            <h1>New Assessment Assignment</h1>
+            <h1>You're Invited to Complete an Assessment</h1>
         </div>
         <div class="content">
             <p>Dear {parent_name},</p>
@@ -195,6 +195,14 @@ def send_assessment_assignment_email(
             <p style="font-size: 14px; color: #6b7280;">
                 Or copy and paste this link into your browser:<br>
                 <a href="{assessment_link}">{assessment_link}</a>
+            </p>
+
+            <p style="font-size: 13px; color: #6b7280; margin-top: 15px;">
+                <strong>First time?</strong> You'll be asked to set up a password when you click the link above.<br>
+                <strong>Returning user?</strong> You'll be logged in automatically.
+            </p>
+            <p style="font-size: 13px; color: #F59E0B;">
+                ⏰ This link expires in 48 hours. If it expires, contact your psychologist for a new one.
             </p>
 
             <p>If you have any questions or concerns, please contact {psychologist_name}.</p>
@@ -225,6 +233,11 @@ Assessment Details:
 
 Access the assessment here:
 {assessment_link}
+
+First time? You'll be asked to set up a password when you click the link above.
+Returning user? You'll be logged in automatically.
+
+Note: This link expires in 48 hours. If it expires, contact your psychologist for a new one.
 
 If you have any questions or concerns, please contact {psychologist_name}.
 
