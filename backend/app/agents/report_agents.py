@@ -165,7 +165,9 @@ TEST CONDITIONS:
 - Any factors that may have affected validity (fatigue, anxiety, medication, illness)
 - Observations of the child during testing
 
-IMPORTANT: Extract the ACTUAL data. If a parent answered "often" to a question about focus difficulties, record "Parent reported focus difficulties occur 'often'". If the data for a category is thin, still extract what exists — even a single data point matters. Do NOT write "no data available" — instead note what CAN be inferred from adjacent responses. Be concise — use short bullet points, not long paragraphs."""
+IMPORTANT: Extract the ACTUAL data. If a parent answered "often" to a question about focus difficulties, record "Parent reported focus difficulties occur 'often'". If the data for a category is thin, still extract what exists — even a single data point matters. Do NOT write "no data available" — instead note what CAN be inferred from adjacent responses. Be concise — use short bullet points, not long paragraphs.
+
+TONE: Always extract and highlight STRENGTHS and POSITIVE observations alongside any difficulties. Note interests, talents, supportive relationships, positive coping strategies, and areas where the child is thriving. Every child has strengths — make sure they are captured."""
 
         return await self.call_llm(prompt, max_tokens=1500, temperature=0.2)
 
@@ -212,7 +214,9 @@ KEY CLINICAL HYPOTHESES:
 - List 2-4 clinical hypotheses that could explain the overall pattern
 - Note which require further investigation through direct assessment
 
-Be bold in your interpretations. Draw on your clinical knowledge to connect dots the raw data alone cannot. Where data is sparse, use what IS available to make reasonable clinical inferences. Be concise — focus on key clinical observations."""
+Be bold in your interpretations. Draw on your clinical knowledge to connect dots the raw data alone cannot. Where data is sparse, use what IS available to make reasonable clinical inferences. Be concise — focus on key clinical observations.
+
+CRITICAL TONE REQUIREMENT: This report will be read by PARENTS. Adopt a STRENGTHS-BASED, empathetic tone throughout. Lead each section with positives before discussing areas of difficulty. Frame difficulties as "areas for development" or "areas where support would be beneficial" — NEVER use deficit-focused or negative language. Highlight the child's resilience, effort, and potential. Even when noting clinical concerns, balance them with protective factors and strengths. Parents should feel understood and hopeful after reading this report, not distressed."""
 
         return await self.call_llm(prompt, max_tokens=1500, temperature=0.4)
 
@@ -229,6 +233,8 @@ CLINICAL INTERPRETATION:
 {interpreter_output}
 
 Write in authoritative third-person clinical prose. NEVER say "data was insufficient" or "no information was available" — these are BANNED. If information is limited, frame gaps as areas for direct assessment. Use varied phrasing: "{first_name} was described as...", "Concerns were raised regarding...", "{first_name} presents with...", "Parental accounts indicate...". Each subsection: 3-6 sentences of substantive professional clinical prose.
+
+CRITICAL TONE: This report is read by PARENTS. Use a STRENGTHS-BASED, warm, and empathetic tone. Lead each subsection with POSITIVE observations before discussing areas of difficulty. Frame challenges constructively — use "areas where support would be beneficial" rather than deficit language. Highlight {first_name}'s strengths, interests, resilience, and positive qualities throughout. Parents should feel that their child is understood and valued, not labelled negatively. NEVER use blunt negative statements like "{first_name} struggles with..." or "{first_name} has poor..." — instead use "{first_name} would benefit from additional support with..." or "An area for development is...".
 
 Use EXACTLY these headings and structure:
 
@@ -426,7 +432,9 @@ Do NOT list or comment on tests that are NOT in the data.
 Then provide:
 - PROFILE ANALYSIS: Is the profile flat or scattered? What is the significance of the scatter?
 - PATTERN RECOGNITION: Do the scores suggest any specific conditions (e.g., SpLD, processing difficulties)?
-- STRENGTH-WEAKNESS ANALYSIS: What are the clear strengths to build on and weaknesses to support?"""
+- STRENGTH-WEAKNESS ANALYSIS: What are the clear strengths to build on and areas where support would be beneficial?
+
+CRITICAL TONE: Always lead with STRENGTHS. Identify and emphasise what the child does WELL before discussing areas of difficulty. Frame lower scores as "areas for development" or "areas where support would be beneficial" — NEVER use deficit language like "poor", "weak", or "failed". Even scores in the Low or Very Low range should be contextualised with empathy and hope."""
 
         return await self.call_llm(prompt, max_tokens=1500, temperature=0.2)
 
@@ -493,7 +501,9 @@ FORMAT RULES:
 - Do NOT invent scores not in the data
 - Do NOT mention AI or "this report"
 - Use {first_name} naturally throughout
-- Begin directly with "## MAIN BODY OF REPORT" — no preamble"""
+- Begin directly with "## MAIN BODY OF REPORT" — no preamble
+
+CRITICAL TONE: This report is read by PARENTS. Use a STRENGTHS-BASED tone throughout. For EVERY section, lead with {first_name}'s strengths and what they do well BEFORE discussing areas of difficulty. Frame lower scores empathetically — e.g., "This is an area where {first_name} would benefit from targeted support" rather than "{first_name} performed poorly". Use language like "an area for development", "would benefit from support", "emerging skill". NEVER use blunt negative phrases like "struggled", "failed", "poor performance", "deficient", or "impaired". Celebrate strengths genuinely — if a child has a strong VCI but lower PSI, lead with the verbal strength as a genuine asset. Parents should feel their child is understood, valued, and that there is a clear path forward."""
 
         return await self.call_llm(prompt, max_tokens=3000, temperature=0.3)
 
@@ -564,8 +574,10 @@ CONVERGENCES: Where do observations from the BACKGROUND INFORMATION (particularl
 DIVERGENCES: Where do the BACKGROUND INFORMATION sections CONTRADICT or are not fully explained by the assessment data? What might explain this?
 HIDDEN PATTERNS: What emerges from reading the BACKGROUND INFORMATION and the cognitive sections together that neither source reveals alone? Pay particular attention to how familial and linguistic history interact with any phonological or attainment findings.
 DIAGNOSTIC IMPLICATIONS: What conditions or profiles does the combined evidence point toward? Consider SpLD diagnoses, ADHD, ASD, or processing difficulties in light of the cognitive-attainment discrepancy patterns present.
-RISK FACTORS: Any safeguarding, mental health, or urgent educational concerns emerging from the Current Situation or TEST CONDITIONS sections?
-PROTECTIVE FACTORS: Strengths that can be leveraged in intervention planning, drawn from both the background history and the cognitive strengths evident in the assessment data."""
+PROTECTIVE FACTORS & STRENGTHS: Strengths that can be leveraged in intervention planning, drawn from both the background history and the cognitive strengths evident in the assessment data. Include interests, supportive relationships, and areas of resilience.
+RISK FACTORS: Any safeguarding, mental health, or urgent educational concerns emerging from the Current Situation or TEST CONDITIONS sections? Frame these sensitively.
+
+TONE: Lead with strengths and protective factors. Frame difficulties as areas for support, not deficits. This analysis feeds the final parent-facing report — ensure a balanced, hopeful perspective."""
 
         return await self.call_llm(prompt, max_tokens=1500, temperature=0.4)
 
@@ -605,6 +617,8 @@ FORMAT RULES:
 - Do NOT rehash either source — synthesise and add clinical value
 - Do NOT mention AI, data analysis tools, or "this report"
 - Use {first_name} naturally throughout
-- Begin directly with "## Convergent Findings" — no preamble"""
+- Begin directly with "## Convergent Findings" — no preamble
+
+CRITICAL TONE: This section is read by PARENTS. Use a STRENGTHS-BASED, warm, and empathetic tone throughout ALL subsections. Lead every section with positives before discussing areas of need. In Convergent Findings, highlight where strengths are confirmed across sources. In Divergent Findings, frame as "areas warranting further exploration" not problems. In Integrated Formulation, present a balanced picture emphasising {first_name}'s potential and the supports that will help them thrive. In Recommendations, frame as empowering actions the family and school can take — use hopeful, solution-focused language. NEVER use deficit language like "poor", "weak", "deficient", "impaired", or "failed". Instead use "area for development", "would benefit from support", "emerging skill". Parents should finish reading this report feeling understood, hopeful, and empowered to support their child."""
 
         return await self.call_llm(prompt, max_tokens=3000, temperature=0.3)
