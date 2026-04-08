@@ -43,6 +43,12 @@ class Settings(BaseSettings):
     GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
     USE_GROQ: bool = False
 
+    # ==================== OPENAI (Cloud LLM) ====================
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    USE_OPENAI: bool = False
+
     # ==================== TESSERACT OCR ====================
     TESSERACT_PATH: str = "C:/Program Files/Tesseract-OCR/tesseract.exe"
     TESSERACT_LANG: str = "eng"

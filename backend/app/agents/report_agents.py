@@ -20,6 +20,7 @@ import logging
 from typing import Optional
 
 from app.agents.base import BaseAgent
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -78,12 +79,12 @@ Completed Q&A Pairs:
             # Truncate to stay within Groq TPM limits
             analyst_output = analyst_output[:3000]
 
-            # Wait for Groq rate limit to reset (free tier: 6000 TPM)
-            logger.info(f"[BackgroundSummaryAgent] Stage 1 complete, waiting 35s for rate limit...")
-            await asyncio.sleep(35)
+            # Wait for Groq rate limit (skipped for OpenAI)
+            if settings.USE_GROQ:
+                logger.info(f"[BackgroundSummaryAgent] Stage 1 complete, waiting 35s for Groq rate limit...")
+                await asyncio.sleep(35)
 
             # ── STAGE 2: Clinical Interpreter ──
-            # Stage 2 receives ONLY the analyst output (not raw data again) to stay under TPM
             logger.info(f"[BackgroundSummaryAgent] Stage 2/3: Clinical Interpreter for {student_name}")
             interpreter_output = await self._run_clinical_interpreter(
                 analyst_output, student_name, first_name
@@ -92,12 +93,12 @@ Completed Q&A Pairs:
                 interpreter_output = f"Clinical interpretation unavailable — synthesizer should work directly from analyst output."
             interpreter_output = interpreter_output[:3000]
 
-            # Wait for Groq rate limit to reset
-            logger.info(f"[BackgroundSummaryAgent] Stage 2 complete, waiting 35s for rate limit...")
-            await asyncio.sleep(35)
+            # Wait for Groq rate limit (skipped for OpenAI)
+            if settings.USE_GROQ:
+                logger.info(f"[BackgroundSummaryAgent] Stage 2 complete, waiting 35s for Groq rate limit...")
+                await asyncio.sleep(35)
 
             # ── STAGE 3: Report Synthesizer ──
-            # Stage 3 receives ONLY the two summaries (not raw data) to stay under TPM
             logger.info(f"[BackgroundSummaryAgent] Stage 3/3: Report Synthesizer for {student_name}")
             final_report = await self._run_report_synthesizer(
                 analyst_output, interpreter_output,
@@ -381,8 +382,9 @@ class CognitiveReportAgent(BaseAgent):
             if not interpretation:
                 interpretation = "Score interpretation unavailable — proceed with direct analysis."
 
-            # Wait for Groq rate limit
-            await asyncio.sleep(20)
+            # Wait for Groq rate limit (skipped for OpenAI)
+            if settings.USE_GROQ:
+                await asyncio.sleep(20)
 
             # Stage 2: Report Writer — produce the final clinical narrative
             logger.info(f"[CognitiveReportAgent] Stage 2/2: Report Writer for {student_name}")
@@ -526,8 +528,9 @@ class UnifiedInsightsAgent(BaseAgent):
             if not analysis:
                 analysis = "Pattern analysis unavailable — proceed with direct synthesis."
 
-            # Wait for Groq rate limit
-            await asyncio.sleep(20)
+            # Wait for Groq rate limit (skipped for OpenAI)
+            if settings.USE_GROQ:
+                await asyncio.sleep(20)
 
             # Stage 2: Synthesizer — write the final unified report
             logger.info(f"[UnifiedInsightsAgent] Stage 2/2: Synthesis Writer for {student_name}")

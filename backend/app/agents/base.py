@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseAgent:
-    """Base agent with LLM integration (Groq or Ollama) and retry logic."""
+    """Base agent with LLM integration (OpenAI, Groq, or Ollama) and retry logic."""
 
     def __init__(self, name: str, timeout: float = 15.0, max_tokens: int = 300):
         self.name = name
@@ -32,10 +32,77 @@ class BaseAgent:
         max_tokens: Optional[int] = None,
         temperature: float = 0.3,
     ) -> Optional[str]:
-        """Call LLM (Groq or Ollama) with error handling. Returns raw text or None on failure."""
+        """Call LLM (OpenAI, Groq, or Ollama) with error handling. Returns raw text or None on failure."""
+        if settings.USE_OPENAI:
+            return await self._call_openai(prompt, format_json, max_tokens, temperature)
         if settings.USE_GROQ:
             return await self._call_groq(prompt, format_json, max_tokens, temperature)
         return await self._call_ollama(prompt, format_json, max_tokens, temperature)
+
+    async def _call_openai(
+        self,
+        prompt: str,
+        format_json: bool = False,
+        max_tokens: Optional[int] = None,
+        temperature: float = 0.3,
+    ) -> Optional[str]:
+        """Call OpenAI API. Returns raw text or None on failure."""
+        tokens = max_tokens or self.max_tokens
+
+        messages = []
+        if format_json:
+            messages.append({"role": "system", "content": "You must respond with valid JSON."})
+        messages.append({"role": "user", "content": prompt})
+
+        payload = {
+            "model": settings.OPENAI_MODEL,
+            "messages": messages,
+            "max_tokens": tokens,
+            "temperature": temperature,
+        }
+        if format_json:
+            payload["response_format"] = {"type": "json_object"}
+
+        headers = {
+            "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
+                    resp = await client.post(
+                        f"{settings.OPENAI_BASE_URL}/chat/completions",
+                        json=payload,
+                        headers=headers,
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()["choices"][0]["message"]["content"].strip()
+
+                    if resp.status_code == 429:
+                        wait_seconds = 5.0 * (attempt + 1)
+                        logger.info(
+                            f"[{self.name}] OpenAI rate limited (attempt {attempt + 1}/{max_retries}), "
+                            f"waiting {wait_seconds:.1f}s..."
+                        )
+                        await asyncio.sleep(wait_seconds)
+                        continue
+
+                    logger.warning(f"[{self.name}] OpenAI returned {resp.status_code}: {resp.text}")
+                    return None
+
+            except httpx.TimeoutException:
+                logger.warning(f"[{self.name}] OpenAI timeout after {self.timeout}s (attempt {attempt + 1})")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(3.0)
+                    continue
+            except Exception as e:
+                logger.warning(f"[{self.name}] OpenAI LLM call failed: {e}")
+                return None
+
+        logger.warning(f"[{self.name}] OpenAI exhausted all {max_retries} retries")
+        return None
 
     async def _call_groq(
         self,
