@@ -92,59 +92,68 @@ export default function ScoresTable({
             {battery.test_date && <span className="ml-2 text-xs font-normal text-slate-500">({battery.test_date})</span>}
           </h3>
 
-          {/* Composites */}
-          {battery.composites && battery.composites.length > 0 && (
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wide">
-                    <th className="px-4 py-3">Index / Composite</th>
-                    <th className="px-4 py-3">Score</th>
-                    <th className="px-4 py-3">Percentile</th>
-                    <th className="px-4 py-3">Classification</th>
-                    <th className="px-4 py-3">95% CI</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {battery.composites.map((comp, cIdx) => (
-                    <tr key={cIdx} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-slate-800">{comp.name || "—"}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatValue(comp.score)}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatValue(comp.percentile)}</td>
-                      <td className="px-4 py-3 text-slate-700">{comp.classification || "—"}</td>
-                      <td className="px-4 py-3 text-slate-700">{comp.confidence_interval || "—"}</td>
+          {/* Composites — only show columns that have data */}
+          {battery.composites && battery.composites.length > 0 && (() => {
+            const hasPercentile = battery.composites!.some(c => c.percentile != null);
+            const hasClassification = battery.composites!.some(c => c.classification != null);
+            const hasCI = battery.composites!.some(c => c.confidence_interval != null);
+            return (
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wide">
+                      <th className="px-4 py-3">Index / Composite</th>
+                      <th className="px-4 py-3">Score</th>
+                      {hasPercentile && <th className="px-4 py-3">Percentile</th>}
+                      {hasClassification && <th className="px-4 py-3">Classification</th>}
+                      {hasCI && <th className="px-4 py-3">95% CI</th>}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {battery.composites!.map((comp, cIdx) => (
+                      <tr key={cIdx} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-medium text-slate-800">{comp.name || "—"}</td>
+                        <td className="px-4 py-3 text-slate-700">{formatValue(comp.score)}</td>
+                        {hasPercentile && <td className="px-4 py-3 text-slate-700">{formatValue(comp.percentile)}</td>}
+                        {hasClassification && <td className="px-4 py-3 text-slate-700">{comp.classification || "—"}</td>}
+                        {hasCI && <td className="px-4 py-3 text-slate-700">{comp.confidence_interval || "—"}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
 
-          {/* Subtests within battery */}
-          {battery.subtests && battery.subtests.length > 0 && (
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wide">
-                    <th className="px-4 py-3">Subtest</th>
-                    <th className="px-4 py-3">Score</th>
-                    <th className="px-4 py-3">Scaled Score</th>
-                    <th className="px-4 py-3">Percentile</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {battery.subtests.map((sub, sIdx) => (
-                    <tr key={sIdx} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-slate-800">{sub.name || "—"}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatValue(sub.score)}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatValue(sub.scaled_score)}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatValue(sub.percentile)}</td>
+          {/* Subtests within battery — only show columns that have data */}
+          {battery.subtests && battery.subtests.length > 0 && (() => {
+            const hasScaledScore = battery.subtests!.some(s => s.scaled_score != null);
+            const hasPercentile = battery.subtests!.some(s => s.percentile != null);
+            return (
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr className="text-left text-xs font-bold text-slate-600 uppercase tracking-wide">
+                      <th className="px-4 py-3">Subtest</th>
+                      <th className="px-4 py-3">Score</th>
+                      {hasScaledScore && <th className="px-4 py-3">Scaled Score</th>}
+                      {hasPercentile && <th className="px-4 py-3">Percentile</th>}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {battery.subtests!.map((sub, sIdx) => (
+                      <tr key={sIdx} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-medium text-slate-800">{sub.name || "—"}</td>
+                        <td className="px-4 py-3 text-slate-700">{formatValue(sub.score)}</td>
+                        {hasScaledScore && <td className="px-4 py-3 text-slate-700">{formatValue(sub.scaled_score)}</td>}
+                        {hasPercentile && <td className="px-4 py-3 text-slate-700">{formatValue(sub.percentile)}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
         </div>
       ))}
 

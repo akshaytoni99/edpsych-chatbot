@@ -440,7 +440,7 @@ Then provide:
 
 CRITICAL TONE: Always lead with STRENGTHS. Identify and emphasise what the child does WELL before discussing areas of difficulty. Frame lower scores as "areas for development" or "areas where support would be beneficial" — NEVER use deficit language like "poor", "weak", or "failed". Even scores in the Low or Very Low range should be contextualised with empathy and hope."""
 
-        return await self.call_llm(prompt, max_tokens=1500, temperature=0.2)
+        return await self.call_llm(prompt, max_tokens=3000, temperature=0.2)
 
     async def _write_report(
         self, scores_json: str, interpretation: str,
