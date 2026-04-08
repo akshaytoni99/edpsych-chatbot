@@ -19,6 +19,7 @@ from app.models.student import Student
 from app.models.assignment import AssessmentAssignment, AssignmentStatus
 from app.models.student_guardian import StudentGuardian
 from app.utils.email import send_assessment_assignment_email, EmailService
+from app.utils.magic_link import create_invite_magic_link
 
 router = APIRouter(prefix="/assignments", tags=["assignments"])
 
@@ -155,8 +156,14 @@ async def create_assignment(
             use_tls=settings.SMTP_USE_TLS
         )
 
-        # Build assessment link
-        assessment_link = f"{settings.FRONTEND_URL}/parent/assessment/{new_assignment.id}"
+        # Create magic link token and build assessment link
+        magic_link_token = await create_invite_magic_link(
+            db=db,
+            user_id=assigned_to.id,
+            assignment_id=new_assignment.id,
+            expiry_hours=settings.MAGIC_LINK_EXPIRY_HOURS,
+        )
+        assessment_link = f"{settings.FRONTEND_URL}/auth/magic/{magic_link_token.token}"
 
         # Format due date if present
         due_date_str = None
