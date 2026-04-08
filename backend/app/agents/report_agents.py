@@ -288,7 +288,7 @@ class IQScoreExtractorAgent(BaseAgent):
 
             snippet = raw_text[:12000]
 
-            prompt = f"""You are extracting structured data from a UK educational psychology cognitive assessment report. UK reports commonly use these test batteries together: WISC-VUK, WIAT-IIIUK, TOWRE-2, and CTOPP-2.
+            prompt = f"""You are extracting structured data from a UK educational psychology assessment report. The report may contain ANY combination of standardised test batteries. Common ones include WISC-VUK, WPPSI-IV, BAS3, KABC-II, WIAT-IIIUK, YARC, WRAT-5, TOWRE-2, CTOPP-2, PhAB-2, BPVS-3, Beery VMI, DTVP-3, BRIEF-2, Conners, and others — but do NOT limit yourself to this list. Extract ALL test batteries and scores found in the text.
 
 RAW REPORT TEXT:
 \"\"\"
@@ -300,7 +300,7 @@ Return a SINGLE JSON object matching EXACTLY this schema:
 {{
   "test_batteries": [
     {{
-      "battery_name": "WISC-VUK" | "WIAT-IIIUK" | "TOWRE-2" | "CTOPP-2" | string,
+      "battery_name": string,
       "test_date": string | null,
       "administered_by": string | null,
       "composites": [
@@ -332,39 +332,20 @@ Return a SINGLE JSON object matching EXACTLY this schema:
   "notes": string | null
 }}
 
-Guidance on which scores belong to which battery:
-
-WISC-VUK (Wechsler Intelligence Scale for Children — Fifth UK Edition):
-  Composite indices: Full-Scale IQ (FSIQ), Verbal Comprehension Index (VCI),
-  Visual Spatial Index (VSI), Fluid Reasoning Index (FRI),
-  Working Memory Index (WMI), Processing Speed Index (PSI).
-  Also extract any individual subtest scaled scores present (e.g. Similarities,
-  Vocabulary, Block Design, Matrix Reasoning, Digit Span, Coding, etc.).
-
-WIAT-IIIUK (Wechsler Individual Achievement Test — Third UK Edition):
-  Subtests: Listening Comprehension, Reading Comprehension, Word Reading,
-  Pseudoword Decoding, Oral Reading Fluency, Spelling, Numeracy,
-  Maths Problem-Solving, Maths Fluency, Sentence Combining,
-  Essay Composition, Alphabet Writing Fluency.
-
-TOWRE-2 (Test of Word Reading Efficiency — Second Edition):
-  Subtests: Sight Word Efficiency, Phonemic Decoding Efficiency,
-  Total Word Reading Efficiency.
-
-CTOPP-2 (Comprehensive Test of Phonological Processing — Second Edition):
-  Composites: Phonological Awareness, Rapid Naming.
-  Also extract any individual subtests present (e.g. Elision, Blending Words,
-  Rapid Digit Naming, Rapid Letter Naming, etc.).
+Instructions:
+- Create one entry in "test_batteries" for EACH distinct test battery found in the report
+- Use the battery_name EXACTLY as it appears in the report (e.g., "WISC-VUK", "BAS3", "WIAT-IIIUK")
+- "composites" holds index/composite-level scores (e.g., VCI, VSI, FRI for WISC-VUK; Verbal Ability for BAS3; Phonological Awareness for CTOPP-2)
+- "subtests" holds individual subtest-level scores within each battery (e.g., Similarities, Block Design; or Word Reading, Spelling)
+- "full_scale_iq" should contain the overall cognitive ability score if one exists (FSIQ, GCA, etc.)
+- "scaled_score" is for subtest-level scaled scores (typically 1-19 scale); use null if not present
 
 Strict rules:
 - Only extract values that are EXPLICITLY present in the text.
 - Use null for any field you cannot find. DO NOT invent, guess, or interpolate scores.
 - "confidence_interval" should be a string like "95-105" or "90% CI 95-105" if stated; otherwise null.
 - "classification" should be the descriptive band exactly as stated in the report (e.g. "Average", "Low Average") if present; otherwise null.
-- "scaled_score" is the subtest-level scaled score (typically 1-19 scale); use null if not present.
-- "composites" holds index/composite scores; "subtests" holds individual subtest scores within each battery.
-- "full_scale_iq" should mirror the FSIQ composite extracted under WISC-VUK for convenience.
-- "test_batteries" should be an array containing one entry per battery found in the text (possibly empty).
+- "test_batteries" should be an array containing one entry per battery found (possibly empty if no scores found).
 - Return JSON only — no prose, no markdown code fence."""
 
             result = await self.call_llm_json(prompt, max_tokens=1500, temperature=0.1)
@@ -425,43 +406,20 @@ class CognitiveReportAgent(BaseAgent):
 SCORES:
 {scores_json}
 
-Identify and classify scores from the following instruments using UK classification bands ("Extremely Low" <70, "Very Low" 70-79, "Low Average" 80-89, "Average" 90-109, "High Average" 110-119, "Superior" 120-129, "Very Superior" 130+):
+First, identify WHICH test batteries and subtests are present in the data. Different students receive different assessments. Common UK batteries include (but are not limited to):
+- Cognitive: WISC-VUK, WPPSI-IV, BAS3, KABC-II, Leiter-3
+- Attainments: WIAT-IIIUK, YARC, WRAT-5, BPVS-3
+- Reading efficiency: TOWRE-2, YARC
+- Phonological: CTOPP-2, PhAB-2
+- Other: BRIEF-2, Conners, DTVP-3, Beery VMI, etc.
 
-WISC-VUK INDICES:
-- Verbal Comprehension Index (VCI)
-- Visual Spatial Index (VSI)
-- Fluid Reasoning Index (FRI)
-- Working Memory Index (WMI)
-- Processing Speed Index (PSI)
-- Full-Scale IQ (FSIQ)
+For each score/subtest/composite ACTUALLY PRESENT in the data, provide:
+1. The UK classification band using standard bands ("Extremely Low" <70, "Very Low" 70-79, "Low Average" 80-89, "Average" 90-109, "High Average" 110-119, "Superior" 120-129, "Very Superior" 130+)
+2. The percentile rank interpretation
+3. Whether this represents a significant strength or weakness relative to the overall profile
+4. What this score means functionally — how would it manifest in a classroom?
 
-WIAT-IIIUK SUBTESTS:
-- Listening Comprehension
-- Reading Comprehension
-- Word Reading
-- Pseudoword Decoding
-- Oral Reading Fluency
-- Spelling
-- Numeracy
-- Maths Problem-Solving
-- Maths Fluency
-- Sentence Combining
-- Essay Composition
-- Alphabet Writing Fluency
-
-TOWRE-2:
-- Sight Word Efficiency
-- Phonemic Decoding Efficiency
-- Total Word Reading Efficiency
-
-CTOPP-2:
-- Phonological Awareness composite
-- Rapid Naming composite
-
-For each score/subtest found in the data, provide:
-1. The UK classification band and percentile rank interpretation
-2. Whether this represents a significant strength or weakness relative to the overall profile
-3. What this score means functionally — how would it manifest in a classroom?
+Do NOT list or comment on tests that are NOT in the data.
 
 Then provide:
 - PROFILE ANALYSIS: Is the profile flat or scattered? What is the significance of the scatter?
@@ -484,85 +442,47 @@ PSYCHOMETRIC INTERPRETATION:
 
 Write the final published report section in the style of a senior UK educational psychologist. This section will be read by parents, SENCOs, and potentially tribunals.
 
-Use EXACTLY these headings and structure:
+IMPORTANT: Different students receive different test batteries. You MUST adapt the report structure to match ONLY the tests actually present in the scores data. Do NOT include sections for tests that were not administered.
+
+Use this ADAPTIVE heading structure — include each section ONLY if the relevant test data exists in the scores:
 
 ## MAIN BODY OF REPORT
-Write a brief introductory paragraph stating which standardised assessments were administered during this assessment (e.g., WISC-VUK, WIAT-IIIUK, TOWRE-2, CTOPP-2) and the purpose of each.
+Write a brief introductory paragraph stating which standardised assessments were actually administered during this assessment and the purpose of each.
 
 ## COGNITIVE PROFILE
-Write an introductory paragraph about the WISC-VUK (Wechsler Intelligence Scale for Children — Fifth UK Edition), explaining it was administered to assess {first_name}'s cognitive abilities across five primary index scales.
+Include this section ONLY if a cognitive/IQ test was administered (e.g., WISC-VUK, WPPSI-IV, BAS3, KABC-II).
+Write an introductory paragraph naming the specific cognitive test used and its purpose.
 
-### WISC-VUK Verbal Comprehension Index (VCI)
-State the composite score, percentile rank, and UK classification band. Explain what the VCI measures (verbal reasoning, word knowledge, verbal concept formation). Describe {first_name}'s performance and what it means functionally in the classroom. If VCI data is not present in the scores, note that this index was not administered during this assessment.
+For each cognitive index/composite found in the data, create a ### subsection using the EXACT test name and index name as it appears in the data (e.g., "### WISC-VUK Verbal Comprehension Index (VCI)" or "### BAS3 Verbal Ability"). For each:
+- State the composite score, percentile rank, and UK classification band
+- Explain what the index measures
+- Describe {first_name}'s performance and functional classroom implications
 
-### WISC-VUK Visual Spatial Index (VSI)
-State the composite score, percentile rank, and UK classification band. Explain what the VSI measures (visual-spatial reasoning, ability to analyse and construct geometric designs). Describe {first_name}'s performance and functional classroom implications. If VSI data is not present in the scores, note that this index was not administered during this assessment.
-
-### WISC-VUK Fluid Reasoning Index (FRI)
-State the composite score, percentile rank, and UK classification band. Explain what the FRI measures (ability to detect underlying conceptual relationships, inductive and quantitative reasoning). Describe {first_name}'s performance and functional classroom implications. If FRI data is not present in the scores, note that this index was not administered during this assessment.
-
-### WISC-VUK Working Memory Index (WMI)
-State the composite score, percentile rank, and UK classification band. Explain what the WMI measures (ability to hold and manipulate information in conscious awareness). Describe {first_name}'s performance and functional classroom implications. If WMI data is not present in the scores, note that this index was not administered during this assessment.
-
-### WISC-VUK Processing Speed Index (PSI)
-State the composite score, percentile rank, and UK classification band. Explain what the PSI measures (speed and accuracy of visual scanning, discrimination, and simple decision-making). Describe {first_name}'s performance and functional classroom implications. If PSI data is not present in the scores, note that this index was not administered during this assessment.
-
-### WISC-VUK Full-Scale IQ: General Ability Level
-State the Full-Scale IQ score, percentile rank, confidence interval, and UK classification band. Provide a profile scatter analysis — note any statistically significant discrepancies between indices and what this means for the interpretability of the FSIQ as a unitary measure of ability.
+Then include a ### subsection for the Full-Scale/General Ability score (e.g., "### WISC-VUK Full-Scale IQ: General Ability Level" or "### BAS3 General Conceptual Ability (GCA)"):
+- State the overall score, percentile, confidence interval, and classification
+- Provide profile scatter analysis and interpretability
 
 ## ATTAINMENTS
-Write an introductory paragraph about the WIAT-IIIUK (Wechsler Individual Achievement Test — Third UK Edition), explaining it was administered to assess {first_name}'s academic attainments across reading, writing, and mathematics. For each of the following subtests, write a ### subsection ONLY if the subtest data appears in the scores. If a subtest was not administered, skip it entirely — do NOT include a heading or note about it.
+Include this section ONLY if attainment tests were administered (e.g., WIAT-IIIUK, YARC, WRAT-5).
+Write an introductory paragraph naming the specific attainment test(s) used.
 
-### WIAT IIIUK Listening Comprehension
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
+For each attainment subtest found in the data, create a ### subsection using the EXACT test name as it appears in the data (e.g., "### WIAT IIIUK Word Reading" or "### YARC Reading Accuracy"). For each:
+- State the standard score, percentile rank, and UK classification band
+- Describe what was assessed and {first_name}'s performance
+- Provide functional implications for the classroom
 
-### WIAT IIIUK Reading Comprehension
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Word Reading
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Pseudoword Decoding
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Oral Reading Fluency
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Spelling
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Numeracy
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Maths Problem-Solving
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Maths Fluency
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Sentence Combining
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT IIIUK Essay Composition
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### WIAT-IIIUK Alphabet Writing Fluency
-State the standard score, percentile rank, and UK classification band. Describe what was assessed and {first_name}'s performance. Provide functional implications for the classroom.
-
-### Test of Word Reading Efficiency - Second Edition (TOWRE-2)
-Write this subsection ONLY if TOWRE-2 data appears in the scores. State the standard scores, percentile ranks, and UK classification bands for Sight Word Efficiency and Phonemic Decoding Efficiency. Describe what TOWRE-2 measures and {first_name}'s performance. Provide functional implications.
+If TOWRE-2 data is present, include "### Test of Word Reading Efficiency - Second Edition (TOWRE-2)" with scores and interpretation.
 
 ## PHONOLOGICAL PROCESSING
-Write an introductory paragraph about the CTOPP-2 (Comprehensive Test of Phonological Processing — Second Edition), explaining it was administered to assess {first_name}'s phonological processing abilities.
+Include this section ONLY if phonological tests were administered (e.g., CTOPP-2, PhAB-2).
+Write an introductory paragraph naming the specific phonological test used.
 
-### Comprehensive Test of Phonological Processing - Second Edition (CTOPP-2)
-Provide an overview of what the CTOPP-2 measures and why phonological processing is important for literacy development.
+For each phonological composite/subtest found in the data, create a ### subsection (e.g., "### Phonological Awareness", "### Rapid Naming"). For each:
+- State the composite score, percentile rank, and UK classification band
+- Explain what the skill measures and its importance for literacy
+- Describe {first_name}'s performance and functional implications
 
-### Phonological Awareness
-State the composite score, percentile rank, and UK classification band. Describe what phonological awareness measures (ability to access and manipulate the sound structure of language). Describe {first_name}'s performance and functional implications for reading and spelling development.
-
-### Rapid Naming
-State the composite score, percentile rank, and UK classification band. Describe what rapid naming measures (efficiency of retrieving phonological information from long-term memory). Describe {first_name}'s performance and functional implications for reading fluency.
+SKIP any major section (COGNITIVE PROFILE, ATTAINMENTS, PHONOLOGICAL PROCESSING) entirely if no data exists for it. Do NOT write "this test was not administered" — simply omit the section.
 
 FORMAT RULES:
 - Reference SPECIFIC numeric scores, percentiles, and UK classification bands throughout
@@ -633,16 +553,16 @@ class UnifiedInsightsAgent(BaseAgent):
 SOURCE 1 — BACKGROUND INFORMATION (from parent questionnaire — includes Health and developmental history, Familial history of SpLD, Linguistic history, Education history, Current Situation, and TEST CONDITIONS):
 {background}
 
-SOURCE 2 — COGNITIVE ASSESSMENT (from standardised testing — includes MAIN BODY OF REPORT, COGNITIVE PROFILE with WISC-VUK indices, ATTAINMENTS with WIAT-IIIUK subtests and TOWRE-2, and PHONOLOGICAL PROCESSING with CTOPP-2):
+SOURCE 2 — COGNITIVE ASSESSMENT (from standardised testing — may include COGNITIVE PROFILE, ATTAINMENTS, and/or PHONOLOGICAL PROCESSING sections depending on which tests were administered):
 {cognitive}
 
-Analyse:
-CONVERGENCES: Where do observations from the BACKGROUND INFORMATION (particularly Health and developmental history, Familial history of SpLD, and Linguistic history) CONFIRM what the COGNITIVE PROFILE, ATTAINMENTS, or PHONOLOGICAL PROCESSING scores show? Be specific — which background observation maps to which score or index?
-DIVERGENCES: Where do the BACKGROUND INFORMATION sections CONTRADICT or are not fully explained by the COGNITIVE PROFILE, ATTAINMENTS, or PHONOLOGICAL PROCESSING data? What might explain this?
-HIDDEN PATTERNS: What emerges from reading the BACKGROUND INFORMATION and the cognitive sections together that neither source reveals alone? Pay particular attention to how Familial history of SpLD and Linguistic history interact with the PHONOLOGICAL PROCESSING and ATTAINMENTS findings.
-DIAGNOSTIC IMPLICATIONS: What conditions or profiles does the combined evidence point toward? Consider SpLD diagnoses (dyslexia, dyscalculia, dyspraxia), ADHD, ASD, or processing difficulties in light of both the BACKGROUND INFORMATION and the WISC-VUK/WIAT-IIIUK discrepancy patterns.
+Analyse (adapt to whichever test batteries are present in Source 2 — do NOT assume specific tests):
+CONVERGENCES: Where do observations from the BACKGROUND INFORMATION (particularly Health and developmental history, Familial history of SpLD, and Linguistic history) CONFIRM what the cognitive, attainment, or phonological scores show? Be specific — which background observation maps to which score or index?
+DIVERGENCES: Where do the BACKGROUND INFORMATION sections CONTRADICT or are not fully explained by the assessment data? What might explain this?
+HIDDEN PATTERNS: What emerges from reading the BACKGROUND INFORMATION and the cognitive sections together that neither source reveals alone? Pay particular attention to how familial and linguistic history interact with any phonological or attainment findings.
+DIAGNOSTIC IMPLICATIONS: What conditions or profiles does the combined evidence point toward? Consider SpLD diagnoses, ADHD, ASD, or processing difficulties in light of the cognitive-attainment discrepancy patterns present.
 RISK FACTORS: Any safeguarding, mental health, or urgent educational concerns emerging from the Current Situation or TEST CONDITIONS sections?
-PROTECTIVE FACTORS: Strengths that can be leveraged in intervention planning, drawn from both the Education history and the cognitive strengths evident in the COGNITIVE PROFILE."""
+PROTECTIVE FACTORS: Strengths that can be leveraged in intervention planning, drawn from both the background history and the cognitive strengths evident in the assessment data."""
 
         return await self.call_llm(prompt, max_tokens=1500, temperature=0.4)
 
@@ -660,25 +580,25 @@ PATTERN ANALYSIS:
 Write the final published section using EXACTLY these headings:
 
 ## Convergent Findings
-Cross-reference the BACKGROUND INFORMATION (Health and developmental history, Familial history of SpLD, Linguistic history, Education history, Current Situation) with the COGNITIVE PROFILE (WISC-VUK indices), ATTAINMENTS (WIAT-IIIUK subtests, TOWRE-2), and PHONOLOGICAL PROCESSING (CTOPP-2) findings. Where do parent-reported observations align with and are corroborated by the standardised assessment results? Reference specific details from both sources — for example, how a Familial history of SpLD maps onto the PHONOLOGICAL PROCESSING scores, or how reported literacy difficulties in Education history align with WIAT-IIIUK Word Reading or Pseudoword Decoding performance. Explain why each convergence is clinically significant.
+Cross-reference the BACKGROUND INFORMATION subsections with whatever cognitive, attainment, and phonological assessment sections are present in the cognitive report. Where do parent-reported observations align with and are corroborated by the standardised assessment results? Reference specific details from both sources — for example, how familial history maps onto phonological or reading scores, or how reported difficulties align with specific subtest performance. Explain why each convergence is clinically significant. Use the ACTUAL test names from the cognitive report (not assumed ones).
 
 ## Divergent Findings and Areas for Further Investigation
-Where observations from the BACKGROUND INFORMATION appear to diverge from, or are not fully explained by, the COGNITIVE PROFILE, ATTAINMENTS, or PHONOLOGICAL PROCESSING data. Frame these professionally as areas requiring further exploration rather than contradictions. Where relevant, consider whether WISC-VUK index scatter or WIAT-IIIUK subtest variability might account for apparent inconsistencies between reported and assessed functioning. Suggest what further investigation would help resolve each divergence.
+Where observations from the BACKGROUND INFORMATION appear to diverge from, or are not fully explained by, the assessment data. Frame these professionally as areas requiring further exploration rather than contradictions. Where relevant, consider whether cognitive index scatter or attainment subtest variability might account for apparent inconsistencies. Suggest what further investigation would help resolve each divergence.
 
 ## Integrated Formulation
-A clinical formulation that draws together all the evidence — from the BACKGROUND INFORMATION sections through to the COGNITIVE PROFILE, ATTAINMENTS, and PHONOLOGICAL PROCESSING data — into a coherent narrative about {first_name}'s needs. What is the emerging picture of this child? What are the primary areas of need? What WISC-VUK/WIAT-IIIUK discrepancy patterns, if present, are clinically meaningful? What strengths can be built upon?
+A clinical formulation that draws together all the evidence — from the BACKGROUND INFORMATION sections through to whatever cognitive, attainment, and phonological data is available — into a coherent narrative about {first_name}'s needs. What is the emerging picture of this child? What are the primary areas of need? What cognitive-attainment discrepancy patterns, if present, are clinically meaningful? What strengths can be built upon?
 
 ## Recommendations
 Concrete, specific, clinically grounded recommendations organised as:
-- Recommendations for school (classroom strategies, accommodations, SEND support — including any SpLD-specific provisions such as dyslexia-friendly teaching, assistive technology, or access arrangements supported by the WIAT-IIIUK and WISC-VUK profiles)
-- Recommendations for home (parental strategies, environmental modifications, and ways to support reading, spelling, or phonological development identified through the PHONOLOGICAL PROCESSING findings)
-- Recommendations for phonological intervention (where CTOPP-2 or WIAT-IIIUK Pseudoword Decoding/Word Reading scores indicate a need, specify the type of structured, evidence-based phonological or literacy intervention recommended, its frequency, and the professional best placed to deliver it)
-- Recommendations for further assessment (any additional diagnostic conclusions regarding SpLD that follow from the WISC-VUK/WIAT-IIIUK discrepancy analysis and PHONOLOGICAL PROCESSING findings)
+- Recommendations for school (classroom strategies, accommodations, SEND support — including any SpLD-specific provisions supported by the assessment profiles)
+- Recommendations for home (parental strategies, environmental modifications, and ways to support areas of difficulty identified through the assessment)
+- Recommendations for intervention (where phonological, literacy, or numeracy difficulties are indicated by the assessment scores, specify the type of structured, evidence-based intervention recommended, its frequency, and the professional best placed to deliver it)
+- Recommendations for further assessment (any additional diagnostic conclusions or referrals that follow from the cognitive-attainment discrepancy analysis)
 Write these as flowing prose paragraphs, not bullet lists.
 
 FORMAT RULES:
 - Professional clinical prose throughout
-- Reference specific details from both the BACKGROUND INFORMATION and cognitive report sections by name
+- Reference specific details from both the BACKGROUND INFORMATION and cognitive report sections using the ACTUAL test names present
 - Do NOT rehash either source — synthesise and add clinical value
 - Do NOT mention AI, data analysis tools, or "this report"
 - Use {first_name} naturally throughout
