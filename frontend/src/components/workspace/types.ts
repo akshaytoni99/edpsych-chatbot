@@ -25,14 +25,40 @@ export interface SubtestScore {
   name: string;
   score: number | string | null;
   percentile?: number | string | null;
+  scaled_score?: number | string | null;
   confidence_interval?: string | null;
+}
+
+export interface CompositeScore {
+  name: string;
+  score: number | string | null;
+  percentile?: number | string | null;
+  confidence_interval?: string | null;
+  classification?: string | null;
+}
+
+export interface TestBattery {
+  battery_name: string;
+  test_date?: string | null;
+  administered_by?: string | null;
+  composites?: CompositeScore[];
+  subtests?: SubtestScore[];
+}
+
+export interface FullScaleIQ {
+  score: number | string | null;
+  percentile?: number | string | null;
+  confidence_interval?: string | null;
+  classification?: string | null;
 }
 
 export interface ParsedScores {
   test_name?: string | null;
   test_date?: string | null;
-  full_scale_iq?: number | string | null;
+  full_scale_iq?: FullScaleIQ | number | string | null;
+  test_batteries?: TestBattery[];
   subtests?: SubtestScore[] | null;
+  notes?: string | null;
   [key: string]: unknown;
 }
 

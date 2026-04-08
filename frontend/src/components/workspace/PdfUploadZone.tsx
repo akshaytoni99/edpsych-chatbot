@@ -206,7 +206,7 @@ export default function PdfUploadZone({
               Processing PDF and extracting scores…
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              This may take 10–30 seconds while OCR and the AI run.
+              This may take 10–30 seconds to process.
             </p>
           </div>
         )}

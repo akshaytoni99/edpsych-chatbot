@@ -194,7 +194,7 @@ export default function CognitiveReportCard({
             <>
               <ScoresTable
                 scores={cognitiveProfile.parsed_scores}
-                confidence={cognitiveProfile.confidence_score}
+                confidence={cognitiveProfile.confidence_score ?? 1}
                 editable
                 onScoresChange={handleScoresChange}
               />
@@ -237,7 +237,7 @@ export default function CognitiveReportCard({
                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
               >
                 <span className="text-sm font-semibold text-slate-700">
-                  Cognitive Profile · FSIQ {cognitiveProfile.parsed_scores?.full_scale_iq ?? "—"}
+                  Extracted Scores
                 </span>
                 <svg
                   className={`w-4 h-4 text-slate-500 transition-transform ${
@@ -254,7 +254,7 @@ export default function CognitiveReportCard({
                 <div className="p-4 bg-white">
                   <ScoresTable
                     scores={cognitiveProfile.parsed_scores}
-                    confidence={cognitiveProfile.confidence_score}
+                    confidence={cognitiveProfile.confidence_score ?? 1}
                   />
                 </div>
               )}
