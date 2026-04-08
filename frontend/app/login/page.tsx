@@ -242,7 +242,7 @@ export default function LoginPage() {
               <a href="#" className="hover:text-primary transition-colors">Privacy</a>
             </div>
             <div className="mt-6 lg:mt-8 text-[9px] lg:text-[10px] text-slate-400 font-medium">
-              © 2024 The EdPsych Practice. All clinical data encrypted.
+              © 2026 The EdPsych Practice. All clinical data encrypted.
             </div>
           </footer>
         </div>
