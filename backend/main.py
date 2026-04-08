@@ -36,7 +36,9 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("🚀 Starting EdPsych AI Backend...")
     logger.info(f"📊 Database: {settings.DATABASE_HOST}:{settings.DATABASE_PORT}")
-    if getattr(settings, 'USE_GROQ', False):
+    if getattr(settings, 'USE_OPENAI', False):
+        logger.info(f"🧠 LLM: OpenAI ({settings.OPENAI_MODEL})")
+    elif getattr(settings, 'USE_GROQ', False):
         logger.info(f"🧠 LLM: Groq ({settings.GROQ_MODEL})")
     else:
         logger.info(f"🧠 LLM: {settings.OLLAMA_MODEL} @ {settings.OLLAMA_BASE_URL}")
@@ -117,7 +119,7 @@ async def root():
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    llm_status = "groq" if getattr(settings, 'USE_GROQ', False) else ("ollama" if settings.USE_LOCAL_LLM else "disabled")
+    llm_status = "openai" if getattr(settings, 'USE_OPENAI', False) else ("groq" if getattr(settings, 'USE_GROQ', False) else ("ollama" if settings.USE_LOCAL_LLM else "disabled"))
     return {
         "status": "healthy",
         "database": "connected",
