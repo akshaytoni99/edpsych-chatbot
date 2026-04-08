@@ -174,7 +174,7 @@ def send_assessment_assignment_email(
             <p>Please click the button below to access the assessment:</p>
 
             <div style="text-align: center;">
-                <a href="{assessment_link}" class="button">Start Assessment</a>
+                <a href="{assessment_link}" class="button" style="display:inline-block;background-color:#4F46E5;color:#ffffff;padding:12px 30px;text-decoration:none;border-radius:6px;font-weight:bold;">Start Assessment</a>
             </div>
 
             <p style="font-size: 14px; color: #6b7280;">
