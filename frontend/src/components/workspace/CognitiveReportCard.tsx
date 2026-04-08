@@ -52,6 +52,10 @@ export default function CognitiveReportCard({
   };
 
   const generateReport = async () => {
+    const ok = window.confirm(
+      "This will generate a cognitive report from the extracted scores. Continue?"
+    );
+    if (!ok) return;
     setBusy(true);
     setError(null);
     try {
@@ -209,7 +213,12 @@ export default function CognitiveReportCard({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setReupload(true)}
+                  onClick={() => {
+                    const ok = window.confirm(
+                      "Re-uploading will replace the current extracted scores. Continue?"
+                    );
+                    if (ok) setReupload(true);
+                  }}
                   className="text-sm text-primary hover:underline"
                 >
                   Re-upload PDF

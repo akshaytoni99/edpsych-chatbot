@@ -46,6 +46,10 @@ export default function BackgroundSummaryCard({
   const [error, setError] = useState<string | null>(null);
 
   const doGenerate = async () => {
+    const ok = window.confirm(
+      "This will generate a background summary from the parent assessment data. Continue?"
+    );
+    if (!ok) return;
     setBusy(true);
     setError(null);
     try {

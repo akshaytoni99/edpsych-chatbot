@@ -50,6 +50,10 @@ export default function UnifiedInsightsCard({
   const canSynthesize = hasBackgroundSummary && hasCognitiveReport;
 
   const synthesize = async () => {
+    const ok = window.confirm(
+      "This will generate unified insights from the background summary and cognitive report. Continue?"
+    );
+    if (!ok) return;
     setBusy(true);
     setError(null);
     try {
