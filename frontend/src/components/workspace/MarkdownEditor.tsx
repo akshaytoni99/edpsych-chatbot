@@ -2,6 +2,8 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { API_BASE } from "@/lib/api";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface MarkdownEditorProps {
   reportId: string | null;
@@ -194,6 +196,7 @@ export default function MarkdownEditor({
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [, forceTick] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { confirm, confirmProps } = useConfirm();
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestContentRef = useRef(content);
@@ -276,10 +279,11 @@ export default function MarkdownEditor({
     doSave(content);
   };
 
-  const handleDiscard = () => {
+  const handleDiscard = async () => {
     if (!hasChanges) return;
-    const ok = window.confirm(
-      "Discard all unsaved changes and revert to the last saved version?"
+    const ok = await confirm(
+      "Discard all unsaved changes and revert to the last saved version?",
+      { title: "Discard Changes", confirmLabel: "Discard", variant: "danger" }
     );
     if (!ok) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -332,6 +336,7 @@ export default function MarkdownEditor({
 
   return (
     <div className="w-full">
+      <ConfirmModal {...confirmProps} />
       {/* Tabs + status bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="inline-flex rounded-xl bg-slate-100 p-1">

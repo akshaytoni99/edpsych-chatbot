@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE } from "@/lib/api";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface Assignment {
   id: string;
@@ -45,6 +47,7 @@ export default function DashboardPage() {
   const [reports, setReports] = useState<ParentReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const { confirm, confirmProps } = useConfirm();
 
   useEffect(() => {
     // Check authentication
@@ -164,9 +167,10 @@ export default function DashboardPage() {
     router.push(`/chat/${assignmentId}`);
   };
 
-  const handleStartOver = (assignmentId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure? This will restart the assessment from the beginning."
+  const handleStartOver = async (assignmentId: string) => {
+    const confirmed = await confirm(
+      "Are you sure? This will restart the assessment from the beginning.",
+      { title: "Restart Assessment", confirmLabel: "Restart", variant: "danger" }
     );
     if (!confirmed) return;
 
@@ -216,6 +220,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <ConfirmModal {...confirmProps} />
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">

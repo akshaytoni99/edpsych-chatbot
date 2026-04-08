@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 import { API_BASE } from '@/lib/api';
+import ConfirmModal from '@/components/ConfirmModal';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface JobInfo {
   id: string;
@@ -62,6 +64,7 @@ export default function PsychologistReportReviewPage() {
   const [approving, setApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { confirm, confirmProps } = useConfirm();
 
   // Editable fields
   const [editedProfile, setEditedProfile] = useState('');
@@ -206,8 +209,9 @@ export default function PsychologistReportReviewPage() {
   };
 
   const handleApproveReport = async () => {
-    const confirmed = window.confirm(
-      'Are you sure you want to approve this report? Once approved, it will be available to the parent.'
+    const confirmed = await confirm(
+      'Are you sure you want to approve this report? Once approved, it will be available to the parent.',
+      { title: 'Approve Report', confirmLabel: 'Approve' }
     );
     if (!confirmed) return;
 
@@ -358,6 +362,7 @@ export default function PsychologistReportReviewPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <ConfirmModal {...confirmProps} />
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">

@@ -5,6 +5,8 @@ import { API_BASE } from "@/lib/api";
 import MarkdownEditor from "./MarkdownEditor";
 import PdfUploadZone from "./PdfUploadZone";
 import ScoresTable from "./ScoresTable";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import type { CognitiveProfile, ParsedScores, Report } from "./types";
 
 interface CognitiveReportCardProps {
@@ -26,6 +28,7 @@ export default function CognitiveReportCard({
   const [error, setError] = useState<string | null>(null);
   const [reupload, setReupload] = useState(false);
   const [showScoresDetail, setShowScoresDetail] = useState(false);
+  const { confirm, confirmProps } = useConfirm();
 
   const callPost = async (path: string, body?: object): Promise<Report> => {
     const token = localStorage.getItem("access_token");
@@ -52,8 +55,9 @@ export default function CognitiveReportCard({
   };
 
   const generateReport = async () => {
-    const ok = window.confirm(
-      "This will generate a cognitive report from the extracted scores. Continue?"
+    const ok = await confirm(
+      "This will generate a cognitive report from the uploaded scores. Continue?",
+      { title: "Generate Cognitive Report", confirmLabel: "Generate" }
     );
     if (!ok) return;
     setBusy(true);
@@ -86,8 +90,9 @@ export default function CognitiveReportCard({
   };
 
   const regenerate = async () => {
-    const ok = window.confirm(
-      "Regenerating will replace the current draft and your edits will be lost. Continue?"
+    const ok = await confirm(
+      "Regenerating will replace the current draft and your edits will be lost. Continue?",
+      { title: "Regenerate Report", confirmLabel: "Regenerate", variant: "danger" }
     );
     if (!ok) return;
     setBusy(true);
@@ -109,6 +114,14 @@ export default function CognitiveReportCard({
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleReupload = async () => {
+    const ok = await confirm(
+      "Re-uploading will replace the current scores. Continue?",
+      { title: "Re-upload PDF", confirmLabel: "Re-upload", variant: "danger" }
+    );
+    if (ok) setReupload(true);
   };
 
   const handleScoresChange = (scores: ParsedScores) => {
@@ -141,6 +154,7 @@ export default function CognitiveReportCard({
 
   return (
     <section className="glass-card p-6 sm:p-8 rounded-2xl shadow-xl">
+      <ConfirmModal {...confirmProps} />
       {header}
 
       {error && (
@@ -213,12 +227,7 @@ export default function CognitiveReportCard({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const ok = window.confirm(
-                      "Re-uploading will replace the current extracted scores. Continue?"
-                    );
-                    if (ok) setReupload(true);
-                  }}
+                  onClick={handleReupload}
                   className="text-sm text-primary hover:underline"
                 >
                   Re-upload PDF

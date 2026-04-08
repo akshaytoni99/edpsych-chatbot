@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { API_BASE } from "@/lib/api";
 import MarkdownEditor from "./MarkdownEditor";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import type { Report } from "./types";
 
 interface BackgroundSummaryCardProps {
@@ -44,10 +46,12 @@ export default function BackgroundSummaryCard({
 }: BackgroundSummaryCardProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { confirm, confirmProps } = useConfirm();
 
   const doGenerate = async () => {
-    const ok = window.confirm(
-      "This will generate a background summary from the parent assessment data. Continue?"
+    const ok = await confirm(
+      "This will generate a background summary from the parent assessment data. Continue?",
+      { title: "Generate Background Summary", confirmLabel: "Generate" }
     );
     if (!ok) return;
     setBusy(true);
@@ -81,8 +85,9 @@ export default function BackgroundSummaryCard({
   };
 
   const doRegenerate = async () => {
-    const ok = window.confirm(
-      "Regenerating will replace the current draft and your edits will be lost. Continue?"
+    const ok = await confirm(
+      "Regenerating will replace the current draft and your edits will be lost. Continue?",
+      { title: "Regenerate Report", confirmLabel: "Regenerate", variant: "danger" }
     );
     if (!ok) return;
     setBusy(true);
@@ -108,6 +113,8 @@ export default function BackgroundSummaryCard({
 
   return (
     <section className="glass-card p-6 sm:p-8 rounded-2xl shadow-xl">
+      <ConfirmModal {...confirmProps} />
+
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white flex-shrink-0">
@@ -142,7 +149,7 @@ export default function BackgroundSummaryCard({
           <div className="h-4 bg-slate-200 rounded animate-pulse w-5/6" />
           <div className="h-4 bg-slate-200 rounded animate-pulse w-4/6" />
           <p className="text-xs text-slate-500 mt-2">
-            Generating using multi-agent clinical pipeline — this takes 60–90 seconds.
+            Generating report — this may take up to 90 seconds.
           </p>
         </div>
       ) : !existingReport ? (
@@ -167,7 +174,7 @@ export default function BackgroundSummaryCard({
           </div>
           {!hasParentData && (
             <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 inline-block">
-              Parent hasn’t completed the assessment yet — you can still start blank.
+              Parent hasn't completed the assessment yet — you can still start blank.
             </p>
           )}
         </div>

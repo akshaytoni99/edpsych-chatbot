@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { API_BASE } from "@/lib/api";
 import MarkdownEditor from "./MarkdownEditor";
+import ConfirmModal from "@/components/ConfirmModal";
+import { useConfirm } from "@/hooks/useConfirm";
 import type { Report } from "./types";
 
 interface UnifiedInsightsCardProps {
@@ -46,12 +48,14 @@ export default function UnifiedInsightsCard({
 }: UnifiedInsightsCardProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { confirm, confirmProps } = useConfirm();
 
   const canSynthesize = hasBackgroundSummary && hasCognitiveReport;
 
   const synthesize = async () => {
-    const ok = window.confirm(
-      "This will generate unified insights from the background summary and cognitive report. Continue?"
+    const ok = await confirm(
+      "This will generate unified insights from the background summary and cognitive report. Continue?",
+      { title: "Generate Unified Insights", confirmLabel: "Generate" }
     );
     if (!ok) return;
     setBusy(true);
@@ -84,8 +88,9 @@ export default function UnifiedInsightsCard({
   };
 
   const regenerate = async () => {
-    const ok = window.confirm(
-      "Regenerating will replace the current draft and your edits will be lost. Continue?"
+    const ok = await confirm(
+      "Regenerating will replace the current draft and your edits will be lost. Continue?",
+      { title: "Regenerate Report", confirmLabel: "Regenerate", variant: "danger" }
     );
     if (!ok) return;
     setBusy(true);
@@ -111,6 +116,8 @@ export default function UnifiedInsightsCard({
 
   return (
     <section className="glass-card p-6 sm:p-8 rounded-2xl shadow-xl">
+      <ConfirmModal {...confirmProps} />
+
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white flex-shrink-0">
