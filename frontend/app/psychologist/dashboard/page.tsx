@@ -42,6 +42,8 @@ interface Student {
     is_primary: string;
   }[];
   has_active_assignment: boolean;
+  assignment_status: string | null;
+  progress_percentage: number;
 }
 
 interface Assignment {
