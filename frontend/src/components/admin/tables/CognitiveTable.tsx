@@ -18,7 +18,7 @@ export default function CognitiveTable({ rows }: CognitiveTableProps) {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-white/5 border-b border-white/10">
-              <tr><Th>Student</Th><Th>Test Name</Th><Th>Test Date</Th><Th>FSIQ</Th><Th>Confidence</Th><Th>OCR Length</Th><Th>Created</Th></tr>
+              <tr><Th>Student</Th><Th>Test Name</Th><Th>Test Date</Th><Th>Overall Score</Th><Th>Quality</Th><Th>Text Length</Th><Th>Created</Th></tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {rows.map((row) => {

@@ -132,7 +132,7 @@ export default function CognitiveReportCard({
         <div>
           <h2 className="text-xl font-bold text-on-background">Cognitive Report</h2>
           <p className="text-xs text-slate-500">
-            Upload a WISC-V, WIAT-III or similar PDF, review scores, then generate narrative.
+            Upload a cognitive assessment PDF, review scores, then generate narrative.
           </p>
         </div>
       </div>
