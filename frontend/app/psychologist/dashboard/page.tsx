@@ -1716,135 +1716,147 @@ export default function PsychologistDashboard() {
               })()}
             </div>
 
-            {/* Guardian Management Modal */}
+            {/* Guardian Management Modal (overlay) */}
             {selectedStudentForGuardians && (
-              <div className="glass-card p-8 rounded-2xl mt-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h4 className="text-lg font-bold text-on-background">
-                    Manage Guardians for {students.find(s => s.id === selectedStudentForGuardians)?.first_name} {students.find(s => s.id === selectedStudentForGuardians)?.last_name}
-                  </h4>
-                  <button
-                    onClick={() => setSelectedStudentForGuardians(null)}
-                    className="text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    ✕ Close
-                  </button>
-                </div>
-
-                {/* Current Guardians List */}
-                <div className="mb-6">
-                  <h5 className="text-sm font-bold text-on-background mb-3">Current Guardians</h5>
-                  {guardians.length === 0 ? (
-                    <p className="text-sm text-slate-500 italic">No guardians assigned yet</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {guardians.map((guardian) => (
-                        <div key={guardian.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-lg">
-                          <div>
-                            <p className="font-medium text-on-background">{guardian.guardian.name}</p>
-                            <p className="text-sm text-slate-600">{guardian.guardian.email}</p>
-                            {guardian.relationship_type && (
-                              <span className="text-xs text-slate-500">Relationship: {guardian.relationship_type}</span>
-                            )}
-                            {guardian.is_primary === "true" && (
-                              <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded">Primary</span>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => handleRemoveGuardian(guardian.id)}
-                            className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Add Guardian Button */}
-                {!showAddGuardianForm && (
-                  <button
-                    onClick={() => setShowAddGuardianForm(true)}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    + Add Another Guardian
-                  </button>
-                )}
-
-                {/* Add Guardian Form */}
-                {showAddGuardianForm && (
-                  <div className="mt-4 p-4 border border-slate-200 rounded-lg bg-white">
-                    <h5 className="text-sm font-bold text-on-background mb-3">Add New Guardian</h5>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-on-background mb-2">
-                          Select Parent/Guardian
-                        </label>
-                        <select
-                          value={newGuardianData.guardian_user_id}
-                          onChange={(e) => setNewGuardianData({ ...newGuardianData, guardian_user_id: e.target.value })}
-                          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                        >
-                          <option value="">Select parent/guardian...</option>
-                          {parentUsers
-                            .filter(parent => !guardians.find(g => g.guardian_user_id === parent.id))
-                            .map((parent) => (
-                              <option key={parent.id} value={parent.id}>
-                                {parent.name} ({parent.email})
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-on-background mb-2">
-                          Relationship Type (Optional)
-                        </label>
-                        <select
-                          value={newGuardianData.relationship_type}
-                          onChange={(e) => setNewGuardianData({ ...newGuardianData, relationship_type: e.target.value })}
-                          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                        >
-                          <option value="">Select relationship...</option>
-                          <option value="Mother">Mother</option>
-                          <option value="Father">Father</option>
-                          <option value="Guardian">Guardian</option>
-                          <option value="Grandparent">Grandparent</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={newGuardianData.is_primary === "true"}
-                          onChange={(e) => setNewGuardianData({ ...newGuardianData, is_primary: e.target.checked ? "true" : "false" })}
-                          className="mr-2"
-                        />
-                        <label className="text-sm text-on-background">Set as primary contact</label>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleAddGuardian}
-                          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                          Add Guardian
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowAddGuardianForm(false);
-                            setNewGuardianData({ guardian_user_id: "", relationship_type: "", is_primary: "false" });
-                          }}
-                          className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
+              <div
+                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                style={{ animation: "fadeIn 0.15s ease-out" }}
+                onClick={(e) => { if (e.target === e.currentTarget) setSelectedStudentForGuardians(null); }}
+              >
+                <div
+                  className="bg-white rounded-2xl shadow-2xl max-w-lg w-[90%] mx-4 max-h-[85vh] overflow-y-auto"
+                  style={{ animation: "scaleIn 0.2s ease-out" }}
+                >
+                  {/* Header */}
+                  <div className="flex justify-between items-center px-6 pt-6 pb-4 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
+                    <h4 className="text-lg font-bold text-slate-900">
+                      Manage Guardians for {students.find(s => s.id === selectedStudentForGuardians)?.first_name} {students.find(s => s.id === selectedStudentForGuardians)?.last_name}
+                    </h4>
+                    <button
+                      onClick={() => setSelectedStudentForGuardians(null)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
                   </div>
-                )}
+
+                  <div className="px-6 py-5">
+                    {/* Current Guardians List */}
+                    <div className="mb-6">
+                      <h5 className="text-sm font-bold text-slate-900 mb-3">Current Guardians</h5>
+                      {guardians.length === 0 ? (
+                        <p className="text-sm text-slate-500 italic">No guardians assigned yet</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {guardians.map((guardian) => (
+                            <div key={guardian.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                              <div>
+                                <p className="font-medium text-slate-900">{guardian.guardian.name}</p>
+                                <p className="text-sm text-slate-600">{guardian.guardian.email}</p>
+                                {guardian.relationship_type && (
+                                  <span className="text-xs text-slate-500">{guardian.relationship_type}</span>
+                                )}
+                                {guardian.is_primary === "true" && (
+                                  <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full">Primary</span>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => handleRemoveGuardian(guardian.id)}
+                                className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Add Guardian Button */}
+                    {!showAddGuardianForm && (
+                      <button
+                        onClick={() => setShowAddGuardianForm(true)}
+                        className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors"
+                      >
+                        + Add Another Guardian
+                      </button>
+                    )}
+
+                    {/* Add Guardian Form */}
+                    {showAddGuardianForm && (
+                      <div className="mt-4 p-5 border border-slate-200 rounded-xl bg-slate-50">
+                        <h5 className="text-sm font-bold text-slate-900 mb-3">Add New Guardian</h5>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                              Select Parent/Guardian
+                            </label>
+                            <select
+                              value={newGuardianData.guardian_user_id}
+                              onChange={(e) => setNewGuardianData({ ...newGuardianData, guardian_user_id: e.target.value })}
+                              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none bg-white"
+                            >
+                              <option value="">Select parent/guardian...</option>
+                              {parentUsers
+                                .filter(parent => !guardians.find(g => g.guardian_user_id === parent.id))
+                                .map((parent) => (
+                                  <option key={parent.id} value={parent.id}>
+                                    {parent.name} ({parent.email})
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                              Relationship Type (Optional)
+                            </label>
+                            <select
+                              value={newGuardianData.relationship_type}
+                              onChange={(e) => setNewGuardianData({ ...newGuardianData, relationship_type: e.target.value })}
+                              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none bg-white"
+                            >
+                              <option value="">Select relationship...</option>
+                              <option value="Mother">Mother</option>
+                              <option value="Father">Father</option>
+                              <option value="Guardian">Guardian</option>
+                              <option value="Grandparent">Grandparent</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={newGuardianData.is_primary === "true"}
+                              onChange={(e) => setNewGuardianData({ ...newGuardianData, is_primary: e.target.checked ? "true" : "false" })}
+                              className="mr-2 rounded"
+                            />
+                            <label className="text-sm text-slate-700">Set as primary contact</label>
+                          </div>
+
+                          <div className="flex gap-2 pt-2">
+                            <button
+                              onClick={handleAddGuardian}
+                              className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors"
+                            >
+                              Add Guardian
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowAddGuardianForm(false);
+                                setNewGuardianData({ guardian_user_id: "", relationship_type: "", is_primary: "false" });
+                              }}
+                              className="px-5 py-2.5 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
