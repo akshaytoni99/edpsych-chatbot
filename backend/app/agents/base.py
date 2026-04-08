@@ -78,7 +78,15 @@ class BaseAgent:
                         headers=headers,
                     )
                     if resp.status_code == 200:
-                        return resp.json()["choices"][0]["message"]["content"].strip()
+                        data = resp.json()
+                        finish_reason = data["choices"][0].get("finish_reason", "unknown")
+                        content = data["choices"][0]["message"]["content"].strip()
+                        if finish_reason == "length":
+                            logger.warning(
+                                f"[{self.name}] OpenAI response truncated (finish_reason=length, "
+                                f"max_tokens={tokens}). Response length: {len(content)} chars"
+                            )
+                        return content
 
                     if resp.status_code == 429:
                         wait_seconds = 5.0 * (attempt + 1)
@@ -235,5 +243,5 @@ class BaseAgent:
                     return json.loads(raw[start:end])
                 except json.JSONDecodeError:
                     pass
-            logger.warning(f"[{self.name}] Failed to parse JSON from LLM response")
+            logger.warning(f"[{self.name}] Failed to parse JSON from LLM response. First 500 chars: {raw[:500]}")
             return None

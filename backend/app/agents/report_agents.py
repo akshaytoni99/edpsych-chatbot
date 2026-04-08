@@ -276,8 +276,8 @@ class IQScoreExtractorAgent(BaseAgent):
     def __init__(self):
         super().__init__(
             name="IQScoreExtractorAgent",
-            timeout=45.0,
-            max_tokens=1500,
+            timeout=60.0,
+            max_tokens=3000,
         )
 
     async def extract(self, raw_text: str) -> dict:
@@ -359,7 +359,7 @@ Strict rules:
 - "test_batteries" should be an array containing one entry per battery found (possibly empty if no scores found).
 - Return JSON only — no prose, no markdown code fence."""
 
-            result = await self.call_llm_json(prompt, max_tokens=1500, temperature=0.1)
+            result = await self.call_llm_json(prompt, max_tokens=3000, temperature=0.1)
             if result is None:
                 return {"error": "The language model failed to return valid JSON. Please review the PDF manually."}
             return result
