@@ -351,11 +351,30 @@ async def get_students_for_assignment(
             select(AssessmentAssignment).where(
                 and_(
                     AssessmentAssignment.student_id == student.id,
-                    AssessmentAssignment.status.in_([AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS])
+                    AssessmentAssignment.status.in_([AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS, AssignmentStatus.COMPLETED])
                 )
-            )
+            ).order_by(AssessmentAssignment.assigned_at.desc())
         )
-        has_active_assignment = assignment_result.scalar_one_or_none() is not None
+        active_assignment = assignment_result.scalar_one_or_none()
+
+        # Calculate progress from chat session if assignment exists
+        progress_pct = 0
+        assignment_status = None
+        if active_assignment:
+            assignment_status = active_assignment.status.value if hasattr(active_assignment.status, 'value') else str(active_assignment.status)
+            from app.models.chat import ChatSession
+            session_result = await db.execute(
+                select(ChatSession).where(
+                    ChatSession.assignment_id == active_assignment.id
+                ).order_by(ChatSession.created_at.desc())
+            )
+            chat_session = session_result.scalar_one_or_none()
+            if chat_session and chat_session.context_data:
+                answered = chat_session.context_data.get("answered_node_ids", [])
+                total_nodes = 102  # parent_assessment_v1 answerable nodes
+                progress_pct = round((len(answered) / total_nodes) * 100) if total_nodes > 0 else 0
+                if chat_session.status == "completed":
+                    progress_pct = 100
 
         students_with_guardians.append({
             "id": str(student.id),
@@ -363,8 +382,10 @@ async def get_students_for_assignment(
             "last_name": student.last_name,
             "grade_level": student.year_group,
             "school_name": student.school_name,
-            "guardians": guardians_list,  # Now returns list of all guardians
-            "has_active_assignment": has_active_assignment
+            "guardians": guardians_list,
+            "has_active_assignment": active_assignment is not None,
+            "assignment_status": assignment_status,
+            "progress_percentage": progress_pct,
         })
 
     return students_with_guardians

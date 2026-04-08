@@ -1654,9 +1654,34 @@ export default function PsychologistDashboard() {
                           </td>
                           <td className="py-4 px-4">
                             {student.has_active_assignment ? (
-                              <span className="px-3 py-1 rounded-lg text-xs font-bold border bg-blue-100 text-blue-700 border-blue-200">
-                                Active Assessment
-                              </span>
+                              <div className="flex flex-col gap-1.5 min-w-[120px]">
+                                <div className="flex items-center justify-between">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                    student.assignment_status === "COMPLETED"
+                                      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                      : student.assignment_status === "IN_PROGRESS"
+                                      ? "bg-blue-100 text-blue-700 border-blue-200"
+                                      : "bg-amber-100 text-amber-700 border-amber-200"
+                                  }`}>
+                                    {student.assignment_status === "COMPLETED" ? "Completed" : student.assignment_status === "IN_PROGRESS" ? "In Progress" : "Assigned"}
+                                  </span>
+                                  <span className="text-[11px] font-semibold text-slate-500">{student.progress_percentage || 0}%</span>
+                                </div>
+                                <div className="w-full bg-slate-200 rounded-full h-1.5">
+                                  <div
+                                    className={`h-1.5 rounded-full transition-all duration-500 ${
+                                      (student.progress_percentage || 0) === 100
+                                        ? "bg-emerald-500"
+                                        : (student.progress_percentage || 0) > 50
+                                        ? "bg-blue-500"
+                                        : (student.progress_percentage || 0) > 0
+                                        ? "bg-amber-500"
+                                        : "bg-slate-300"
+                                    }`}
+                                    style={{ width: `${student.progress_percentage || 0}%` }}
+                                  />
+                                </div>
+                              </div>
                             ) : (
                               <span className="px-3 py-1 rounded-lg text-xs font-bold border bg-slate-100 text-slate-700 border-slate-200">
                                 No Assignment
