@@ -366,7 +366,7 @@ async def get_students_for_assignment(
             session_result = await db.execute(
                 select(ChatSession).where(
                     ChatSession.assignment_id == active_assignment.id
-                ).order_by(ChatSession.created_at.desc())
+                ).order_by(ChatSession.started_at.desc())
             )
             chat_session = session_result.scalar_one_or_none()
             if chat_session and chat_session.context_data:
