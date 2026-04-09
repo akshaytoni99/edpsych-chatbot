@@ -192,7 +192,28 @@ export default function AdminDashboard() {
   const [resetting, setResetting] = useState<string | null>(null);
   const [statPopup, setStatPopup] = useState<{ open: boolean; title: string; items: { id: string; label: string; sub?: string }[]; loading: boolean }>({ open: false, title: "", items: [], loading: false });
   const [dialog, setDialog] = useState<{ open: boolean; title: string; message: string; variant: "info" | "warning" | "danger" | "success"; confirmLabel: string; cancelLabel?: string; onConfirm: () => void; onCancel?: () => void }>({ open: false, title: "", message: "", variant: "info", confirmLabel: "OK", onConfirm: () => {} });
-  const [activeTab, setActiveTab] = useState<"users" | "explorer">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "students" | "assignments" | "explorer">("users");
+
+  /* ─── Students tab state ─── */
+  const [adminStudents, setAdminStudents] = useState<any[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [showCreateStudent, setShowCreateStudent] = useState(false);
+  const [studentForm, setStudentForm] = useState({
+    student_first_name: "", student_last_name: "", date_of_birth: "", gender: "", grade: "", school_name: "",
+    parents: [{ type: "parent", full_name: "", email: "", phone: "", relationship: "Mother", is_primary: true }],
+  });
+  const [studentFormError, setStudentFormError] = useState("");
+  const [creatingStudent, setCreatingStudent] = useState(false);
+
+  /* ─── Assignments tab state ─── */
+  const [adminAssignments, setAdminAssignments] = useState<any[]>([]);
+  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [showAssignForm, setShowAssignForm] = useState(false);
+  const [assignStudents, setAssignStudents] = useState<any[]>([]);
+  const [assignForm, setAssignForm] = useState({ student_id: "", parent_id: "", notes: "" });
+  const [assignFormError, setAssignFormError] = useState("");
+  const [assigning, setAssigning] = useState(false);
+  const [selectedStudentGuardians, setSelectedStudentGuardians] = useState<any[]>([]);
 
   const showAlert = (title: string, message: string, variant: "info" | "warning" | "danger" | "success" = "info") => {
     setDialog({ open: true, title, message, variant, confirmLabel: "OK", onConfirm: () => setDialog((d) => ({ ...d, open: false })) });
@@ -242,6 +263,113 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  /* ─── Students data ─── */
+  const fetchAdminStudents = async () => {
+    setStudentsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${API_BASE}/admin/students/all-with-details`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) { const data = await res.json(); setAdminStudents(data.students || []); }
+    } catch (e) { console.error("Error fetching students:", e); }
+    finally { setStudentsLoading(false); }
+  };
+
+  const handleCreateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStudentFormError("");
+    setCreatingStudent(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${API_BASE}/admin/students/create-with-parents`, {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(studentForm),
+      });
+      if (res.ok) {
+        setShowCreateStudent(false);
+        setStudentForm({ student_first_name: "", student_last_name: "", date_of_birth: "", gender: "", grade: "", school_name: "", parents: [{ type: "parent", full_name: "", email: "", phone: "", relationship: "Mother", is_primary: true }] });
+        fetchAdminStudents();
+        showAlert("Success", "Student created successfully!", "success");
+      } else { const d = await res.json().catch(() => null); setStudentFormError(d?.detail || "Failed to create student"); }
+    } catch { setStudentFormError("Network error."); }
+    finally { setCreatingStudent(false); }
+  };
+
+  /* ─── Assignments data ─── */
+  const fetchAdminAssignments = async () => {
+    setAssignmentsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${API_BASE}/admin/assignments/all`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) { const data = await res.json(); setAdminAssignments(data || []); }
+    } catch (e) { console.error("Error fetching assignments:", e); }
+    finally { setAssignmentsLoading(false); }
+  };
+
+  const fetchStudentsForAssign = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${API_BASE}/admin/students/all-with-details`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) { const data = await res.json(); setAssignStudents(data.students || []); }
+    } catch {}
+  };
+
+  const handleStudentSelectForAssign = (studentId: string) => {
+    setAssignForm({ ...assignForm, student_id: studentId, parent_id: "" });
+    const student = assignStudents.find((s: any) => s.id === studentId);
+    setSelectedStudentGuardians(student?.guardians || []);
+  };
+
+  const handleAssign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAssignFormError("");
+    if (!assignForm.student_id || !assignForm.parent_id) { setAssignFormError("Select both student and parent"); return; }
+    setAssigning(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${API_BASE}/admin/assignments/assign`, {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(assignForm),
+      });
+      if (res.ok) {
+        setShowAssignForm(false);
+        setAssignForm({ student_id: "", parent_id: "", notes: "" });
+        fetchAdminAssignments();
+        showAlert("Success", "Assessment assigned and magic link sent!", "success");
+      } else { const d = await res.json().catch(() => null); setAssignFormError(d?.detail || "Failed to assign"); }
+    } catch { setAssignFormError("Network error."); }
+    finally { setAssigning(false); }
+  };
+
+  const handleResendInvite = async (assignmentId: string) => {
+    const token = localStorage.getItem("access_token");
+    try {
+      const res = await fetch(`${API_BASE}/admin/assignments/${assignmentId}/resend-link`, {
+        method: "POST", headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) showAlert("Sent", "Magic link resent successfully", "success");
+      else showAlert("Error", "Failed to resend invite", "danger");
+    } catch { showAlert("Error", "Network error", "danger"); }
+  };
+
+  const handleCancelAssignment = (assignmentId: string) => {
+    showConfirm("Cancel Assignment", "Are you sure you want to cancel this assignment?", "danger", "Cancel Assignment", async () => {
+      const token = localStorage.getItem("access_token");
+      try {
+        const res = await fetch(`${API_BASE}/admin/assignments/${assignmentId}/cancel`, {
+          method: "PATCH", headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) { fetchAdminAssignments(); showAlert("Cancelled", "Assignment cancelled", "info"); }
+        else showAlert("Error", "Failed to cancel", "danger");
+      } catch { showAlert("Error", "Network error", "danger"); }
+    });
+  };
+
+  /* ─── Fetch students/assignments when switching tabs ─── */
+  useEffect(() => {
+    if (activeTab === "students" && adminStudents.length === 0) fetchAdminStudents();
+    if (activeTab === "assignments" && adminAssignments.length === 0) fetchAdminAssignments();
+  }, [activeTab]);
 
   /* ─── Stat popup ─── */
   const handleStatClick = async (statType: string) => {
@@ -396,6 +524,12 @@ export default function AdminDashboard() {
               <button onClick={() => setActiveTab("users")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "users" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
                 Overview
               </button>
+              <button onClick={() => setActiveTab("students")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "students" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+                Students
+              </button>
+              <button onClick={() => setActiveTab("assignments")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "assignments" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+                Assignments
+              </button>
               <button onClick={() => setActiveTab("explorer")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "explorer" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
                 Data Explorer
               </button>
@@ -418,9 +552,11 @@ export default function AdminDashboard() {
       </header>
 
       {/* ── Mobile tab bar ── */}
-      <div className="sm:hidden flex border-b border-white/5 bg-slate-900/60">
-        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "users" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Overview</button>
-        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors ${activeTab === "explorer" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Data Explorer</button>
+      <div className="sm:hidden flex border-b border-white/5 bg-slate-900/60 overflow-x-auto">
+        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "users" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Overview</button>
+        <button onClick={() => setActiveTab("students")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "students" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Students</button>
+        <button onClick={() => setActiveTab("assignments")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "assignments" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Assignments</button>
+        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "explorer" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Explorer</button>
       </div>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -577,6 +713,144 @@ export default function AdminDashboard() {
               )}
             </div>
           </>
+        ) : activeTab === "students" ? (
+          /* ── Students Tab ── */
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Student Management</h2>
+                <p className="text-sm text-slate-400 mt-1">Create students and link parents/schools</p>
+              </div>
+              <button onClick={() => { setShowCreateStudent(true); }} className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                Add Student
+              </button>
+            </div>
+
+            {studentsLoading ? (
+              <div className="flex justify-center py-16"><div className="w-6 h-6 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin" /></div>
+            ) : adminStudents.length === 0 ? (
+              <div className="text-center py-16 text-slate-500">No students yet. Click &quot;Add Student&quot; to create one.</div>
+            ) : (
+              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead><tr className="border-b border-white/5">
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">School</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Parent/Guardian</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-white/5">
+                      {adminStudents.map((s: any) => (
+                        <tr key={s.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-5 py-3.5">
+                            <p className="text-sm font-medium text-white">{s.first_name} {s.last_name}</p>
+                          </td>
+                          <td className="px-5 py-3.5 text-sm text-slate-400">{s.grade || "-"}</td>
+                          <td className="px-5 py-3.5 text-sm text-slate-400">{s.school_name || "-"}</td>
+                          <td className="px-5 py-3.5">
+                            {s.guardians && s.guardians.length > 0 ? (
+                              <div>
+                                <p className="text-sm text-white">{s.guardians[0].name}</p>
+                                <p className="text-[11px] text-slate-500">{s.guardians[0].email}</p>
+                              </div>
+                            ) : <span className="text-slate-600">No guardian</span>}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            {s.assignment_status ? (
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.assignment_status === "completed" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
+                                  {s.assignment_status.toUpperCase()}
+                                </span>
+                                {s.progress_percentage > 0 && s.assignment_status !== "completed" && (
+                                  <span className="text-[11px] text-slate-500">{s.progress_percentage}%</span>
+                                )}
+                              </div>
+                            ) : <span className="text-[11px] text-slate-600">No assignment</span>}
+                          </td>
+                          <td className="px-5 py-3.5 text-right">
+                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-blue-400 hover:text-blue-300">Reports Workspace</a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : activeTab === "assignments" ? (
+          /* ── Assignments Tab ── */
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Assessment Assignments</h2>
+                <p className="text-sm text-slate-400 mt-1">Assign assessments and manage magic links</p>
+              </div>
+              <button onClick={() => { setShowAssignForm(true); fetchStudentsForAssign(); }} className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                New Assignment
+              </button>
+            </div>
+
+            {assignmentsLoading ? (
+              <div className="flex justify-center py-16"><div className="w-6 h-6 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin" /></div>
+            ) : adminAssignments.length === 0 ? (
+              <div className="text-center py-16 text-slate-500">No assignments yet. Click &quot;New Assignment&quot; to create one.</div>
+            ) : (
+              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead><tr className="border-b border-white/5">
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned To</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Due Date</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned</th>
+                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-white/5">
+                      {adminAssignments.map((a: any) => (
+                        <tr key={a.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-5 py-3.5">
+                            <p className="text-sm font-medium text-white">{a.student_name || "Unknown"}</p>
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <p className="text-sm text-white">{a.assigned_to_name || "Unknown"}</p>
+                            <p className="text-[11px] text-slate-500">{a.assigned_to_role || ""}</p>
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              a.status === "completed" ? "bg-emerald-500/20 text-emerald-400" :
+                              a.status === "cancelled" ? "bg-slate-500/20 text-slate-400" :
+                              "bg-amber-500/20 text-amber-400"
+                            }`}>
+                              {(a.status || "").toUpperCase()}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3.5 text-sm text-slate-400">{a.due_date ? new Date(a.due_date).toLocaleDateString() : "No deadline"}</td>
+                          <td className="px-5 py-3.5 text-sm text-slate-500">{a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : "-"}</td>
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
+                              {a.status === "assigned" && (
+                                <>
+                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">Resend</button>
+                                  <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">Cancel</button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           /* ── Data Explorer Tab ── */
           <div>
@@ -716,6 +990,139 @@ export default function AdminDashboard() {
           <div className="px-5 py-3 border-t border-slate-100">
             <p className="text-[11px] text-slate-400 text-center">{statPopup.loading ? "" : `${statPopup.items.length} record${statPopup.items.length !== 1 ? "s" : ""}`}</p>
           </div>
+        </div>
+      </ModalOverlay>
+
+      {/* ── Create Student Modal ── */}
+      <ModalOverlay open={showCreateStudent} onClose={() => { setShowCreateStudent(false); setStudentFormError(""); }} maxW="max-w-lg">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-on-background">Create New Student</h3>
+          <p className="text-xs text-slate-400 mt-1 mb-5">Enter student and parent/guardian details</p>
+          {studentFormError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{studentFormError}</div>}
+          <form onSubmit={handleCreateStudent} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">First Name</label>
+                <input type="text" required value={studentForm.student_first_name} onChange={(e) => setStudentForm({ ...studentForm, student_first_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Last Name</label>
+                <input type="text" required value={studentForm.student_last_name} onChange={(e) => setStudentForm({ ...studentForm, student_last_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Date of Birth</label>
+                <input type="date" required value={studentForm.date_of_birth} onChange={(e) => setStudentForm({ ...studentForm, date_of_birth: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Grade/Year</label>
+                <input type="text" value={studentForm.grade} onChange={(e) => setStudentForm({ ...studentForm, grade: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Year 7" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Gender</label>
+                <select value={studentForm.gender} onChange={(e) => setStudentForm({ ...studentForm, gender: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                  <option value="">Select...</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-500 mb-1">School Name</label>
+              <input type="text" value={studentForm.school_name} onChange={(e) => setStudentForm({ ...studentForm, school_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+            </div>
+
+            <div className="border-t border-slate-200 pt-3 mt-3">
+              <h4 className="text-sm font-semibold text-on-background mb-3">Parent/Guardian</h4>
+              {studentForm.parents.map((p, idx) => (
+                <div key={idx} className="space-y-2 mb-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Full Name</label>
+                      <input type="text" required value={p.full_name} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, full_name: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
+                      <input type="email" required value={p.email} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, email: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Phone</label>
+                      <input type="tel" value={p.phone} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, phone: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Relationship</label>
+                      <select value={p.relationship} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, relationship: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
+                        <option value="Mother">Mother</option>
+                        <option value="Father">Father</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Grandparent">Grandparent</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Type</label>
+                      <select value={p.type} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, type: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
+                        <option value="parent">Parent</option>
+                        <option value="school">School</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 pt-3">
+              <button type="button" onClick={() => { setShowCreateStudent(false); setStudentFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
+              <button type="submit" disabled={creatingStudent} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+                {creatingStudent ? "Creating..." : "Create Student"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </ModalOverlay>
+
+      {/* ── New Assignment Modal ── */}
+      <ModalOverlay open={showAssignForm} onClose={() => { setShowAssignForm(false); setAssignFormError(""); }} maxW="max-w-md">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-on-background">New Assignment</h3>
+          <p className="text-xs text-slate-400 mt-1 mb-5">Assign assessment and send magic link</p>
+          {assignFormError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{assignFormError}</div>}
+          <form onSubmit={handleAssign} className="space-y-3">
+            <div>
+              <label className="block text-[11px] font-medium text-slate-500 mb-1">Student</label>
+              <select required value={assignForm.student_id} onChange={(e) => handleStudentSelectForAssign(e.target.value)} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                <option value="">Select student...</option>
+                {assignStudents.map((s: any) => (
+                  <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-500 mb-1">Assign To (Parent/Guardian)</label>
+              <select required value={assignForm.parent_id} onChange={(e) => setAssignForm({ ...assignForm, parent_id: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                <option value="">Select parent/guardian...</option>
+                {selectedStudentGuardians.map((g: any) => (
+                  <option key={g.id} value={g.id}>{g.name} ({g.email}) - {g.relationship}</option>
+                ))}
+              </select>
+              {assignForm.student_id && selectedStudentGuardians.length === 0 && (
+                <p className="text-[11px] text-amber-500 mt-1">No guardians linked to this student. Add a guardian first.</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-[11px] font-medium text-slate-500 mb-1">Notes (optional)</label>
+              <textarea value={assignForm.notes} onChange={(e) => setAssignForm({ ...assignForm, notes: e.target.value })} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" rows={2} placeholder="Any notes for the parent..." />
+            </div>
+            <div className="flex gap-3 pt-3">
+              <button type="button" onClick={() => { setShowAssignForm(false); setAssignFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
+              <button type="submit" disabled={assigning} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+                {assigning ? "Assigning..." : "Assign & Send Link"}
+              </button>
+            </div>
+          </form>
         </div>
       </ModalOverlay>
 

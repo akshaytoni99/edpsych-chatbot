@@ -1,28 +1,33 @@
 """
 Admin API Routes
-Handles admin-only operations: user management, system monitoring
+Handles admin-only operations: user management, system monitoring,
+student creation, and assignment management.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, delete as sql_delete
+from sqlalchemy import select, func, and_, update, delete as sql_delete
 from typing import List, Optional
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime, timezone
 
 from app.core.database import get_db
 from app.core.security import get_current_active_user, get_password_hash
+from app.core.config import settings
 from app.models.user import User, UserRole
 from app.models.student import Student
 from app.models.student_guardian import StudentGuardian
 from app.models.assessment import AssessmentSession
-from app.models.assignment import AssessmentAssignment
+from app.models.assignment import AssessmentAssignment, AssignmentStatus
+from app.models.magic_link import MagicLinkToken
 from app.models.chat import ChatSession, ChatMessage
 from app.models.psychologist_report import PsychologistReport
 from app.models.upload import IQTestUpload, CognitiveProfile
 from app.models.report import GeneratedReport
 from app.schemas.user import UserCreate, UserResponse
+from app.utils.magic_link import create_invite_magic_link
+from app.utils.email import send_assessment_assignment_email
 
 
 class AdminUserUpdate(BaseModel):
@@ -31,6 +36,41 @@ class AdminUserUpdate(BaseModel):
     phone: Optional[str] = None
     organization: Optional[str] = None
     role: Optional[str] = None  # "PARENT", "PSYCHOLOGIST", "SCHOOL", "ADMIN"
+
+
+class ParentCreate(BaseModel):
+    """Parent/Guardian information schema"""
+    type: str  # "parent" or "school"
+    full_name: str
+    email: EmailStr
+    phone: str
+    relationship: str  # "Mother", "Father", "Guardian", etc.
+    is_primary: bool = True
+
+
+class StudentWithParentCreate(BaseModel):
+    """Combined student and parent creation schema"""
+    # Student info
+    student_first_name: str
+    student_last_name: str
+    date_of_birth: str  # YYYY-MM-DD
+    gender: Optional[str] = None
+    grade: Optional[str] = None
+    school_name: Optional[str] = None
+    medical_history: Optional[str] = None
+    notes: Optional[str] = None
+
+    # Parent/Guardian info
+    parents: List[ParentCreate]
+
+
+class AssessmentAssignCreate(BaseModel):
+    """Assessment assignment schema"""
+    student_id: UUID
+    parent_id: UUID
+    assessment_type: str = "parent_assessment"
+    due_date: Optional[datetime] = None
+    notes: Optional[str] = None
 
 router = APIRouter(tags=["admin"])
 
@@ -749,3 +789,470 @@ async def reset_student_assessment(
     await db.commit()
 
     return {"message": "Assessment reset successfully", "sessions_reset": sessions_reset}
+
+
+# ---------------------------------------------------------------------------
+# Student creation (moved from psychologist role)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/students/create-with-parents", status_code=status.HTTP_201_CREATED)
+async def admin_create_student_with_parents(
+    data: StudentWithParentCreate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Create student + parent/guardians in a single transaction (admin only).
+
+    1. Create a new student profile
+    2. Create parent/guardian account(s) or link existing ones
+    3. Link parents to student via StudentGuardian
+    """
+
+    try:
+        # 1. Create student
+        student = Student(
+            first_name=data.student_first_name,
+            last_name=data.student_last_name,
+            date_of_birth=datetime.strptime(data.date_of_birth, "%Y-%m-%d").date(),
+            gender=data.gender,
+            year_group=data.grade,
+            school_name=data.school_name,
+            created_by_user_id=current_user.id,
+        )
+        db.add(student)
+        await db.flush()  # Get student ID without committing
+
+        created_parents = []
+
+        # 2. Create parent/guardian accounts
+        for parent_data in data.parents:
+            # Check if user already exists
+            existing_user_result = await db.execute(
+                select(User).where(User.email == parent_data.email)
+            )
+            existing_user = existing_user_result.scalar_one_or_none()
+
+            if existing_user:
+                parent = existing_user
+            else:
+                # Create new parent account (no password – will set via magic link)
+                parent = User(
+                    email=parent_data.email,
+                    password_hash=None,
+                    role=UserRole.PARENT if parent_data.type == "parent" else UserRole.SCHOOL,
+                    full_name=parent_data.full_name,
+                    phone=parent_data.phone,
+                    is_active=True,
+                    is_verified=False,  # Will verify via magic link later
+                )
+                db.add(parent)
+                await db.flush()
+
+                created_parents.append({
+                    "email": parent.email,
+                    "full_name": parent.full_name,
+                })
+
+            # 3. Link parent to student
+            guardian_link = StudentGuardian(
+                student_id=student.id,
+                guardian_user_id=parent.id,
+                relationship_type=parent_data.relationship,
+                is_primary="true" if parent_data.is_primary else "false",
+            )
+            db.add(guardian_link)
+
+        await db.commit()
+        await db.refresh(student)
+
+        return {
+            "success": True,
+            "student_id": str(student.id),
+            "student_name": f"{student.first_name} {student.last_name}",
+            "parents_created": len(created_parents),
+            "parents_linked": len(data.parents),
+            "message": "Student and parents created successfully",
+            "created_parents": created_parents,
+        }
+
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create student and parents: {str(e)}",
+        )
+
+
+# ---------------------------------------------------------------------------
+# Assignment management (moved from psychologist role)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/assignments/assign", status_code=status.HTTP_201_CREATED)
+async def admin_assign_assessment(
+    assignment: AssessmentAssignCreate,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Assign assessment to a parent and generate a secure magic link (admin only).
+
+    1. Create assignment record
+    2. Generate secure magic-link token
+    3. Send email with link to parent
+    4. Return link for admin to share manually if needed
+    """
+
+    # Verify student exists
+    student_result = await db.execute(
+        select(Student).where(Student.id == assignment.student_id)
+    )
+    student = student_result.scalar_one_or_none()
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Student not found"
+        )
+
+    # Verify parent exists
+    parent_result = await db.execute(
+        select(User).where(User.id == assignment.parent_id)
+    )
+    parent = parent_result.scalar_one_or_none()
+    if not parent:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Parent not found"
+        )
+
+    # Check parent-student relationship
+    relationship_result = await db.execute(
+        select(StudentGuardian).where(
+            and_(
+                StudentGuardian.student_id == assignment.student_id,
+                StudentGuardian.guardian_user_id == assignment.parent_id,
+            )
+        )
+    )
+    relationship = relationship_result.scalar_one_or_none()
+    if not relationship:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Parent is not linked to this student",
+        )
+
+    # Create assignment
+    new_assignment = AssessmentAssignment(
+        assigned_by_psychologist_id=current_user.id,
+        student_id=assignment.student_id,
+        assigned_to_user_id=assignment.parent_id,
+        status=AssignmentStatus.ASSIGNED,
+        due_date=assignment.due_date,
+        notes=assignment.notes,
+    )
+    db.add(new_assignment)
+    await db.flush()
+
+    # Create magic link for parent access
+    magic_link_token = await create_invite_magic_link(
+        db,
+        str(new_assignment.assigned_to_user_id),
+        str(new_assignment.id),
+        expiry_hours=settings.MAGIC_LINK_EXPIRY_HOURS,
+    )
+    magic_link_url = f"{settings.FRONTEND_URL}/auth/magic/{magic_link_token.token}"
+
+    await db.commit()
+
+    # Send assessment assignment email with magic link
+    student_name = f"{student.first_name} {student.last_name}"
+    send_assessment_assignment_email(
+        parent_email=parent.email,
+        parent_name=parent.full_name or parent.email,
+        student_name=student_name,
+        psychologist_name=current_user.full_name or "Admin",
+        assessment_link=magic_link_url,
+    )
+
+    return {
+        "success": True,
+        "assignment_id": str(new_assignment.id),
+        "magic_link": magic_link_url,
+        "status": "assigned",
+        "message": "Assessment assigned and notifications sent",
+    }
+
+
+@router.post("/assignments/{assignment_id}/resend-link")
+async def admin_resend_magic_link(
+    assignment_id: str,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Resend a magic link for an existing assignment (admin only)."""
+
+    # Verify assignment exists
+    result = await db.execute(
+        select(AssessmentAssignment).where(AssessmentAssignment.id == assignment_id)
+    )
+    assignment = result.scalar_one_or_none()
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+
+    # Get assigned parent user
+    result = await db.execute(
+        select(User).where(User.id == assignment.assigned_to_user_id)
+    )
+    parent = result.scalar_one_or_none()
+    if not parent:
+        raise HTTPException(status_code=404, detail="Assigned parent not found")
+
+    # Get student
+    result = await db.execute(
+        select(Student).where(Student.id == assignment.student_id)
+    )
+    student = result.scalar_one_or_none()
+
+    # Invalidate existing unused magic links for this assignment
+    await db.execute(
+        update(MagicLinkToken)
+        .where(MagicLinkToken.assignment_id == assignment_id)
+        .where(MagicLinkToken.used_at.is_(None))
+        .values(used_at=datetime.now(timezone.utc))
+    )
+
+    # Create new magic link
+    magic_link_token = await create_invite_magic_link(
+        db,
+        str(parent.id),
+        str(assignment.id),
+        expiry_hours=settings.MAGIC_LINK_EXPIRY_HOURS,
+    )
+    magic_link_url = f"{settings.FRONTEND_URL}/auth/magic/{magic_link_token.token}"
+
+    # Send email
+    student_name = (
+        f"{student.first_name} {student.last_name}" if student else "your child"
+    )
+    send_assessment_assignment_email(
+        parent_email=parent.email,
+        parent_name=parent.full_name or parent.email,
+        student_name=student_name,
+        psychologist_name=current_user.full_name or "Admin",
+        assessment_link=magic_link_url,
+    )
+
+    return {
+        "message": "Magic link resent successfully",
+        "magic_link": magic_link_url,
+        "sent_to": parent.email,
+    }
+
+
+# ---------------------------------------------------------------------------
+# All-students and all-assignments read endpoints (admin only)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/students/all-with-details")
+async def admin_get_all_students_with_details(
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Return ALL students with guardians, active assignments, and progress (admin only).
+
+    Unlike the psychologist version which filters by created_by_user_id,
+    this returns every student in the system.
+    """
+
+    result = await db.execute(
+        select(Student).order_by(Student.created_at.desc())
+    )
+    students = result.scalars().all()
+
+    students_with_details = []
+    for student in students:
+        # Get parents/guardians
+        guardians_result = await db.execute(
+            select(StudentGuardian, User)
+            .join(User, StudentGuardian.guardian_user_id == User.id)
+            .where(StudentGuardian.student_id == student.id)
+        )
+        guardians = guardians_result.all()
+
+        # Get active assignments (non-cancelled)
+        assignments_result = await db.execute(
+            select(AssessmentAssignment).where(
+                and_(
+                    AssessmentAssignment.student_id == student.id,
+                    AssessmentAssignment.status != AssignmentStatus.CANCELLED,
+                )
+            )
+        )
+        assignments = assignments_result.scalars().all()
+
+        # Calculate progress from chat sessions
+        progress_pct = 0
+        for asgn in assignments:
+            if asgn.status in [AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS]:
+                sess_result = await db.execute(
+                    select(ChatSession)
+                    .where(ChatSession.assignment_id == asgn.id)
+                    .order_by(ChatSession.started_at.desc())
+                )
+                chat_session = sess_result.scalars().first()
+                if chat_session and chat_session.context_data:
+                    answered = chat_session.context_data.get("answered_node_ids", [])
+                    total_nodes = 102  # parent_assessment_v1 answerable nodes
+                    progress_pct = (
+                        round((len(answered) / total_nodes) * 100)
+                        if total_nodes > 0
+                        else 0
+                    )
+                    if chat_session.status == "completed":
+                        progress_pct = 100
+                break  # use the first active assignment for progress
+
+        students_with_details.append({
+            "id": str(student.id),
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+            "date_of_birth": (
+                student.date_of_birth.isoformat() if student.date_of_birth else None
+            ),
+            "age": (
+                (datetime.now().date() - student.date_of_birth).days // 365
+                if student.date_of_birth
+                else None
+            ),
+            "gender": student.gender,
+            "grade": student.year_group,
+            "school_name": student.school_name,
+            "created_at": (
+                student.created_at.isoformat() if student.created_at else None
+            ),
+            "guardians": [
+                {
+                    "id": str(user.id),
+                    "name": user.full_name,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "relationship": guardian.relationship_type,
+                    "is_primary": guardian.is_primary,
+                }
+                for guardian, user in guardians
+            ],
+            "active_assignments": len(assignments),
+            "has_active_assessment": any(
+                a.status in [AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS]
+                for a in assignments
+            ),
+            "progress_percentage": progress_pct,
+        })
+
+    return {
+        "total": len(students_with_details),
+        "students": students_with_details,
+    }
+
+
+@router.get("/assignments/all")
+async def admin_get_all_assignments(
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Return all assignments with student and assigned_to user info (admin only).
+    """
+
+    result = await db.execute(
+        select(AssessmentAssignment).order_by(
+            AssessmentAssignment.assigned_at.desc()
+        )
+    )
+    assignments = result.scalars().all()
+
+    assignments_with_details = []
+    for assignment in assignments:
+        # Student info
+        student_result = await db.execute(
+            select(Student).where(Student.id == assignment.student_id)
+        )
+        student = student_result.scalar_one_or_none()
+
+        # Assigned-to user info
+        assigned_to_result = await db.execute(
+            select(User).where(User.id == assignment.assigned_to_user_id)
+        )
+        assigned_to = assigned_to_result.scalar_one_or_none()
+
+        assignments_with_details.append({
+            "id": str(assignment.id),
+            "student": (
+                {
+                    "id": str(student.id),
+                    "first_name": student.first_name,
+                    "last_name": student.last_name,
+                    "grade_level": student.year_group,
+                }
+                if student
+                else None
+            ),
+            "assigned_to": (
+                {
+                    "id": str(assigned_to.id),
+                    "name": assigned_to.full_name,
+                    "email": assigned_to.email,
+                    "role": assigned_to.role.value,
+                }
+                if assigned_to
+                else None
+            ),
+            "status": (
+                assignment.status.value
+                if hasattr(assignment.status, "value")
+                else str(assignment.status)
+            ),
+            "notes": assignment.notes,
+            "due_date": (
+                assignment.due_date.isoformat() if assignment.due_date else None
+            ),
+            "assigned_at": assignment.assigned_at.isoformat(),
+        })
+
+    return assignments_with_details
+
+
+@router.patch("/assignments/{assignment_id}/cancel")
+async def admin_cancel_assignment(
+    assignment_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Cancel an assessment assignment (admin only).
+    Sets status to CANCELLED. Cannot cancel already-completed assignments.
+    """
+
+    result = await db.execute(
+        select(AssessmentAssignment).where(AssessmentAssignment.id == assignment_id)
+    )
+    assignment = result.scalar_one_or_none()
+
+    if not assignment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assignment not found",
+        )
+
+    if assignment.status == AssignmentStatus.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot cancel a completed assignment",
+        )
+
+    assignment.status = AssignmentStatus.CANCELLED
+    await db.commit()
+
+    return {"message": "Assignment cancelled successfully"}

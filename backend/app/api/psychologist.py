@@ -22,6 +22,7 @@ from app.models.student import Student
 from app.models.student_guardian import StudentGuardian
 from app.models.assignment import AssessmentAssignment, AssignmentStatus
 from app.models.upload import IQTestUpload, UploadStatus, CognitiveProfile
+from app.models.chat import ChatSession
 from app.models.report import GeneratedReport, ReportStatus, FinalReport, FinalReportStatus
 from app.utils.magic_link import create_invite_magic_link
 from app.utils.email import send_assessment_assignment_email
@@ -428,6 +429,99 @@ async def get_my_students(
                 a.status in [AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS]
                 for a in assignments
             )
+        })
+
+    return {
+        "total": len(students_with_details),
+        "students": students_with_details
+    }
+
+
+# ============================================================================
+# GET ALL STUDENTS (READ-ONLY FOR PSYCHOLOGIST)
+# ============================================================================
+
+@router.get("/students/all-students")
+async def get_all_students_readonly(
+    current_user: User = Depends(require_psychologist_or_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get ALL students with parent info and assignment progress (read-only view).
+    Used by psychologist dashboard to see student list without creation rights.
+    """
+    result = await db.execute(
+        select(Student).order_by(Student.created_at.desc())
+    )
+    students = result.scalars().all()
+
+    students_with_details = []
+    for student in students:
+        # Get primary guardian
+        guardians_result = await db.execute(
+            select(StudentGuardian, User)
+            .join(User, StudentGuardian.guardian_user_id == User.id)
+            .where(StudentGuardian.student_id == student.id)
+        )
+        guardians = guardians_result.all()
+
+        primary_guardian = None
+        for guardian, user in guardians:
+            if guardian.is_primary == "true" or primary_guardian is None:
+                primary_guardian = {
+                    "name": user.full_name,
+                    "email": user.email,
+                    "relationship": guardian.relationship_type,
+                }
+
+        # Get assignment status and progress
+        assignments_result = await db.execute(
+            select(AssessmentAssignment)
+            .where(
+                and_(
+                    AssessmentAssignment.student_id == student.id,
+                    AssessmentAssignment.status != AssignmentStatus.CANCELLED
+                )
+            )
+        )
+        assignments = assignments_result.scalars().all()
+
+        assignment_status = None
+        progress_percentage = 0
+        for a in assignments:
+            if a.status in [AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS]:
+                assignment_status = a.status.value if hasattr(a.status, 'value') else str(a.status)
+                # Get progress from chat session
+                sess_result = await db.execute(
+                    select(ChatSession)
+                    .where(ChatSession.assignment_id == a.id)
+                    .order_by(ChatSession.last_interaction_at.desc())
+                )
+                session = sess_result.scalars().first()
+                if session and session.context_data:
+                    answered = session.context_data.get("answered_node_ids", [])
+                    from app.utils.flow_engine import flow_engine
+                    progress_percentage = flow_engine.calculate_progress(
+                        session.flow_type, answered
+                    )
+                break
+            elif a.status == AssignmentStatus.COMPLETED:
+                assignment_status = "completed"
+                progress_percentage = 100
+
+        students_with_details.append({
+            "id": str(student.id),
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+            "grade": student.year_group,
+            "school_name": student.school_name,
+            "parent": primary_guardian,
+            "assignment_status": assignment_status,
+            "progress_percentage": progress_percentage,
+            "has_active_assignment": any(
+                a.status in [AssignmentStatus.ASSIGNED, AssignmentStatus.IN_PROGRESS]
+                for a in assignments
+            ),
         })
 
     return {
