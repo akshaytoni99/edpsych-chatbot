@@ -68,9 +68,7 @@ export default function CompletionBanner({ onNavigate }: CompletionBannerProps) 
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2.5 tracking-tight">
           Assessment Complete!
         </h2>
-        <p className="text-sm sm:text-base text-gray-500 leading-relaxed mb-8 max-w-xs mx-auto">
-          Thank you for completing the assessment. A comprehensive report is being prepared based on your responses.
-        </p>
+        <div className="mb-8" />
 
         {/* CTA Button */}
         <button
@@ -91,15 +89,6 @@ export default function CompletionBanner({ onNavigate }: CompletionBannerProps) 
           Return to Dashboard
         </button>
 
-        {/* Subtle reassurance */}
-        <div className="mt-5 flex items-center justify-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-emerald-500">
-            <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-          </svg>
-          <p className="text-[11px] text-gray-400 font-medium">
-            Your responses have been securely saved
-          </p>
-        </div>
       </div>
     </div>
   );
