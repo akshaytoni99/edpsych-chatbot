@@ -1790,7 +1790,7 @@
     },
     "completion": {
       "type": "completion",
-      "content": "🎉 Thank you so much for completing this assessment!\n\nI'm now generating a comprehensive report based on your responses. This will include:\n\n✅ Summary of {student_name}'s strengths\n✅ Areas of concern\n✅ Personalized recommendations\n\nYour psychologist will review this report and may reach out with next steps.",
+      "content": "Thank you so much for completing this assessment!",
       "action": "generate_report",
       "metadata": {
         "category": "completion"
