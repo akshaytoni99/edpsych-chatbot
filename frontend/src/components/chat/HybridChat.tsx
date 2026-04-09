@@ -88,6 +88,9 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
     content: string;
     choiceValue?: string;
   } | null>(null);
+  const [consecutiveMcqCount, setConsecutiveMcqCount] = useState(0);
+  const [showTextNudge, setShowTextNudge] = useState(false);
+  const nudgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
@@ -97,6 +100,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
     return () => {
       mountedRef.current = false;
       if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+      if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current);
     };
   }, []);
 
@@ -422,6 +426,15 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
     (option: McqOption) => {
       setInputFeedback(null);
       sendMessage('mcq_choice', option.label, option.value);
+      setConsecutiveMcqCount((prev) => {
+        const next = prev + 1;
+        if (next >= 3 && next % 3 === 0) {
+          setShowTextNudge(true);
+          if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current);
+          nudgeTimerRef.current = setTimeout(() => setShowTextNudge(false), 6000);
+        }
+        return next;
+      });
     },
     [sendMessage]
   );
@@ -430,6 +443,9 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
     (text: string) => {
       setInputFeedback(null);
       sendMessage('free_text', text);
+      setConsecutiveMcqCount(0);
+      setShowTextNudge(false);
+      if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current);
     },
     [sendMessage]
   );
@@ -576,12 +592,29 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
             />
           )}
           {showTextInput && (
-            <ChatInput
-              onSend={handleTextSend}
-              disabled={loading || isCompleted}
-              placeholder={inputPlaceholder}
-              validationFeedback={inputFeedback}
-            />
+            <div className="relative">
+              {showTextNudge && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-40 animate-slide-up">
+                  <div className="relative bg-indigo-600 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-200/50 whitespace-nowrap">
+                    Feel free to share more details using the text field below
+                    <button
+                      onClick={() => { setShowTextNudge(false); if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current); }}
+                      className="ml-2 text-indigo-200 hover:text-white"
+                    >
+                      ✕
+                    </button>
+                    {/* Arrow pointing down */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-indigo-600" />
+                  </div>
+                </div>
+              )}
+              <ChatInput
+                onSend={handleTextSend}
+                disabled={loading || isCompleted}
+                placeholder={inputPlaceholder}
+                validationFeedback={inputFeedback}
+              />
+            </div>
           )}
         </>
       )}
