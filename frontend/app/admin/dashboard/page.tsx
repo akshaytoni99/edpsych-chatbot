@@ -347,8 +347,12 @@ export default function AdminDashboard() {
       const res = await fetch(`${API_BASE}/admin/assignments/${assignmentId}/resend-link`, {
         method: "POST", headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) showAlert("Sent", "Magic link resent successfully", "success");
-      else showAlert("Error", "Failed to resend invite", "danger");
+      if (res.ok) {
+        const data = await res.json();
+        const link = data.magic_link || "";
+        try { await navigator.clipboard.writeText(link); } catch {}
+        showAlert("Magic Link Ready", `Copied to clipboard and emailed to ${data.sent_to}.\n\n${link}`, "success");
+      } else showAlert("Error", "Failed to resend invite", "danger");
     } catch { showAlert("Error", "Network error", "danger"); }
   };
 
@@ -816,11 +820,11 @@ export default function AdminDashboard() {
                       {adminAssignments.map((a: any) => (
                         <tr key={a.id} className="hover:bg-white/5 transition-colors group">
                           <td className="px-5 py-3.5">
-                            <p className="text-sm font-medium text-white">{a.student_name || "Unknown"}</p>
+                            <p className="text-sm font-medium text-white">{a.student ? `${a.student.first_name || ""} ${a.student.last_name || ""}`.trim() || "Unknown" : "Unknown"}</p>
                           </td>
                           <td className="px-5 py-3.5">
-                            <p className="text-sm text-white">{a.assigned_to_name || "Unknown"}</p>
-                            <p className="text-[11px] text-slate-500">{a.assigned_to_role || ""}</p>
+                            <p className="text-sm text-white">{a.assigned_to?.name || "Unknown"}</p>
+                            <p className="text-[11px] text-slate-500">{a.assigned_to?.email || ""}</p>
                           </td>
                           <td className="px-5 py-3.5">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -834,10 +838,10 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 text-sm text-slate-400">{a.due_date ? new Date(a.due_date).toLocaleDateString() : "No deadline"}</td>
                           <td className="px-5 py-3.5 text-sm text-slate-500">{a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : "-"}</td>
                           <td className="px-5 py-3.5">
-                            <div className="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-1.5">
                               {a.status === "assigned" && (
                                 <>
-                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">Resend</button>
+                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">Resend Link</button>
                                   <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">Cancel</button>
                                 </>
                               )}
