@@ -839,7 +839,7 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 text-sm text-slate-500">{a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : "-"}</td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center justify-end gap-1.5">
-                              {a.status === "assigned" && (
+                              {(a.status || "").toLowerCase() === "assigned" && (
                                 <>
                                   <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">Resend Link</button>
                                   <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">Cancel</button>
