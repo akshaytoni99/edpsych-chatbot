@@ -10,7 +10,16 @@ export default function RegisterPage() {
         <span className="text-white font-serif text-xl tracking-wide">The Ed Psych Practice</span>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-12 ed-hero">
+      <div
+        className="flex-1 flex items-center justify-center px-4 py-12"
+        style={{
+          backgroundImage: "url('/images/cherry-tree.png')",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "left center",
+          backgroundSize: "520px auto",
+          backgroundColor: "#eeeeee",
+        }}
+      >
         <div className="max-w-lg w-full">
           {/* Branding */}
           <div className="text-center mb-8">
