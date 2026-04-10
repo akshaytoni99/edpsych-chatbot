@@ -7,8 +7,8 @@ interface CompletionBannerProps {
 }
 
 const CONFETTI_COLORS = [
-  'bg-indigo-400', 'bg-purple-400', 'bg-emerald-400',
-  'bg-pink-400', 'bg-amber-400', 'bg-blue-400',
+  'bg-teal-400', 'bg-teal-400', 'bg-emerald-400',
+  'bg-pink-400', 'bg-amber-400', 'bg-teal-400',
 ];
 
 export default function CompletionBanner({ onNavigate }: CompletionBannerProps) {
@@ -75,12 +75,12 @@ export default function CompletionBanner({ onNavigate }: CompletionBannerProps) 
           onClick={onNavigate}
           aria-label="Return to Dashboard"
           className="inline-flex items-center gap-2.5 min-h-[52px]
-            bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600
-            hover:from-indigo-600 hover:via-indigo-700 hover:to-purple-700
+            bg-gradient-to-r from-teal-500 via-teal-600 to-teal-600
+            hover:from-teal-600 hover:via-teal-700 hover:to-teal-700
             text-white px-8 py-3.5 rounded-2xl font-semibold text-sm sm:text-base
-            shadow-xl shadow-indigo-200/50 hover:shadow-2xl hover:shadow-indigo-200/60
+            shadow-xl shadow-teal-200/50 hover:shadow-2xl hover:shadow-teal-200/60
             transition-all duration-300 hover:-translate-y-1
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2
             active:translate-y-0 active:shadow-lg"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">

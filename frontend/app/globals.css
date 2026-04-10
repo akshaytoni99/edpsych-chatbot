@@ -2,12 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* ============================================
+   Ed Psych Practice fonts — matches theedpsych.com
+   Average (serif) + Nunito (sans) are loaded via next/font in layout.tsx,
+   exposed as --font-average and --font-nunito CSS variables.
+   ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 @layer base {
   body {
     @apply font-body bg-background text-on-background antialiased;
+    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 1.8;
+    color: #333333;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-average), Georgia, serif;
+    font-weight: 400;
+    color: #333333;
+  }
+  h1 span, h2 span, h3 span {
+    color: #00a1aa;
+  }
+  p {
+    line-height: 1.8;
+  }
+  a {
+    color: #e61844;
+  }
+  a:hover {
+    color: #cf0627;
   }
 }
 
@@ -16,20 +41,110 @@
     position: fixed;
     inset: 0;
     z-index: -1;
-    opacity: 0.05;
+    opacity: 0.03;
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   .premium-gradient {
-    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+    background: linear-gradient(135deg, #00acb6 0%, #0c888e 100%);
+  }
+
+  .ed-hero {
+    background-color: #eeeeee;
+    min-height: 340px;
+  }
+
+  .ed-nav {
+    background-color: #00acb6;
+    color: #ffffff;
+  }
+
+  .ed-btn-primary {
+    background-color: #e61844;
+    border: 1px solid #e61844;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-weight: 600;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .ed-btn-primary:hover {
+    background-color: #cf0627;
+    border-color: #cf0627;
+    color: #ffffff;
+  }
+
+  .ed-btn-teal {
+    background-color: #00acb6;
+    border: 1px solid #00acb6;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-weight: 600;
+    transition: background-color 0.15s ease;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .ed-btn-teal:hover {
+    background-color: #0c888e;
+    border-color: #0c888e;
+    color: #ffffff;
+  }
+
+  .ed-btn-outline {
+    background-color: transparent;
+    border: 1px solid #e61844;
+    color: #e61844;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .ed-btn-outline:hover {
+    background-color: #e61844;
+    color: #ffffff;
+  }
+
+  .ed-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+  .ed-card-dashed {
+    background: #ffffff;
+    border: 1px dashed #cccccc;
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+  .brand-wordmark {
+    font-family: var(--font-average), Georgia, serif;
+    color: #0c888e;
+    font-size: 36px;
+    line-height: 1.1;
+  }
+
+  .brand-tagline {
+    font-family: var(--font-nunito), system-ui, sans-serif;
+    color: #737373;
+    font-size: 18px;
+    font-style: italic;
   }
 
   .floating-label-group {
@@ -41,21 +156,22 @@
     top: -0.5rem;
     left: 0.75rem;
     font-size: 0.75rem;
-    color: #3B82F6;
-    background: #F1F5F9;
+    color: #00acb6;
+    background: #ffffff;
     padding: 0 0.25rem;
   }
 
   .floating-label-group label {
-    @apply absolute top-4 left-4 transition-all duration-200 pointer-events-none text-slate-500;
+    @apply absolute top-4 left-4 transition-all duration-200 pointer-events-none;
+    color: #737373;
   }
 
   .editorial-shadow {
-    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   .brand-accent {
-    background: linear-gradient(to right, #3B82F6, #6366F1);
+    background: linear-gradient(to right, #00acb6, #0c888e);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

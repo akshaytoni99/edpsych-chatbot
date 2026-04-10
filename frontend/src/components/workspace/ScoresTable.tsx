@@ -62,9 +62,9 @@ export default function ScoresTable({
   return (
     <div className="space-y-4">
       {/* Overall Score */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-50 border border-teal-100">
         <div>
-          <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+          <p className="text-xs font-semibold text-teal-700 uppercase tracking-wide">
             Overall Ability Score
           </p>
           <p className="mt-1 text-4xl font-extrabold text-slate-900">

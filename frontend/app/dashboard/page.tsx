@@ -184,7 +184,7 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ASSIGNED":
-        return "bg-blue-100 text-blue-700";
+        return "bg-teal-100 text-teal-700";
       case "IN_PROGRESS":
         return "bg-amber-100 text-amber-700";
       case "COMPLETED":
@@ -283,8 +283,8 @@ export default function DashboardPage() {
             <p className="text-slate-500 mb-6 max-w-md mx-auto">
               You don't have any assessments assigned yet. A psychologist or administrator will assign assessments to you when needed.
             </p>
-            <div className="mt-8 p-4 bg-blue-50 rounded-xl max-w-lg mx-auto">
-              <p className="text-sm text-blue-900 font-medium">
+            <div className="mt-8 p-4 bg-teal-50 rounded-xl max-w-lg mx-auto">
+              <p className="text-sm text-teal-900 font-medium">
                 <span className="font-bold">Note:</span> Once an assessment is assigned to you by a psychologist, it will appear here and you'll be able to start it for your child.
               </p>
             </div>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
               >
                 {/* Student Info */}
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-black text-2xl flex-shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-500 flex items-center justify-center text-white font-black text-2xl flex-shrink-0">
                     {assignment.student?.first_name[0]}{assignment.student?.last_name[0]}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -365,9 +365,9 @@ export default function DashboardPage() {
 
                 {/* Notes */}
                 {assignment.notes && (
-                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-xs font-bold text-blue-900 mb-1">Notes:</p>
-                    <p className="text-sm text-blue-800">{assignment.notes}</p>
+                  <div className="mb-4 p-3 bg-teal-50 rounded-lg">
+                    <p className="text-xs font-bold text-teal-900 mb-1">Notes:</p>
+                    <p className="text-sm text-teal-800">{assignment.notes}</p>
                   </div>
                 )}
 
@@ -377,7 +377,7 @@ export default function DashboardPage() {
                     <>
                       <button
                         onClick={() => handleContinue(assignment.id)}
-                        className="flex-1 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all"
+                        className="flex-1 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-teal-600 transition-all"
                       >
                         Continue for {assignment.student?.first_name} ({assignment.progress_percentage ?? 0}%)
                       </button>
@@ -393,7 +393,7 @@ export default function DashboardPage() {
                   {assignment.status === "ASSIGNED" && (
                     <button
                       onClick={() => handleStartAssessment(assignment.id)}
-                      className="flex-1 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all"
+                      className="flex-1 px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-teal-600 transition-all"
                     >
                       Start Assessment
                     </button>

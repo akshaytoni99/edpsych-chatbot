@@ -66,7 +66,7 @@ export default function ChatTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
@@ -135,7 +135,7 @@ export default function ChatTestPage() {
                               assignment.status === 'ASSIGNED'
                                 ? 'text-yellow-600'
                                 : assignment.status === 'IN_PROGRESS'
-                                ? 'text-blue-600'
+                                ? 'text-teal-600'
                                 : 'text-green-600'
                             }`}
                           >
@@ -161,7 +161,7 @@ export default function ChatTestPage() {
           </div>
 
           {/* Info Section */}
-          <div className="mt-8 p-6 bg-blue-50 border-2 border-blue-300 rounded-xl">
+          <div className="mt-8 p-6 bg-teal-50 border-2 border-teal-300 rounded-xl">
             <h3 className="text-lg font-bold text-gray-900 mb-2">How it works:</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start">

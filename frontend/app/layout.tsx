@@ -1,5 +1,23 @@
 import type { Metadata } from "next";
+import { Average, Nunito } from "next/font/google";
 import "./globals.css";
+
+// Ed Psych Practice fonts — mirror https://www.theedpsych.com
+// Average (serif) for headings, Nunito (sans) for body.
+// Loaded via next/font for zero-CLS, self-hosted, and automatically optimized.
+const average = Average({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-average",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["300", "400", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-nunito",
+});
 
 export const metadata: Metadata = {
   title: "The EdPsych Practice | Educational Psychology Platform",
@@ -12,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className={`light ${average.variable} ${nunito.variable}`}>
       <body>
         <div className="noise-overlay" />
         {children}

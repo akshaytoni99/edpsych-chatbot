@@ -80,13 +80,13 @@ function Dialog({
   onCancel?: () => void;
 }) {
   const btnColor = {
-    info: "bg-primary hover:bg-blue-700",
+    info: "bg-primary hover:bg-teal-700",
     warning: "bg-amber-500 hover:bg-amber-600",
     danger: "bg-red-500 hover:bg-red-600",
     success: "bg-emerald-500 hover:bg-emerald-600",
   }[variant];
   const iconColor = {
-    info: "text-primary bg-blue-50",
+    info: "text-primary bg-teal-50",
     warning: "text-amber-500 bg-amber-50",
     danger: "text-red-500 bg-red-50",
     success: "text-emerald-500 bg-emerald-50",
@@ -162,7 +162,7 @@ function StatCard({
 function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, string> = {
     ADMIN: "bg-slate-800 text-white",
-    PSYCHOLOGIST: "bg-violet-100 text-violet-700",
+    PSYCHOLOGIST: "bg-teal-100 text-teal-700",
     SCHOOL: "bg-sky-100 text-sky-700",
     PARENT: "bg-emerald-100 text-emerald-700",
   };
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-[3px] border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-[3px] border-slate-700 border-t-teal-500 rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-slate-500">Loading dashboard...</p>
         </div>
       </div>
@@ -503,10 +503,10 @@ export default function AdminDashboard() {
   }
 
   /* ─── Icons ─── */
-  const UserIcon = <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>;
+  const UserIcon = <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>;
   const StudentIcon = <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" /></svg>;
-  const AssessmentIcon = <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>;
-  const ReportIcon = <svg className="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>;
+  const AssessmentIcon = <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>;
+  const ReportIcon = <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -515,12 +515,12 @@ export default function AdminDashboard() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               </div>
               <div>
                 <h1 className="text-sm font-bold text-white leading-none">EdPsych</h1>
-                <p className="text-[9px] font-medium text-blue-400 tracking-widest uppercase">Admin Console</p>
+                <p className="text-[9px] font-medium text-teal-400 tracking-widest uppercase">Admin Console</p>
               </div>
             </div>
 
@@ -544,7 +544,7 @@ export default function AdminDashboard() {
                 <p className="text-sm font-medium text-white leading-none">{user?.full_name}</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">{user?.email}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-[11px] font-bold">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-[11px] font-bold">
                 {(user?.full_name || "A").charAt(0).toUpperCase()}
               </div>
               <button onClick={handleLogout} className="text-xs font-medium text-slate-500 hover:text-red-400 transition-colors">
@@ -557,10 +557,10 @@ export default function AdminDashboard() {
 
       {/* ── Mobile tab bar ── */}
       <div className="sm:hidden flex border-b border-white/5 bg-slate-900/60 overflow-x-auto">
-        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "users" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Overview</button>
-        <button onClick={() => setActiveTab("students")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "students" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Students</button>
-        <button onClick={() => setActiveTab("assignments")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "assignments" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Assignments</button>
-        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "explorer" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-500"}`}>Explorer</button>
+        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "users" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Overview</button>
+        <button onClick={() => setActiveTab("students")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "students" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Students</button>
+        <button onClick={() => setActiveTab("assignments")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "assignments" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Assignments</button>
+        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "explorer" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Explorer</button>
       </div>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -575,10 +575,10 @@ export default function AdminDashboard() {
             {/* ── Stats Grid ── */}
             {stats && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-blue-500/15" onClick={() => handleStatClick("Total Users")} />
+                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Total Users")} />
                 <StatCard label="Students" value={stats.total_students} icon={StudentIcon} color="bg-emerald-500/15" onClick={() => handleStatClick("Total Students")} />
-                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-indigo-500/15" onClick={() => handleStatClick("Assessments")} />
-                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-violet-500/15" onClick={() => handleStatClick("Reports")} />
+                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Assessments")} />
+                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Reports")} />
               </div>
             )}
 
@@ -587,7 +587,7 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
                 {([
                   { key: "PARENT" as const, label: "Parents", color: "border-l-emerald-500 bg-emerald-500/10", textColor: "text-emerald-400" },
-                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-violet-500 bg-violet-500/10", textColor: "text-violet-400" },
+                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-teal-500 bg-teal-500/10", textColor: "text-teal-400" },
                   { key: "SCHOOL" as const, label: "Schools", color: "border-l-sky-500 bg-sky-500/10", textColor: "text-sky-400" },
                   { key: "ADMIN" as const, label: "Admins", color: "border-l-amber-500 bg-amber-500/10", textColor: "text-amber-400" },
                 ] as const).map((r) => (
@@ -615,7 +615,7 @@ export default function AdminDashboard() {
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value)}
-                    className="h-9 px-3 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-slate-300 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all [&>option]:bg-slate-800 [&>option]:text-white"
+                    className="h-9 px-3 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-slate-300 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500/50 transition-all [&>option]:bg-slate-800 [&>option]:text-white"
                   >
                     <option value="all">All Roles</option>
                     <option value="PARENT">Parents</option>
@@ -625,7 +625,7 @@ export default function AdminDashboard() {
                   </select>
                   <button
                     onClick={() => setShowAddUser(true)}
-                    className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5"
+                    className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     Add User
@@ -701,7 +701,7 @@ export default function AdminDashboard() {
                                   {resetting === u.id ? "..." : "Reset"}
                                 </button>
                               )}
-                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors" title="Edit user">
+                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 transition-colors" title="Edit user">
                                 Edit
                               </button>
                               <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors" title="Delete user">
@@ -725,7 +725,7 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-white">Student Management</h2>
                 <p className="text-sm text-slate-400 mt-1">Create students and link parents/schools</p>
               </div>
-              <button onClick={() => { setShowCreateStudent(true); }} className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5">
+              <button onClick={() => { setShowCreateStudent(true); }} className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 Add Student
               </button>
@@ -776,7 +776,7 @@ export default function AdminDashboard() {
                             ) : <span className="text-[11px] text-slate-600">No assignment</span>}
                           </td>
                           <td className="px-5 py-3.5 text-right">
-                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-blue-400 hover:text-blue-300">Reports Workspace</a>
+                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-teal-400 hover:text-teal-300">Reports Workspace</a>
                           </td>
                         </tr>
                       ))}
@@ -794,7 +794,7 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-white">Assessment Assignments</h2>
                 <p className="text-sm text-slate-400 mt-1">Assign assessments and manage magic links</p>
               </div>
-              <button onClick={() => { setShowAssignForm(true); fetchStudentsForAssign(); }} className="h-9 px-4 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-1.5">
+              <button onClick={() => { setShowAssignForm(true); fetchStudentsForAssign(); }} className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 New Assignment
               </button>
@@ -841,7 +841,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center justify-end gap-1.5">
                               {(a.status || "").toLowerCase() === "assigned" && (
                                 <>
-                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">Resend Link</button>
+                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 transition-colors">Resend Link</button>
                                   <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">Cancel</button>
                                 </>
                               )}
@@ -907,7 +907,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowAddUser(false); setCreateError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={creating} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={creating} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
                 {creating ? "Creating..." : "Create User"}
               </button>
             </div>
@@ -951,7 +951,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setSelectedUser(null); setEditError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={saving} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={saving} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -1080,7 +1080,7 @@ export default function AdminDashboard() {
 
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowCreateStudent(false); setStudentFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={creatingStudent} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={creatingStudent} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
                 {creatingStudent ? "Creating..." : "Create Student"}
               </button>
             </div>
@@ -1122,7 +1122,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowAssignForm(false); setAssignFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={assigning} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={assigning} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
                 {assigning ? "Assigning..." : "Assign & Send Link"}
               </button>
             </div>

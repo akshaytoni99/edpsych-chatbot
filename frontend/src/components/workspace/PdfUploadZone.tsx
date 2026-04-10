@@ -150,8 +150,8 @@ export default function PdfUploadZone({
           disabled || uploading
             ? "opacity-60 cursor-not-allowed"
             : dragActive
-            ? "border-primary bg-blue-50"
-            : "border-slate-300 bg-slate-50 hover:border-primary hover:bg-blue-50/50"
+            ? "border-primary bg-teal-50"
+            : "border-slate-300 bg-slate-50 hover:border-primary hover:bg-teal-50/50"
         }`}
       >
         <input
@@ -168,7 +168,7 @@ export default function PdfUploadZone({
 
         {!uploading && !processing && (
           <>
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-500 flex items-center justify-center text-white">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"

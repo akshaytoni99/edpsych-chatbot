@@ -120,7 +120,7 @@ export default function UnifiedInsightsCard({
 
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-pink-500 flex items-center justify-center text-white flex-shrink-0">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -180,7 +180,7 @@ export default function UnifiedInsightsCard({
             type="button"
             onClick={synthesize}
             disabled={busy}
-            className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl shadow hover:shadow-lg transition-all disabled:opacity-40"
+            className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-pink-500 text-white font-bold rounded-xl shadow hover:shadow-lg transition-all disabled:opacity-40"
           >
             Synthesize Insights
           </button>

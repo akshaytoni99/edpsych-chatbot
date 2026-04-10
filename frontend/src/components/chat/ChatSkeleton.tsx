@@ -45,7 +45,7 @@ export default function ChatSkeleton() {
 
           {/* User message skeleton */}
           <div className="flex items-end gap-2.5 justify-end animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <div className="max-w-[72%] rounded-2xl rounded-br-md px-4 py-3 bg-indigo-100/60 shadow-sm">
+            <div className="max-w-[72%] rounded-2xl rounded-br-md px-4 py-3 bg-teal-100/60 shadow-sm">
               <div className="h-3.5 w-32 rounded skeleton-shimmer" />
               <div className="h-2.5 w-10 rounded skeleton-shimmer mt-2.5" />
             </div>

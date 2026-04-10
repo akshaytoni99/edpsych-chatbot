@@ -97,7 +97,7 @@ export default function StudentDetailPage() {
       case "COMPLETED":
         return "bg-emerald-100 text-emerald-700 border-emerald-200";
       case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-teal-100 text-teal-700 border-teal-200";
       case "DRAFT":
         return "bg-slate-100 text-slate-700 border-slate-200";
       default:
@@ -168,7 +168,7 @@ export default function StudentDetailPage() {
         {/* Student Profile Card */}
         <div className="glass-card p-8 rounded-3xl mb-8">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-black text-4xl flex-shrink-0">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-teal-500 to-teal-500 flex items-center justify-center text-white font-black text-4xl flex-shrink-0">
               {student.first_name[0]}{student.last_name[0]}
             </div>
             <div className="flex-1">
@@ -233,7 +233,7 @@ export default function StudentDetailPage() {
               </p>
               <button
                 onClick={handleStartAssessment}
-                className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all inline-flex items-center gap-2"
+                className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-teal-600 transition-all inline-flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -324,7 +324,7 @@ export default function StudentDetailPage() {
                               e.stopPropagation();
                               router.push(`/student/${studentId}/assessment/${assessment.session_token}`);
                             }}
-                            className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all"
+                            className="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-teal-600 transition-all"
                           >
                             Continue
                           </button>

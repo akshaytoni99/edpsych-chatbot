@@ -221,7 +221,7 @@ export default function ReportsPage() {
             </p>
             <button
               onClick={() => router.push(`/student/${studentId}/assessment`)}
-              className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-teal-600 transition-all inline-flex items-center gap-2"
             >
               Start Assessment
             </button>
@@ -249,7 +249,7 @@ export default function ReportsPage() {
                           ? "bg-emerald-100 text-emerald-700"
                           : report.status === "pending_review"
                           ? "bg-amber-100 text-amber-700"
-                          : "bg-blue-100 text-blue-700"
+                          : "bg-teal-100 text-teal-700"
                       }`}>
                         {report.status.replace("_", " ")}
                       </span>
@@ -270,7 +270,7 @@ export default function ReportsPage() {
                   {selectedReport.profile_text && (
                     <div className="glass-card p-8 rounded-2xl">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                        <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600">
                           {getSectionIcon("profile")}
                         </div>
                         <h3 className="text-xl font-bold text-on-background">Student Profile</h3>
@@ -287,7 +287,7 @@ export default function ReportsPage() {
                   {selectedReport.impact_text && (
                     <div className="glass-card p-8 rounded-2xl">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600">
                           {getSectionIcon("impact")}
                         </div>
                         <h3 className="text-xl font-bold text-on-background">Educational Impact</h3>
@@ -331,7 +331,7 @@ export default function ReportsPage() {
                               job.status === "completed"
                                 ? "bg-emerald-100 text-emerald-700"
                                 : job.status === "running"
-                                ? "bg-blue-100 text-blue-700"
+                                ? "bg-teal-100 text-teal-700"
                                 : "bg-slate-100 text-slate-700"
                             }`}>
                               {job.status}

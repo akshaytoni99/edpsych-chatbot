@@ -250,7 +250,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
                 ${isListening
                   ? 'border-2 border-red-300 bg-red-50/30 shadow-sm shadow-red-100/50'
                   : isFocused
-                  ? 'border-2 border-indigo-400 bg-white shadow-md shadow-indigo-100/30'
+                  ? 'border-2 border-teal-400 bg-white shadow-md shadow-teal-100/30'
                   : 'border-2 border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-white'
                 }`}
               style={{ overflowY: 'auto' }}
@@ -294,9 +294,9 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
             className={`h-[42px] w-[42px] sm:h-[46px] sm:w-[46px] flex items-center justify-center flex-shrink-0
               rounded-2xl
               transition-all duration-200
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-1
               ${value.trim() && !disabled
-                ? 'bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:via-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200/40 hover:shadow-xl hover:shadow-indigo-200/50 hover:-translate-y-0.5 active:translate-y-0'
+                ? 'bg-gradient-to-r from-teal-500 via-teal-600 to-teal-600 hover:from-teal-600 hover:via-teal-700 hover:to-teal-700 text-white shadow-lg shadow-teal-200/40 hover:shadow-xl hover:shadow-teal-200/50 hover:-translate-y-0.5 active:translate-y-0'
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
               }`}
           >

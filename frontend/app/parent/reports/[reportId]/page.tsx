@@ -200,7 +200,7 @@ export default function ParentReportViewPage() {
           </p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all min-h-[44px]"
+            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-teal-600 transition-all min-h-[44px]"
           >
             Back to Dashboard
           </button>
@@ -230,7 +230,7 @@ export default function ParentReportViewPage() {
           <p className="text-slate-500 mb-6">{error}</p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all min-h-[44px]"
+            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-teal-600 transition-all min-h-[44px]"
           >
             Back to Dashboard
           </button>
@@ -370,7 +370,7 @@ export default function ParentReportViewPage() {
             {profileText && (
               <section className="glass-card p-6 sm:p-8 rounded-2xl report-section">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -410,7 +410,7 @@ export default function ParentReportViewPage() {
             {impactText && (
               <section className="glass-card p-6 sm:p-8 rounded-2xl report-section">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 flex-shrink-0">
                     <svg
                       className="w-5 h-5"
                       fill="none"

@@ -493,7 +493,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
         <div className="max-w-3xl mx-auto flex items-center gap-2.5 sm:gap-3 relative">
           {/* Logo / Avatar */}
           <div className="relative group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-200/40 group-hover:shadow-xl group-hover:shadow-indigo-200/50 transition-shadow duration-300">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-teal-500 via-teal-600 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200/40 group-hover:shadow-xl group-hover:shadow-teal-200/50 transition-shadow duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-[22px] sm:h-[22px]">
                 <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7Z" />
                 <path d="M10 21h4" />
@@ -518,8 +518,8 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
           {/* Category badge */}
           {currentCategory && (
             <div className="hidden sm:flex items-center animate-fade-in">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 ring-1 ring-indigo-100/80 capitalize shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-gradient-to-r from-teal-50 to-teal-50 text-teal-600 ring-1 ring-teal-100/80 capitalize shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
                 {currentCategory}
               </span>
             </div>
@@ -530,8 +530,8 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
             <button
               onClick={handleSaveAndExit}
               className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2
-                bg-white border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50/50
-                text-gray-500 hover:text-indigo-600
+                bg-white border border-gray-200 hover:border-teal-200 hover:bg-teal-50/50
+                text-gray-500 hover:text-teal-600
                 text-xs sm:text-sm font-medium rounded-xl
                 transition-all duration-200 shadow-sm hover:shadow"
             >
@@ -595,16 +595,16 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
             <div className="relative">
               {showTextNudge && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-40 animate-slide-up">
-                  <div className="relative bg-indigo-600 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-200/50 whitespace-nowrap">
+                  <div className="relative bg-teal-600 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-teal-200/50 whitespace-nowrap">
                     Feel free to share more details using the text field below
                     <button
                       onClick={() => { setShowTextNudge(false); if (nudgeTimerRef.current) clearTimeout(nudgeTimerRef.current); }}
-                      className="ml-2 text-indigo-200 hover:text-white"
+                      className="ml-2 text-teal-200 hover:text-white"
                     >
                       ✕
                     </button>
                     {/* Arrow pointing down */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-indigo-600" />
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-teal-600" />
                   </div>
                 </div>
               )}

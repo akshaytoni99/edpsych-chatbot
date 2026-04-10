@@ -132,7 +132,7 @@ export default function CognitiveReportCard({
   const header = (
     <div className="flex items-start justify-between gap-4 mb-6">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white flex-shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-500 flex items-center justify-center text-white flex-shrink-0">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               strokeLinecap="round"
@@ -221,7 +221,7 @@ export default function CognitiveReportCard({
                   type="button"
                   onClick={generateReport}
                   disabled={busy}
-                  className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow hover:shadow-lg transition-all disabled:opacity-40"
+                  className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold rounded-xl shadow hover:shadow-lg transition-all disabled:opacity-40"
                 >
                   {busy ? "Generating…" : "Generate Cognitive Report"}
                 </button>

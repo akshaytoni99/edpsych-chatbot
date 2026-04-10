@@ -130,7 +130,7 @@ export default function MagicLinkPage() {
     }
   };
 
-  // --- Eye icon SVGs (matching login/register pattern) ---
+  // --- Eye icon SVGs ---
   const EyeOpen = (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -148,46 +148,46 @@ export default function MagicLinkPage() {
 
   const renderLoading = () => (
     <div className="text-center">
-      <div className="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mx-auto mb-6" />
-      <h2 className="text-2xl font-extrabold tracking-tight text-on-background mb-2">
+      <div className="w-12 h-12 border-4 border-[#dedede] border-t-[#00acb6] rounded-full animate-spin mx-auto mb-6" />
+      <h2 className="font-serif text-[24px] text-[#333] mb-2">
         Verifying your link...
       </h2>
-      <p className="text-slate-500 text-sm">Please wait while we verify your invitation.</p>
+      <p className="text-[#737373] text-[15px]">Please wait while we verify your invitation.</p>
     </div>
   );
 
   const renderAutoLogin = () => (
     <div className="text-center">
-      <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-        <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-16 h-16 bg-[#e6f7f8] border border-[#00acb6] rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg className="w-8 h-8 text-[#00acb6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <h2 className="text-2xl font-extrabold tracking-tight text-on-background mb-2">
+      <h2 className="font-serif text-[24px] text-[#333] mb-2">
         Logging you in...
       </h2>
-      <p className="text-slate-500 text-sm">You will be redirected momentarily.</p>
+      <p className="text-[#737373] text-[15px]">You will be redirected momentarily.</p>
     </div>
   );
 
   const renderError = (message: string) => (
     <div className="text-center">
-      <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
-        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-white border border-[#e61844] rounded p-6 mb-8">
+        <div className="w-12 h-12 bg-[#fdecec] border border-[#e61844] rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-[#e61844]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <h2 className="text-xl font-extrabold tracking-tight text-on-background mb-2">
+        <h2 className="font-serif text-[22px] text-[#333] mb-2">
           {message}
         </h2>
-        <p className="text-slate-500 text-sm">
+        <p className="text-[#737373] text-[15px]">
           Please contact your psychologist for a new invitation link.
         </p>
       </div>
       <button
         onClick={() => router.push("/login")}
-        className="w-full py-3 lg:py-4 bg-on-background text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 active:scale-[0.98] transition-all duration-300 text-sm lg:text-base"
+        className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors text-[16px] border border-[#e61844] hover:border-[#cf0627]"
       >
         Go to Login
       </button>
@@ -196,70 +196,72 @@ export default function MagicLinkPage() {
 
   const renderPasswordSetup = (userEmail: string) => (
     <div>
-      <div className="mb-8 lg:mb-10">
-        <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-on-background mb-3">
-          Welcome to The EdPsych Practice
+      <div className="mb-8">
+        <h2 className="font-serif text-[30px] text-[#333] mb-3">
+          Welcome to <span className="text-[#00a1aa]">The Ed Psych Practice</span>
         </h2>
-        <p className="text-slate-500 font-medium text-sm lg:text-base">
+        <p className="text-[#737373] text-[16px] leading-[1.8]">
           Set up your password to access your child&apos;s assessment.
         </p>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
-        <svg className="w-5 h-5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-[#e6f7f8] border border-[#00acb6] rounded px-4 py-3 mb-6 flex items-center gap-3">
+        <svg className="w-5 h-5 text-[#0c888e] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
         </svg>
-        <span className="text-sm text-blue-800 font-medium truncate">{userEmail}</span>
+        <span className="text-[15px] text-[#0c888e] font-semibold truncate">{userEmail}</span>
       </div>
 
-      <form onSubmit={handlePasswordSubmit} className="space-y-5 lg:space-y-6">
+      <form onSubmit={handlePasswordSubmit} className="space-y-5">
         {formError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-medium">
+          <div className="bg-[#fdecec] border border-[#e61844] rounded px-4 py-3 text-[14px] text-[#e61844] font-semibold">
             {formError}
           </div>
         )}
 
         {/* Password Field */}
-        <div className="floating-label-group">
+        <div className="relative">
+          <label htmlFor="password" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+            Password (min 8 characters)
+          </label>
           <input
             type={showPassword ? "text" : "password"}
             id="password"
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 lg:py-4 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-300 text-on-surface outline-none text-sm lg:text-base"
-            placeholder=" "
+            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
             required
             minLength={8}
           />
-          <label htmlFor="password" className="text-xs lg:text-sm font-medium">Password (min 8 characters)</label>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 lg:right-4 top-3 lg:top-4 text-slate-400 hover:text-primary transition-colors"
+            className="absolute right-3 top-[38px] text-[#737373] hover:text-[#00acb6] transition-colors"
           >
             {showPassword ? EyeClosed : EyeOpen}
           </button>
         </div>
 
         {/* Confirm Password Field */}
-        <div className="floating-label-group">
+        <div className="relative">
+          <label htmlFor="confirmPassword" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+            Confirm Password
+          </label>
           <input
             type={showConfirmPassword ? "text" : "password"}
             id="confirmPassword"
             name="confirmPassword"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 lg:py-4 bg-surface border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all duration-300 text-on-surface outline-none text-sm lg:text-base"
-            placeholder=" "
+            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
             required
             minLength={8}
           />
-          <label htmlFor="confirmPassword" className="text-xs lg:text-sm font-medium">Confirm Password</label>
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 lg:right-4 top-3 lg:top-4 text-slate-400 hover:text-primary transition-colors"
+            className="absolute right-3 top-[38px] text-[#737373] hover:text-[#00acb6] transition-colors"
           >
             {showConfirmPassword ? EyeClosed : EyeOpen}
           </button>
@@ -268,9 +270,9 @@ export default function MagicLinkPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-3 lg:py-4 bg-on-background text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 text-sm lg:text-base"
+          className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors disabled:opacity-50 text-[16px] border border-[#e61844] hover:border-[#cf0627]"
         >
-          <span>{submitting ? "Setting up..." : "Create Password & Continue"}</span>
+          {submitting ? "Setting up..." : "Create Password & Continue"}
         </button>
       </form>
     </div>
@@ -291,77 +293,70 @@ export default function MagicLinkPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-stretch overflow-hidden">
-      {/* Left Section: Visual Branding */}
-      <section className="hidden lg:flex w-7/12 relative bg-surface items-center justify-center p-16 overflow-hidden border-r border-slate-200">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-100 rounded-full blur-[160px] opacity-60" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-100 rounded-full blur-[140px] opacity-40" />
-        </div>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Top teal nav — matches theedpsych.com */}
+      <div className="ed-nav w-full py-3 px-6">
+        <span className="text-white font-serif text-xl tracking-wide">The Ed Psych Practice</span>
+      </div>
 
-        <div className="relative z-10 max-w-2xl w-full">
-          <header className="mb-16">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <span className="text-on-background text-2xl font-black tracking-tighter">The EdPsych Practice</span>
+      <div className="flex-1 flex items-stretch">
+        {/* Left Section: Welcome hero */}
+        <section className="hidden lg:flex w-6/12 relative ed-hero items-center justify-center p-16 border-r border-[#dedede]">
+          <div className="relative z-10 max-w-xl w-full text-center">
+            <div className="mb-8">
+              <h1 className="brand-wordmark mb-2">The Ed Psych Practice</h1>
+              <p className="brand-tagline">An Independent Practice in Central London</p>
             </div>
-            <h1 className="text-on-background text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6">
-              Welcome to your <span className="brand-accent">Assessment Portal</span>.
-            </h1>
-            <p className="text-slate-500 text-lg lg:text-xl leading-relaxed font-normal max-w-lg">
-              Your psychologist has invited you to securely access your child&apos;s assessment. Set up your account to get started.
+
+            <div className="w-20 h-[2px] bg-[#00acb6] mx-auto mb-8" />
+
+            <h2 className="font-serif text-[30px] leading-[1.3] text-[#333] mb-6">
+              Your <span className="text-[#00a1aa]">Assessment Portal</span>
+            </h2>
+            <p className="text-[18px] leading-[1.8] text-[#737373] max-w-md mx-auto mb-10">
+              Your psychologist has invited you to securely access your child&apos;s
+              assessment. Set up your account to get started.
             </p>
-          </header>
 
-          {/* Illustration Card */}
-          <div className="relative rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] bg-white p-2 border border-slate-200">
-            <div className="relative rounded-[2rem] overflow-hidden bg-gradient-to-br from-emerald-50 to-blue-50 h-[300px] flex flex-col items-center justify-center p-8">
-              <svg className="w-20 h-20 text-emerald-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <h3 className="text-2xl font-bold text-on-surface mb-2 text-center">Secure Access</h3>
-              <p className="text-slate-500 text-center text-sm">Your data is encrypted and protected</p>
+            <div className="ed-card max-w-md mx-auto">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#e6f7f8] border border-[#00acb6] rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-[#00acb6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h3 className="font-serif text-[18px] text-[#333] mb-1">Secure Access</h3>
+                  <p className="text-[14px] text-[#737373]">Your data is encrypted and protected</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Right Section: Content */}
-      <main className="w-full lg:w-5/12 bg-background flex flex-col items-center justify-center p-8 sm:p-16 relative">
-        {/* Header for mobile */}
-        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg border border-slate-100">
-            <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
+        {/* Right Section: Content */}
+        <main className="w-full lg:w-6/12 bg-white flex flex-col items-center justify-center p-8 sm:p-16 relative">
+          {/* Mobile branding */}
+          <div className="lg:hidden absolute top-6 left-6">
+            <h1 className="font-serif text-2xl text-[#0c888e]">The Ed Psych Practice</h1>
           </div>
-          <span className="text-on-background font-black text-xl tracking-tighter">The EdPsych Practice</span>
-        </div>
 
-        <div className="max-w-md w-full mt-16 lg:mt-0">
-          {renderContent()}
+          <div className="max-w-md w-full mt-16 lg:mt-0">
+            {renderContent()}
 
-          <footer className="mt-12 lg:mt-16 text-center">
-            <div className="flex justify-center gap-6 lg:gap-8 text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-              <a href="#" className="hover:text-primary transition-colors">Documentation</a>
-              <a href="#" className="hover:text-primary transition-colors">Support</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            </div>
-            <div className="mt-6 lg:mt-8 text-[9px] lg:text-[10px] text-slate-400 font-medium">
-              &copy; 2026 The EdPsych Practice. All clinical data encrypted.
-            </div>
-          </footer>
-        </div>
-      </main>
-
-      {/* Floating Elements */}
-      <div className="fixed top-20 right-[48%] translate-x-1/2 w-48 h-48 bg-blue-400/5 rounded-full blur-[80px] pointer-events-none z-0" />
-      <div className="fixed bottom-20 left-[48%] translate-x-1/2 w-64 h-64 bg-indigo-400/5 rounded-full blur-[100px] pointer-events-none z-0" />
+            <footer className="mt-12 text-center">
+              <div className="flex justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#737373]">
+                <a href="#" className="hover:text-[#e61844] transition-colors">Documentation</a>
+                <a href="#" className="hover:text-[#e61844] transition-colors">Support</a>
+                <a href="#" className="hover:text-[#e61844] transition-colors">Privacy</a>
+              </div>
+              <div className="mt-6 text-[12px] text-[#737373]">
+                &copy; 2026 The Ed Psych Practice. All clinical data encrypted.
+              </div>
+            </footer>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

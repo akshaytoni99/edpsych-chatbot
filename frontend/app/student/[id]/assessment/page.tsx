@@ -88,7 +88,7 @@ export default function AssessmentStartPage() {
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push("/dashboard")}
-            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all"
+            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-teal-600 transition-all"
           >
             Back to Dashboard
           </button>
@@ -100,7 +100,7 @@ export default function AssessmentStartPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+        <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
           <svg
             className="w-8 h-8 text-primary"
             fill="none"

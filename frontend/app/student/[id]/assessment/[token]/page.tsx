@@ -239,7 +239,7 @@ export default function AssessmentPage() {
             </div>
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-teal-500 to-teal-500 transition-all duration-500"
                 style={{ width: `${progress.progress_percentage}%` }}
               />
             </div>
@@ -252,7 +252,7 @@ export default function AssessmentPage() {
         <div className="glass-card p-8 lg:p-12 rounded-3xl">
           {/* Section Badge */}
           <div className="mb-6">
-            <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg border border-blue-200">
+            <span className="inline-block px-4 py-2 bg-teal-100 text-teal-700 text-xs font-bold uppercase tracking-wider rounded-lg border border-teal-200">
               {currentQuestion.section}
             </span>
           </div>
@@ -390,14 +390,14 @@ export default function AssessmentPage() {
         </div>
 
         {/* Help Card */}
-        <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-2xl">
+        <div className="mt-8 p-6 bg-teal-50 border border-teal-200 rounded-2xl">
           <div className="flex gap-4">
-            <svg className="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6 text-teal-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h4 className="font-bold text-blue-900 mb-1">Assessment Tips</h4>
-              <p className="text-sm text-blue-700 leading-relaxed">
+              <h4 className="font-bold text-teal-900 mb-1">Assessment Tips</h4>
+              <p className="text-sm text-teal-700 leading-relaxed">
                 Answer honestly and thoughtfully. There are no right or wrong answers. Your responses help us understand your child's educational needs better. You can save and exit at any time to continue later.
               </p>
             </div>

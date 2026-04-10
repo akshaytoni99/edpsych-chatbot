@@ -254,7 +254,7 @@ export default function PsychologistDashboard() {
       case "COMPLETED":
         return "bg-emerald-100 text-emerald-700 border-emerald-200";
       case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-teal-100 text-teal-700 border-teal-200";
       case "ASSIGNED":
         return "bg-amber-100 text-amber-700 border-amber-200";
       case "CANCELLED":
@@ -398,8 +398,8 @@ export default function PsychologistDashboard() {
 
             <div className="glass-card p-6 rounded-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -416,8 +416,8 @@ export default function PsychologistDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="glass-card p-6 rounded-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
@@ -568,7 +568,7 @@ export default function PsychologistDashboard() {
                   {/* Profile Section */}
                   <div className="glass-card p-8 rounded-2xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                      <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
@@ -594,7 +594,7 @@ export default function PsychologistDashboard() {
                   {/* Impact Section */}
                   <div className="glass-card p-8 rounded-2xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                      <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
@@ -710,7 +710,7 @@ export default function PsychologistDashboard() {
                               assignment.status === "COMPLETED"
                                 ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                 : assignment.status === "IN_PROGRESS"
-                                ? "bg-blue-100 text-blue-700 border-blue-200"
+                                ? "bg-teal-100 text-teal-700 border-teal-200"
                                 : assignment.status === "ASSIGNED"
                                 ? "bg-amber-100 text-amber-700 border-amber-200"
                                 : "bg-slate-100 text-slate-700 border-slate-200"
@@ -875,7 +875,7 @@ export default function PsychologistDashboard() {
                                       isCompleted
                                         ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                         : isInProgress
-                                        ? "bg-blue-100 text-blue-700 border-blue-200"
+                                        ? "bg-teal-100 text-teal-700 border-teal-200"
                                         : "bg-amber-100 text-amber-700 border-amber-200"
                                     }`}>
                                       {isCompleted ? "Completed" : isInProgress ? "In Progress" : "Assigned"}
@@ -888,7 +888,7 @@ export default function PsychologistDashboard() {
                                         progress === 100
                                           ? "bg-emerald-500"
                                           : progress > 50
-                                          ? "bg-blue-500"
+                                          ? "bg-teal-500"
                                           : progress > 0
                                           ? "bg-amber-500"
                                           : "bg-slate-300"
@@ -903,7 +903,7 @@ export default function PsychologistDashboard() {
                           <td className="py-4 px-4">
                             <a
                               href={`/student/${student.id}/workspace`}
-                              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors inline-flex items-center gap-1.5"
+                              className="px-4 py-2 text-sm font-medium text-white bg-[#e61844] hover:bg-[#cf0627] rounded-lg transition-colors inline-flex items-center gap-1.5"
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                               Reports Workspace
