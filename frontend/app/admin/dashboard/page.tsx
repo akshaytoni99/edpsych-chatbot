@@ -167,7 +167,7 @@ function RoleBadge({ role }: { role: string }) {
     PARENT: "bg-emerald-100 text-emerald-700",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide ${styles[role] || "bg-slate-100 text-slate-600"}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.6875rem] font-semibold tracking-wide ${styles[role] || "bg-slate-100 text-slate-600"}`}>
       {role}
     </span>
   );
@@ -519,8 +519,8 @@ export default function AdminDashboard() {
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               </div>
               <div>
-                <h1 className="font-serif text-[18px] font-bold text-[#0c888e] leading-none">The Ed Psych Practice</h1>
-                <p className="text-[9px] font-medium text-[#737373] tracking-widest uppercase">Admin Console</p>
+                <h1 className="font-serif text-[1.125rem] font-bold text-[#0c888e] leading-none">The Ed Psych Practice</h1>
+                <p className="text-[0.5625rem] font-medium text-[#737373] tracking-widest uppercase">Admin Console</p>
               </div>
             </div>
 
@@ -542,9 +542,9 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <div className="hidden md:block text-right">
                 <p className="text-sm font-medium text-[#333] leading-none">{user?.full_name}</p>
-                <p className="text-[11px] text-[#737373] mt-0.5">{user?.email}</p>
+                <p className="text-[0.6875rem] text-[#737373] mt-0.5">{user?.email}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-[11px] font-bold">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-[0.6875rem] font-bold">
                 {(user?.full_name || "A").charAt(0).toUpperCase()}
               </div>
               <button onClick={handleLogout} className="text-xs font-medium text-[#737373] hover:text-[#e61844] transition-colors">
@@ -596,7 +596,7 @@ export default function AdminDashboard() {
                     onClick={() => handleStatClick(r.label)}
                     className={`text-left px-4 py-3 rounded-xl border border-[#dedede] border-l-[3px] ${r.color} hover:bg-[#f4f4f4] transition-all`}
                   >
-                    <p className="text-[10px] font-semibold text-[#737373] uppercase tracking-wider">{r.label}</p>
+                    <p className="text-[0.625rem] font-semibold text-[#737373] uppercase tracking-wider">{r.label}</p>
                     <p className={`text-2xl font-bold ${r.textColor}`}>{stats.users_by_role[r.key]}</p>
                   </button>
                 ))}
@@ -644,12 +644,12 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-[#dedede]">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">User</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Role</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Details</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Joined</th>
-                        <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
+                        <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">User</th>
+                        <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Role</th>
+                        <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Details</th>
+                        <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Joined</th>
+                        <th className="px-5 py-3 text-right text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#dedede]">
@@ -662,7 +662,7 @@ export default function AdminDashboard() {
                               </div>
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-[#333] truncate">{u.full_name}</p>
-                                <p className="text-[11px] text-[#737373] truncate">{u.email}</p>
+                                <p className="text-[0.6875rem] text-[#737373] truncate">{u.email}</p>
                               </div>
                             </div>
                           </td>
@@ -693,15 +693,15 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-[#dedede] text-[#737373] hover:bg-[#f4f4f4] hover:text-[#333] transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
+                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[0.6875rem] font-medium rounded-md border border-[#dedede] text-[#737373] hover:bg-[#f4f4f4] hover:text-[#333] transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
                                 {u.is_active ? "Deactivate" : "Activate"}
                               </button>
                               {u.role === "PARENT" && (
-                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-amber-300 text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-40" title="Reset assessment">
+                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[0.6875rem] font-medium rounded-md border border-amber-300 text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-40" title="Reset assessment">
                                   {resetting === u.id ? "..." : "Reset"}
                                 </button>
                               )}
-                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors" title="Edit user">
+                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[0.6875rem] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors" title="Edit user">
                                 Edit
                               </button>
                               <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors" title="Delete user">
@@ -740,12 +740,12 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead><tr className="border-b border-[#dedede]">
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Grade</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">School</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Parent/Guardian</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
-                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Grade</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">School</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Parent/Guardian</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-right text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                     </tr></thead>
                     <tbody className="divide-y divide-[#dedede]">
                       {adminStudents.map((s: any) => (
@@ -759,24 +759,24 @@ export default function AdminDashboard() {
                             {s.guardians && s.guardians.length > 0 ? (
                               <div>
                                 <p className="text-sm text-[#333]">{s.guardians[0].name}</p>
-                                <p className="text-[11px] text-[#737373]">{s.guardians[0].email}</p>
+                                <p className="text-[0.6875rem] text-[#737373]">{s.guardians[0].email}</p>
                               </div>
                             ) : <span className="text-slate-600">No guardian</span>}
                           </td>
                           <td className="px-5 py-3.5">
                             {s.assignment_status ? (
                               <div className="flex items-center gap-2">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.assignment_status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                                <span className={`px-2 py-0.5 rounded-full text-[0.625rem] font-semibold ${s.assignment_status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
                                   {s.assignment_status.toUpperCase()}
                                 </span>
                                 {s.progress_percentage > 0 && s.assignment_status !== "completed" && (
-                                  <span className="text-[11px] text-[#737373]">{s.progress_percentage}%</span>
+                                  <span className="text-[0.6875rem] text-[#737373]">{s.progress_percentage}%</span>
                                 )}
                               </div>
-                            ) : <span className="text-[11px] text-slate-600">No assignment</span>}
+                            ) : <span className="text-[0.6875rem] text-slate-600">No assignment</span>}
                           </td>
                           <td className="px-5 py-3.5 text-right">
-                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-[#00acb6] hover:text-[#0c888e]">Reports Workspace</a>
+                            <a href={`/student/${s.id}/workspace`} className="text-[0.6875rem] font-medium text-[#00acb6] hover:text-[#0c888e]">Reports Workspace</a>
                           </td>
                         </tr>
                       ))}
@@ -809,12 +809,12 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead><tr className="border-b border-[#dedede]">
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Assigned To</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Due Date</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Assigned</th>
-                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Assigned To</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Due Date</th>
+                      <th className="px-5 py-3 text-left text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Assigned</th>
+                      <th className="px-5 py-3 text-right text-[0.6875rem] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                     </tr></thead>
                     <tbody className="divide-y divide-[#dedede]">
                       {adminAssignments.map((a: any) => (
@@ -824,10 +824,10 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5">
                             <p className="text-sm text-[#333]">{a.assigned_to?.name || "Unknown"}</p>
-                            <p className="text-[11px] text-[#737373]">{a.assigned_to?.email || ""}</p>
+                            <p className="text-[0.6875rem] text-[#737373]">{a.assigned_to?.email || ""}</p>
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            <span className={`px-2 py-0.5 rounded-full text-[0.625rem] font-semibold ${
                               a.status === "completed" ? "bg-emerald-100 text-emerald-700" :
                               a.status === "cancelled" ? "bg-[#737373]/20 text-[#737373]" :
                               "bg-amber-100 text-amber-700"
@@ -841,8 +841,8 @@ export default function AdminDashboard() {
                             <div className="flex items-center justify-end gap-1.5">
                               {(a.status || "").toLowerCase() === "assigned" && (
                                 <>
-                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors">Resend Link</button>
-                                  <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors">Cancel</button>
+                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[0.6875rem] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors">Resend Link</button>
+                                  <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[0.6875rem] font-medium rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors">Cancel</button>
                                 </>
                               )}
                             </div>
@@ -875,7 +875,7 @@ export default function AdminDashboard() {
           {createError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{createError}</div>}
           <form onSubmit={handleCreateUser} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Role</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Role</label>
               <select value={createForm.role} onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="PSYCHOLOGIST">Psychologist</option>
                 <option value="SCHOOL">School</option>
@@ -884,24 +884,24 @@ export default function AdminDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Full Name</label>
               <input type="text" required value={createForm.full_name} onChange={(e) => setCreateForm({ ...createForm, full_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Dr. Jane Smith" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Email</label>
               <input type="email" required value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="jane@example.com" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Password</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Password</label>
               <input type="text" required minLength={8} value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Min 8 characters" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Phone</label>
                 <input type="tel" value={createForm.phone} onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="+44 7700..." />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Organization</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Organization</label>
                 <input type="text" value={createForm.organization} onChange={(e) => setCreateForm({ ...createForm, organization: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Clinic name" />
               </div>
             </div>
@@ -923,25 +923,25 @@ export default function AdminDashboard() {
           {editError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{editError}</div>}
           <form onSubmit={handleSaveUser} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Full Name</label>
               <input type="text" value={editForm.full_name} onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Email</label>
               <input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Phone</label>
                 <input type="tel" value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Organization</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Organization</label>
                 <input type="text" value={editForm.organization} onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Role</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Role</label>
               <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="PARENT">Parent</option>
                 <option value="PSYCHOLOGIST">Psychologist</option>
@@ -979,12 +979,12 @@ export default function AdminDashboard() {
               <div className="space-y-1.5">
                 {statPopup.items.map((item, idx) => (
                   <div key={item.id || idx} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors">
-                    <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[0.6875rem] font-semibold shrink-0">
                       {idx + 1}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-on-background truncate">{item.label}</p>
-                      {item.sub && <p className="text-[11px] text-[#737373] truncate">{item.sub}</p>}
+                      {item.sub && <p className="text-[0.6875rem] text-[#737373] truncate">{item.sub}</p>}
                     </div>
                   </div>
                 ))}
@@ -992,7 +992,7 @@ export default function AdminDashboard() {
             )}
           </div>
           <div className="px-5 py-3 border-t border-slate-100">
-            <p className="text-[11px] text-[#737373] text-center">{statPopup.loading ? "" : `${statPopup.items.length} record${statPopup.items.length !== 1 ? "s" : ""}`}</p>
+            <p className="text-[0.6875rem] text-[#737373] text-center">{statPopup.loading ? "" : `${statPopup.items.length} record${statPopup.items.length !== 1 ? "s" : ""}`}</p>
           </div>
         </div>
       </ModalOverlay>
@@ -1006,25 +1006,25 @@ export default function AdminDashboard() {
           <form onSubmit={handleCreateStudent} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">First Name</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">First Name</label>
                 <input type="text" required value={studentForm.student_first_name} onChange={(e) => setStudentForm({ ...studentForm, student_first_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Last Name</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Last Name</label>
                 <input type="text" required value={studentForm.student_last_name} onChange={(e) => setStudentForm({ ...studentForm, student_last_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Date of Birth</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Date of Birth</label>
                 <input type="date" required value={studentForm.date_of_birth} onChange={(e) => setStudentForm({ ...studentForm, date_of_birth: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Grade/Year</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Grade/Year</label>
                 <input type="text" value={studentForm.grade} onChange={(e) => setStudentForm({ ...studentForm, grade: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Year 7" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-[#737373] mb-1">Gender</label>
+                <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Gender</label>
                 <select value={studentForm.gender} onChange={(e) => setStudentForm({ ...studentForm, gender: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                   <option value="">Select...</option>
                   <option value="Male">Male</option>
@@ -1034,7 +1034,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">School Name</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">School Name</label>
               <input type="text" value={studentForm.school_name} onChange={(e) => setStudentForm({ ...studentForm, school_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
 
@@ -1044,21 +1044,21 @@ export default function AdminDashboard() {
                 <div key={idx} className="space-y-2 mb-3 p-3 bg-slate-50 rounded-lg">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
+                      <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Full Name</label>
                       <input type="text" required value={p.full_name} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, full_name: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
+                      <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Email</label>
                       <input type="email" required value={p.email} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, email: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
+                      <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Phone</label>
                       <input type="tel" value={p.phone} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, phone: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Relationship</label>
+                      <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Relationship</label>
                       <select value={p.relationship} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, relationship: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
                         <option value="Mother">Mother</option>
                         <option value="Father">Father</option>
@@ -1067,7 +1067,7 @@ export default function AdminDashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Type</label>
+                      <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Type</label>
                       <select value={p.type} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, type: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
                         <option value="parent">Parent</option>
                         <option value="school">School</option>
@@ -1096,7 +1096,7 @@ export default function AdminDashboard() {
           {assignFormError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{assignFormError}</div>}
           <form onSubmit={handleAssign} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Student</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Student</label>
               <select required value={assignForm.student_id} onChange={(e) => handleStudentSelectForAssign(e.target.value)} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="">Select student...</option>
                 {assignStudents.map((s: any) => (
@@ -1105,7 +1105,7 @@ export default function AdminDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Assign To (Parent/Guardian)</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Assign To (Parent/Guardian)</label>
               <select required value={assignForm.parent_id} onChange={(e) => setAssignForm({ ...assignForm, parent_id: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="">Select parent/guardian...</option>
                 {selectedStudentGuardians.map((g: any) => (
@@ -1113,11 +1113,11 @@ export default function AdminDashboard() {
                 ))}
               </select>
               {assignForm.student_id && selectedStudentGuardians.length === 0 && (
-                <p className="text-[11px] text-amber-500 mt-1">No guardians linked to this student. Add a guardian first.</p>
+                <p className="text-[0.6875rem] text-amber-500 mt-1">No guardians linked to this student. Add a guardian first.</p>
               )}
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-[#737373] mb-1">Notes (optional)</label>
+              <label className="block text-[0.6875rem] font-medium text-[#737373] mb-1">Notes (optional)</label>
               <textarea value={assignForm.notes} onChange={(e) => setAssignForm({ ...assignForm, notes: e.target.value })} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" rows={2} placeholder="Any notes for the parent..." />
             </div>
             <div className="flex gap-3 pt-3">

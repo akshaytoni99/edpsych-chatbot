@@ -67,7 +67,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <span className="text-white font-serif text-xl tracking-wide">The Ed Psych Practice</span>
         </div>
-        <nav className="hidden md:flex items-center gap-6 text-white text-[13px] uppercase tracking-wider">
+        <nav className="hidden md:flex items-center gap-6 text-white text-[0.8125rem] uppercase tracking-wider">
           <a href="#" className="hover:opacity-80 text-white">Home</a>
           <a href="#" className="hover:opacity-80 text-white">About</a>
           <a href="#" className="hover:opacity-80 text-white">Services</a>
@@ -99,22 +99,22 @@ export default function LoginPage() {
 
             <div className="w-20 h-[2px] bg-[#00acb6] mx-auto mb-8" />
 
-            <h2 className="font-serif text-[30px] leading-[1.3] text-[#333] mb-6">
+            <h2 className="font-serif text-[1.875rem] leading-[1.3] text-[#333] mb-6">
               Assessment <span className="text-[#00a1aa]">Intelligence</span>
             </h2>
-            <p className="text-[18px] leading-[1.8] text-[#737373] max-w-md mx-auto mb-10">
+            <p className="text-[1.125rem] leading-[1.8] text-[#737373] max-w-md mx-auto mb-10">
               Transforming assessment data into precise, actionable insights.
               Built for practitioners who value clarity and depth.
             </p>
 
             <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <div className="ed-card text-left">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-[#00acb6] mb-1">Insight</div>
-                <div className="text-[15px] text-[#333] font-semibold">Neural synthesis</div>
+                <div className="text-[0.6875rem] font-bold uppercase tracking-wider text-[#00acb6] mb-1">Insight</div>
+                <div className="text-[0.9375rem] text-[#333] font-semibold">Neural synthesis</div>
               </div>
               <div className="ed-card text-left">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-[#00acb6] mb-1">Reliability</div>
-                <div className="text-[15px] text-[#333] font-semibold">98.4% confidence</div>
+                <div className="text-[0.6875rem] font-bold uppercase tracking-wider text-[#00acb6] mb-1">Reliability</div>
+                <div className="text-[0.9375rem] text-[#333] font-semibold">98.4% confidence</div>
               </div>
             </div>
           </div>
@@ -129,8 +129,8 @@ export default function LoginPage() {
 
           <div className="max-w-md w-full mt-16 lg:mt-0">
             <div className="mb-8 lg:mb-10">
-              <h2 className="font-serif text-[30px] text-[#333] mb-3">Welcome Back</h2>
-              <p className="text-[16px] text-[#737373]">
+              <h2 className="font-serif text-[1.875rem] text-[#333] mb-3">Welcome Back</h2>
+              <p className="text-[1rem] text-[#737373]">
                 Access your dashboard and student assessments.
               </p>
             </div>
@@ -138,7 +138,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+                <label htmlFor="email" className="block text-[0.8125rem] font-semibold text-[#333] mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -147,14 +147,14 @@ export default function LoginPage() {
                   name="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
+                  className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[1rem] text-[#333]"
                   required
                 />
               </div>
 
               {/* Password Field */}
               <div className="relative">
-                <label htmlFor="password" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+                <label htmlFor="password" className="block text-[0.8125rem] font-semibold text-[#333] mb-1.5">
                   Password
                 </label>
                 <input
@@ -163,7 +163,7 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
+                  className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[1rem] text-[#333]"
                   required
                 />
                 <button
@@ -192,9 +192,9 @@ export default function LoginPage() {
                     onChange={(e) => setFormData({ ...formData, remember: e.target.checked })}
                     className="w-4 h-4 rounded border-[#ccc] text-[#00acb6] focus:ring-[#00acb6]/20"
                   />
-                  <span className="text-[14px] text-[#737373]">Remember me</span>
+                  <span className="text-[0.875rem] text-[#737373]">Remember me</span>
                 </label>
-                <a href="#" className="text-[14px] font-semibold text-[#e61844] hover:text-[#cf0627] transition-colors">
+                <a href="#" className="text-[0.875rem] font-semibold text-[#e61844] hover:text-[#cf0627] transition-colors">
                   Forgot password?
                 </a>
               </div>
@@ -202,25 +202,25 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors duration-150 disabled:opacity-50 text-[16px] border border-[#e61844] hover:border-[#cf0627]"
+                className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors duration-150 disabled:opacity-50 text-[1rem] border border-[#e61844] hover:border-[#cf0627]"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
 
               <div className="mt-4 p-4 bg-[#f4f4f4] border border-[#dedede] rounded">
-                <p className="text-[14px] text-[#737373] text-center leading-relaxed">
+                <p className="text-[0.875rem] text-[#737373] text-center leading-relaxed">
                   <span className="font-semibold text-[#333]">Parents:</span> Your psychologist will send you a magic link via email to set up your account.
                 </p>
               </div>
             </form>
 
             <footer className="mt-12 text-center">
-              <div className="flex justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#737373]">
+              <div className="flex justify-center gap-6 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-[#737373]">
                 <a href="#" className="hover:text-[#e61844] transition-colors">Documentation</a>
                 <a href="#" className="hover:text-[#e61844] transition-colors">Support</a>
                 <a href="#" className="hover:text-[#e61844] transition-colors">Privacy</a>
               </div>
-              <div className="mt-6 text-[12px] text-[#737373]">
+              <div className="mt-6 text-[0.75rem] text-[#737373]">
                 © 2026 The Ed Psych Practice. All clinical data encrypted.
               </div>
             </footer>

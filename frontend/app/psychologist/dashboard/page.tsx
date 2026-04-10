@@ -871,7 +871,7 @@ export default function PsychologistDashboard() {
                               return (
                                 <div className="flex flex-col gap-1.5 min-w-[120px]">
                                   <div className="flex items-center justify-between">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                    <span className={`px-2 py-0.5 rounded text-[0.625rem] font-bold border ${
                                       isCompleted
                                         ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                         : isInProgress
@@ -880,7 +880,7 @@ export default function PsychologistDashboard() {
                                     }`}>
                                       {isCompleted ? "Completed" : isInProgress ? "In Progress" : "Assigned"}
                                     </span>
-                                    <span className="text-[11px] font-semibold text-slate-500">{progress}%</span>
+                                    <span className="text-[0.6875rem] font-semibold text-slate-500">{progress}%</span>
                                   </div>
                                   <div className="w-full bg-slate-200 rounded-full h-1.5">
                                     <div

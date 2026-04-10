@@ -149,10 +149,10 @@ export default function MagicLinkPage() {
   const renderLoading = () => (
     <div className="text-center">
       <div className="w-12 h-12 border-4 border-[#dedede] border-t-[#00acb6] rounded-full animate-spin mx-auto mb-6" />
-      <h2 className="font-serif text-[24px] text-[#333] mb-2">
+      <h2 className="font-serif text-[1.5rem] text-[#333] mb-2">
         Verifying your link...
       </h2>
-      <p className="text-[#737373] text-[15px]">Please wait while we verify your invitation.</p>
+      <p className="text-[#737373] text-[0.9375rem]">Please wait while we verify your invitation.</p>
     </div>
   );
 
@@ -163,10 +163,10 @@ export default function MagicLinkPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <h2 className="font-serif text-[24px] text-[#333] mb-2">
+      <h2 className="font-serif text-[1.5rem] text-[#333] mb-2">
         Logging you in...
       </h2>
-      <p className="text-[#737373] text-[15px]">You will be redirected momentarily.</p>
+      <p className="text-[#737373] text-[0.9375rem]">You will be redirected momentarily.</p>
     </div>
   );
 
@@ -178,16 +178,16 @@ export default function MagicLinkPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <h2 className="font-serif text-[22px] text-[#333] mb-2">
+        <h2 className="font-serif text-[1.375rem] text-[#333] mb-2">
           {message}
         </h2>
-        <p className="text-[#737373] text-[15px]">
+        <p className="text-[#737373] text-[0.9375rem]">
           Please contact your psychologist for a new invitation link.
         </p>
       </div>
       <button
         onClick={() => router.push("/login")}
-        className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors text-[16px] border border-[#e61844] hover:border-[#cf0627]"
+        className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors text-[1rem] border border-[#e61844] hover:border-[#cf0627]"
       >
         Go to Login
       </button>
@@ -197,10 +197,10 @@ export default function MagicLinkPage() {
   const renderPasswordSetup = (userEmail: string) => (
     <div>
       <div className="mb-8">
-        <h2 className="font-serif text-[30px] text-[#333] mb-3">
+        <h2 className="font-serif text-[1.875rem] text-[#333] mb-3">
           Welcome to <span className="text-[#00a1aa]">The Ed Psych Practice</span>
         </h2>
-        <p className="text-[#737373] text-[16px] leading-[1.8]">
+        <p className="text-[#737373] text-[1rem] leading-[1.8]">
           Set up your password to access your child&apos;s assessment.
         </p>
       </div>
@@ -209,19 +209,19 @@ export default function MagicLinkPage() {
         <svg className="w-5 h-5 text-[#0c888e] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
         </svg>
-        <span className="text-[15px] text-[#0c888e] font-semibold truncate">{userEmail}</span>
+        <span className="text-[0.9375rem] text-[#0c888e] font-semibold truncate">{userEmail}</span>
       </div>
 
       <form onSubmit={handlePasswordSubmit} className="space-y-5">
         {formError && (
-          <div className="bg-[#fdecec] border border-[#e61844] rounded px-4 py-3 text-[14px] text-[#e61844] font-semibold">
+          <div className="bg-[#fdecec] border border-[#e61844] rounded px-4 py-3 text-[0.875rem] text-[#e61844] font-semibold">
             {formError}
           </div>
         )}
 
         {/* Password Field */}
         <div className="relative">
-          <label htmlFor="password" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+          <label htmlFor="password" className="block text-[0.8125rem] font-semibold text-[#333] mb-1.5">
             Password (min 8 characters)
           </label>
           <input
@@ -230,7 +230,7 @@ export default function MagicLinkPage() {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
+            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[1rem] text-[#333]"
             required
             minLength={8}
           />
@@ -245,7 +245,7 @@ export default function MagicLinkPage() {
 
         {/* Confirm Password Field */}
         <div className="relative">
-          <label htmlFor="confirmPassword" className="block text-[13px] font-semibold text-[#333] mb-1.5">
+          <label htmlFor="confirmPassword" className="block text-[0.8125rem] font-semibold text-[#333] mb-1.5">
             Confirm Password
           </label>
           <input
@@ -254,7 +254,7 @@ export default function MagicLinkPage() {
             name="confirmPassword"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[16px] text-[#333]"
+            className="w-full px-4 py-3 bg-white border border-[#ccc] rounded focus:ring-2 focus:ring-[#00acb6]/20 focus:border-[#00acb6] outline-none transition-all text-[1rem] text-[#333]"
             required
             minLength={8}
           />
@@ -270,7 +270,7 @@ export default function MagicLinkPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors disabled:opacity-50 text-[16px] border border-[#e61844] hover:border-[#cf0627]"
+          className="w-full py-3 bg-[#e61844] hover:bg-[#cf0627] text-white font-semibold rounded transition-colors disabled:opacity-50 text-[1rem] border border-[#e61844] hover:border-[#cf0627]"
         >
           {submitting ? "Setting up..." : "Create Password & Continue"}
         </button>
@@ -322,10 +322,10 @@ export default function MagicLinkPage() {
 
             <div className="w-20 h-[2px] bg-[#00acb6] mx-auto mb-8" />
 
-            <h2 className="font-serif text-[30px] leading-[1.3] text-[#333] mb-6">
+            <h2 className="font-serif text-[1.875rem] leading-[1.3] text-[#333] mb-6">
               Your <span className="text-[#00a1aa]">Assessment Portal</span>
             </h2>
-            <p className="text-[18px] leading-[1.8] text-[#737373] max-w-md mx-auto mb-10">
+            <p className="text-[1.125rem] leading-[1.8] text-[#737373] max-w-md mx-auto mb-10">
               Your psychologist has invited you to securely access your child&apos;s
               assessment. Set up your account to get started.
             </p>
@@ -338,8 +338,8 @@ export default function MagicLinkPage() {
                   </svg>
                 </div>
                 <div className="text-left">
-                  <h3 className="font-serif text-[18px] text-[#333] mb-1">Secure Access</h3>
-                  <p className="text-[14px] text-[#737373]">Your data is encrypted and protected</p>
+                  <h3 className="font-serif text-[1.125rem] text-[#333] mb-1">Secure Access</h3>
+                  <p className="text-[0.875rem] text-[#737373]">Your data is encrypted and protected</p>
                 </div>
               </div>
             </div>
@@ -357,12 +357,12 @@ export default function MagicLinkPage() {
             {renderContent()}
 
             <footer className="mt-12 text-center">
-              <div className="flex justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#737373]">
+              <div className="flex justify-center gap-6 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-[#737373]">
                 <a href="#" className="hover:text-[#e61844] transition-colors">Documentation</a>
                 <a href="#" className="hover:text-[#e61844] transition-colors">Support</a>
                 <a href="#" className="hover:text-[#e61844] transition-colors">Privacy</a>
               </div>
-              <div className="mt-6 text-[12px] text-[#737373]">
+              <div className="mt-6 text-[0.75rem] text-[#737373]">
                 &copy; 2026 The Ed Psych Practice. All clinical data encrypted.
               </div>
             </footer>

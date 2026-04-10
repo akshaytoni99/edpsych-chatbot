@@ -84,7 +84,7 @@ export default function DataExplorer() {
 
       {/* Row count */}
       {!loading && !error && (
-        <p className="text-[11px] font-medium text-slate-500 mb-3">
+        <p className="text-[0.6875rem] font-medium text-slate-500 mb-3">
           {currentRows.length} {currentRows.length === 1 ? "row" : "rows"}
         </p>
       )}

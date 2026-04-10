@@ -37,7 +37,7 @@ export default function McqOptions({ options, onSelect, disabled }: McqOptionsPr
                 <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 text-gray-500
                   group-hover:from-teal-100 group-hover:to-teal-50 group-hover:text-teal-600
                   border border-gray-200/80 group-hover:border-teal-200
-                  flex items-center justify-center text-[10px] sm:text-[11px] font-bold flex-shrink-0
+                  flex items-center justify-center text-[0.625rem] sm:text-[0.6875rem] font-bold flex-shrink-0
                   transition-all duration-200 shadow-sm">
                   {String.fromCharCode(65 + index)}
                 </span>

@@ -19,7 +19,7 @@ export default function MessageBubble({ message, isLatest }: MessageBubbleProps)
     return (
       <div className="flex justify-center my-4 msg-system-enter">
         <div className="max-w-[85%] text-center">
-          <div className="inline-flex items-center gap-2 text-[13px] text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/50 shadow-sm font-medium">
+          <div className="inline-flex items-center gap-2 text-[0.8125rem] text-gray-500 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200/50 shadow-sm font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-gray-400/60" />
             {message.content}
           </div>
@@ -70,18 +70,18 @@ export default function MessageBubble({ message, isLatest }: MessageBubbleProps)
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-amber-500">
                 <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
               </svg>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500/80">More detail needed</span>
+              <span className="text-[0.625rem] font-bold uppercase tracking-wider text-amber-500/80">More detail needed</span>
             </div>
           )}
 
-          <p className={`whitespace-pre-wrap text-[14px] sm:text-[15px] leading-relaxed ${
+          <p className={`whitespace-pre-wrap text-[0.875rem] sm:text-[0.9375rem] leading-relaxed ${
             isUser ? 'text-white/95' : ''
           }`}>
             {message.content}
           </p>
 
           <div className={`flex items-center gap-1.5 mt-1.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            <p className={`text-[10px] font-medium ${
+            <p className={`text-[0.625rem] font-medium ${
               isUser ? 'text-teal-200/60' : isValidation ? 'text-amber-400/70' : 'text-gray-300'
             }`}>
               {timeString}

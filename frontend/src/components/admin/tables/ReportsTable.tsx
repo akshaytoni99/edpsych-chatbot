@@ -86,11 +86,11 @@ export default function ReportsTable({ initialRows }: ReportsTableProps) {
         {!detailLoading && detail && (
           <div className="space-y-6">
             <div>
-              <h4 className="text-[11px] font-medium uppercase text-slate-500 mb-2">content_markdown</h4>
+              <h4 className="text-[0.6875rem] font-medium uppercase text-slate-500 mb-2">content_markdown</h4>
               <pre className="bg-black/30 border border-white/5 rounded-xl p-4 whitespace-pre-wrap font-mono text-sm text-slate-300 max-h-[50vh] overflow-auto">{detail.content_markdown || "(empty)"}</pre>
             </div>
             <div>
-              <h4 className="text-[11px] font-medium uppercase text-slate-500 mb-2">source_data</h4>
+              <h4 className="text-[0.6875rem] font-medium uppercase text-slate-500 mb-2">source_data</h4>
               <JsonViewer data={detail.source_data ?? {}} />
             </div>
           </div>
@@ -107,9 +107,9 @@ function TypeBadge({ type }: { type: string }) {
   if (type === "background_summary") cls = "bg-blue-500/20 text-blue-400";
   else if (type === "cognitive_report") cls = "bg-violet-500/20 text-violet-400";
   else if (type === "unified_insights") cls = "bg-emerald-500/20 text-emerald-400";
-  return <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${cls}`}>{formatType(type)}</span>;
+  return <span className={`px-2 py-0.5 rounded-md text-[0.6875rem] font-medium ${cls}`}>{formatType(type)}</span>;
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[0.6875rem] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
 }

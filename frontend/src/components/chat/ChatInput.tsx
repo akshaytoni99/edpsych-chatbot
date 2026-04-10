@@ -221,7 +221,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
             <button
               type="button"
               onClick={stopListening}
-              className="ml-auto text-[11px] text-red-600 font-bold hover:text-red-800 bg-red-100 hover:bg-red-200 px-2.5 py-1 rounded-lg transition-colors"
+              className="ml-auto text-[0.6875rem] text-red-600 font-bold hover:text-red-800 bg-red-100 hover:bg-red-200 px-2.5 py-1 rounded-lg transition-colors"
             >
               Stop
             </button>
@@ -256,7 +256,7 @@ export default function ChatInput({ onSend, disabled, placeholder, validationFee
               style={{ overflowY: 'auto' }}
             />
             {value.length > 0 && (
-              <span className={`absolute right-3 bottom-1.5 text-[10px] font-medium tabular-nums transition-colors ${
+              <span className={`absolute right-3 bottom-1.5 text-[0.625rem] font-medium tabular-nums transition-colors ${
                 value.length > 500 ? 'text-amber-500' : 'text-gray-300'
               }`}>
                 {value.length}

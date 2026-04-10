@@ -30,7 +30,7 @@ export default function StudentsTable({ rows }: StudentsTableProps) {
                     {row.primary_guardian ? (
                       <div>
                         <p className="text-sm font-medium text-slate-300">{row.primary_guardian.name}</p>
-                        <p className="text-[11px] text-slate-500">{row.primary_guardian.email}</p>
+                        <p className="text-[0.6875rem] text-slate-500">{row.primary_guardian.email}</p>
                       </div>
                     ) : <span className="text-sm text-slate-600">-</span>}
                   </td>
@@ -50,7 +50,7 @@ export default function StudentsTable({ rows }: StudentsTableProps) {
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[0.6875rem] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
 }
 
 function EmptyState({ label }: { label: string }) {

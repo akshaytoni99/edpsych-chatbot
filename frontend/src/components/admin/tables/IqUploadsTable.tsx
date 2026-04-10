@@ -31,7 +31,7 @@ export default function IqUploadsTable({ rows }: IqUploadsTableProps) {
                       {row.uploaded_by_name ? (
                         <div>
                           <p className="text-sm font-medium text-slate-300">{row.uploaded_by_name}</p>
-                          {row.uploaded_by_email && <p className="text-[11px] text-slate-500">{row.uploaded_by_email}</p>}
+                          {row.uploaded_by_email && <p className="text-[0.6875rem] text-slate-500">{row.uploaded_by_email}</p>}
                         </div>
                       ) : <span className="text-sm text-slate-600">-</span>}
                     </td>
@@ -55,5 +55,5 @@ function formatBytes(bytes: number | null | undefined): string {
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[0.6875rem] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
 }

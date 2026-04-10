@@ -510,7 +510,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
             <h1 className="text-sm sm:text-base font-semibold text-gray-900 tracking-tight truncate">
               The EdPsych Practice Assessment
             </h1>
-            <p className="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:block">
+            <p className="text-[0.625rem] sm:text-xs text-gray-400 font-medium hidden sm:block">
               Educational Psychology - Confidential
             </p>
           </div>
@@ -518,7 +518,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
           {/* Category badge */}
           {currentCategory && (
             <div className="hidden sm:flex items-center animate-fade-in">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-gradient-to-r from-teal-50 to-teal-50 text-teal-600 ring-1 ring-teal-100/80 capitalize shadow-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.6875rem] font-semibold bg-gradient-to-r from-teal-50 to-teal-50 text-teal-600 ring-1 ring-teal-100/80 capitalize shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
                 {currentCategory}
               </span>
@@ -553,7 +553,7 @@ export default function HybridChat({ assignmentId }: HybridChatProps) {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3 text-amber-500">
           <path fillRule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clipRule="evenodd" />
         </svg>
-        <span className="text-[10px] text-amber-600 font-medium">End-to-end encrypted - Your responses are confidential</span>
+        <span className="text-[0.625rem] text-amber-600 font-medium">End-to-end encrypted - Your responses are confidential</span>
       </div>
 
       <MessageList messages={messages} isTyping={isTyping} />

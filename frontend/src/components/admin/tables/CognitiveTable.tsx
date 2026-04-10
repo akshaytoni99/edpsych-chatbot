@@ -40,7 +40,7 @@ export default function CognitiveTable({ rows }: CognitiveTableProps) {
         </div>
       </div>
       <DetailDrawer isOpen={selected !== null} onClose={() => setSelected(null)} title={selected?.student_name ? `Cognitive - ${selected.student_name}` : "Cognitive Profile"}>
-        {selected && <div><h4 className="text-[11px] font-medium uppercase text-slate-500 mb-2">parsed_scores</h4><JsonViewer data={selected.parsed_scores ?? {}} /></div>}
+        {selected && <div><h4 className="text-[0.6875rem] font-medium uppercase text-slate-500 mb-2">parsed_scores</h4><JsonViewer data={selected.parsed_scores ?? {}} /></div>}
       </DetailDrawer>
     </>
   );
@@ -51,9 +51,9 @@ function ConfBadge({ confidence, review }: { confidence: number | null | undefin
   let cls = "bg-red-500/20 text-red-400";
   if (confidence >= 0.9) cls = "bg-emerald-500/20 text-emerald-400";
   else if (confidence >= 0.7) cls = "bg-amber-500/20 text-amber-400";
-  return <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${cls}`}>{(confidence * 100).toFixed(0)}%{review ? " - review" : ""}</span>;
+  return <span className={`px-2 py-0.5 rounded-md text-[0.6875rem] font-medium ${cls}`}>{(confidence * 100).toFixed(0)}%{review ? " - review" : ""}</span>;
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[0.6875rem] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
 }

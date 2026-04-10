@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: string }) {
   if (n === "active" || n === "in_progress") cls = "bg-blue-500/20 text-blue-400";
   else if (n === "completed") cls = "bg-emerald-500/20 text-emerald-400";
   else if (n === "abandoned") cls = "bg-amber-500/20 text-amber-400";
-  return <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${cls}`}>{status || "-"}</span>;
+  return <span className={`px-2 py-0.5 rounded-md text-[0.6875rem] font-medium ${cls}`}>{status || "-"}</span>;
 }
 
 function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -97,9 +97,9 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
 }
 
 function Row({ label, value }: { label: string; value: string }) {
-  return <div className="flex justify-between gap-4 border-b border-white/5 pb-2"><span className="text-[11px] font-medium uppercase text-slate-500">{label}</span><span className="text-sm text-slate-300 text-right break-all">{value}</span></div>;
+  return <div className="flex justify-between gap-4 border-b border-white/5 pb-2"><span className="text-[0.6875rem] font-medium uppercase text-slate-500">{label}</span><span className="text-sm text-slate-300 text-right break-all">{value}</span></div>;
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
+  return <th className="px-4 py-3 text-left text-[0.6875rem] font-semibold text-slate-500 uppercase tracking-wider">{children}</th>;
 }
