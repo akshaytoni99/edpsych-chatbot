@@ -9,11 +9,25 @@
    ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
+/* ============================================
+   Accessibility — root font-size scaling
+   All rem-based classes (Tailwind text-sm/base/lg/xl, spacing)
+   scale with this. Users pick 100/115/130/150% from the menu.
+   Layout stays stable because padding, gaps, and widths are
+   in rem too, so buttons/cards grow in proportion with text.
+   ============================================ */
+html { font-size: 16px; }
+html[data-font-scale="115"] { font-size: 18.4px; }
+html[data-font-scale="130"] { font-size: 20.8px; }
+html[data-font-scale="150"] { font-size: 24px; }
+
+body { overflow-x: hidden; } /* safety net: no horizontal scroll at 150% */
+
 @layer base {
   body {
     @apply font-body bg-background text-on-background antialiased;
     font-family: var(--font-nunito), system-ui, sans-serif;
-    font-size: 18px;
+    font-size: 1.125rem; /* 18px @ 100% — scales with html */
     line-height: 1.8;
     color: #333333;
   }
@@ -136,14 +150,14 @@
   .brand-wordmark {
     font-family: var(--font-average), Georgia, serif;
     color: #0c888e;
-    font-size: 36px;
+    font-size: 2.25rem; /* 36px @ 100% — scales with html */
     line-height: 1.1;
   }
 
   .brand-tagline {
     font-family: var(--font-nunito), system-ui, sans-serif;
     color: #737373;
-    font-size: 18px;
+    font-size: 1.125rem; /* 18px @ 100% — scales with html */
     font-style: italic;
   }
 

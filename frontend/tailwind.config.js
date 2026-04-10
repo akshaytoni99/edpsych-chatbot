@@ -66,13 +66,14 @@ module.exports = {
         sans: ["var(--font-nunito)", "system-ui", "sans-serif"],
       },
       fontSize: {
-        // Compressed heading scale to match Ed Psych document-like tone
-        "brand-logo": ["36px", { lineHeight: "1.2" }],
-        "brand-h1": ["30px", { lineHeight: "1.3" }],
-        "brand-h2": ["24px", { lineHeight: "1.3" }],
-        "brand-h3": ["22px", { lineHeight: "1.35" }],
-        "brand-h5": ["20px", { lineHeight: "1.4" }],
-        "brand-body": ["18px", { lineHeight: "1.8" }],
+        // Compressed heading scale to match Ed Psych document-like tone.
+        // Sizes in rem so they scale with the html font-scale accessibility setting.
+        "brand-logo": ["2.25rem", { lineHeight: "1.2" }], // 36px @ 100%
+        "brand-h1": ["1.875rem", { lineHeight: "1.3" }],  // 30px
+        "brand-h2": ["1.5rem", { lineHeight: "1.3" }],    // 24px
+        "brand-h3": ["1.375rem", { lineHeight: "1.35" }], // 22px
+        "brand-h5": ["1.25rem", { lineHeight: "1.4" }],   // 20px
+        "brand-body": ["1.125rem", { lineHeight: "1.8" }],// 18px
       },
       borderRadius: {
         // Flat 4px base like Bootstrap-era, but keep larger utility classes for cards
