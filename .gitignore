@@ -49,3 +49,6 @@ credentials.json
 redis-data/
 backend/.env.render
 storage/
+
+.vercel
+tsconfig.tsbuildinfo
