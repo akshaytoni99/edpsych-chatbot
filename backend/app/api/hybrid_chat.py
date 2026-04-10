@@ -1389,13 +1389,30 @@ async def complete_chat_session(
     if not session or session.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    if session.status == ChatSessionStatus.COMPLETED.value:
-        raise HTTPException(status_code=400, detail="Session is already completed")
+    # Idempotent finalization: the automatic completion path in the message handler
+    # may already have marked the chat session as COMPLETED. We still need to update
+    # the assignment status and store the QA summary, so don't reject here.
+    already_finalized = (
+        session.status == ChatSessionStatus.COMPLETED.value
+        and session.context_data
+        and "completed_qa_pairs" in session.context_data
+    )
+    if already_finalized:
+        return {
+            "message": "Chat session already finalized",
+            "session_id": str(session.id),
+            "duration_minutes": session.duration_minutes,
+            "total_questions_answered": len(session.context_data.get("completed_qa_pairs", [])),
+            "categories_covered": list(session.context_data.get("explored_areas", [])),
+        }
 
-    session.status = ChatSessionStatus.COMPLETED.value
-    session.completed_at = datetime.utcnow()
-    duration = (session.completed_at - session.started_at).total_seconds() / 60
-    session.duration_minutes = int(duration)
+    if session.status != ChatSessionStatus.COMPLETED.value:
+        session.status = ChatSessionStatus.COMPLETED.value
+    if not session.completed_at:
+        session.completed_at = datetime.utcnow()
+    if not session.duration_minutes:
+        duration = (session.completed_at - session.started_at).total_seconds() / 60
+        session.duration_minutes = int(duration)
 
     # Update assignment status
     result = await db.execute(

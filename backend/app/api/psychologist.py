@@ -500,7 +500,7 @@ async def get_all_students_readonly(
                 session = sess_result.scalars().first()
                 if session and session.context_data:
                     answered = session.context_data.get("answered_node_ids", [])
-                    from app.utils.flow_engine import flow_engine
+                    from app.api.hybrid_chat import flow_engine
                     progress_percentage = flow_engine.calculate_progress(
                         session.flow_type, answered
                     )
