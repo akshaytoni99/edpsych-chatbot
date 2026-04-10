@@ -107,7 +107,7 @@ function Dialog({
           </div>
           <div>
             <h3 className="text-base font-semibold text-on-background">{title}</h3>
-            <p className="text-sm text-slate-500 mt-1 whitespace-pre-line leading-relaxed">{message}</p>
+            <p className="text-sm text-[#737373] mt-1 whitespace-pre-line leading-relaxed">{message}</p>
           </div>
         </div>
         <div className="flex gap-3 justify-end">
@@ -142,18 +142,18 @@ function StatCard({
   return (
     <button
       onClick={onClick}
-      className="group bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-5 text-left hover:bg-white/10 hover:border-white/20 transition-all duration-200 w-full"
+      className="group bg-white backdrop-blur-sm rounded-2xl border border-[#dedede] p-5 text-left hover:bg-[#f4f4f4] hover:border-[#cccccc] transition-all duration-200 w-full"
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
           {icon}
         </div>
-        <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-slate-600 group-hover:text-[#737373] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
-      <p className="text-3xl font-bold text-white tracking-tight">{value}</p>
-      <p className="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wide">{label}</p>
+      <p className="font-serif text-3xl font-bold text-[#333] tracking-tight">{value}</p>
+      <p className="text-xs font-medium text-[#737373] mt-0.5 uppercase tracking-wide">{label}</p>
     </button>
   );
 }
@@ -161,7 +161,7 @@ function StatCard({
 /* ─── Role Badge ─── */
 function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, string> = {
-    ADMIN: "bg-slate-800 text-white",
+    ADMIN: "bg-[#fdecec] text-[#e61844]",
     PSYCHOLOGIST: "bg-teal-100 text-teal-700",
     SCHOOL: "bg-sky-100 text-sky-700",
     PARENT: "bg-emerald-100 text-emerald-700",
@@ -493,10 +493,10 @@ export default function AdminDashboard() {
   /* ─── Loading state ─── */
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#eeeeee] flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-slate-700 border-t-teal-500 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Loading dashboard...</p>
+          <p className="text-sm text-[#737373]">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -509,9 +509,9 @@ export default function AdminDashboard() {
   const ReportIcon = <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-[#f4f4f4]">
       {/* ── Header ── */}
-      <header className="bg-slate-900/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
+      <header className="bg-white backdrop-blur-xl border-b border-[#dedede] sticky top-0 z-40">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
@@ -519,35 +519,35 @@ export default function AdminDashboard() {
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               </div>
               <div>
-                <h1 className="text-sm font-bold text-white leading-none">EdPsych</h1>
-                <p className="text-[9px] font-medium text-teal-400 tracking-widest uppercase">Admin Console</p>
+                <h1 className="font-serif text-[18px] font-bold text-[#0c888e] leading-none">The Ed Psych Practice</h1>
+                <p className="text-[9px] font-medium text-[#737373] tracking-widest uppercase">Admin Console</p>
               </div>
             </div>
 
-            <nav className="hidden sm:flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
-              <button onClick={() => setActiveTab("users")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "users" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+            <nav className="hidden sm:flex items-center gap-1 bg-[#f4f4f4] rounded-lg p-0.5">
+              <button onClick={() => setActiveTab("users")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "users" ? "bg-[#00acb6] text-white" : "text-[#737373] hover:text-[#333]"}`}>
                 Overview
               </button>
-              <button onClick={() => setActiveTab("students")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "students" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+              <button onClick={() => setActiveTab("students")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "students" ? "bg-[#00acb6] text-white" : "text-[#737373] hover:text-[#333]"}`}>
                 Students
               </button>
-              <button onClick={() => setActiveTab("assignments")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "assignments" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+              <button onClick={() => setActiveTab("assignments")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "assignments" ? "bg-[#00acb6] text-white" : "text-[#737373] hover:text-[#333]"}`}>
                 Assignments
               </button>
-              <button onClick={() => setActiveTab("explorer")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "explorer" ? "bg-white/10 text-white" : "text-slate-400 hover:text-white"}`}>
+              <button onClick={() => setActiveTab("explorer")} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === "explorer" ? "bg-[#00acb6] text-white" : "text-[#737373] hover:text-[#333]"}`}>
                 Data Explorer
               </button>
             </nav>
 
             <div className="flex items-center gap-3">
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-white leading-none">{user?.full_name}</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">{user?.email}</p>
+                <p className="text-sm font-medium text-[#333] leading-none">{user?.full_name}</p>
+                <p className="text-[11px] text-[#737373] mt-0.5">{user?.email}</p>
               </div>
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-[11px] font-bold">
                 {(user?.full_name || "A").charAt(0).toUpperCase()}
               </div>
-              <button onClick={handleLogout} className="text-xs font-medium text-slate-500 hover:text-red-400 transition-colors">
+              <button onClick={handleLogout} className="text-xs font-medium text-[#737373] hover:text-[#e61844] transition-colors">
                 Sign out
               </button>
             </div>
@@ -556,11 +556,11 @@ export default function AdminDashboard() {
       </header>
 
       {/* ── Mobile tab bar ── */}
-      <div className="sm:hidden flex border-b border-white/5 bg-slate-900/60 overflow-x-auto">
-        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "users" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Overview</button>
-        <button onClick={() => setActiveTab("students")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "students" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Students</button>
-        <button onClick={() => setActiveTab("assignments")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "assignments" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Assignments</button>
-        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "explorer" ? "border-teal-500 text-teal-400" : "border-transparent text-slate-500"}`}>Explorer</button>
+      <div className="sm:hidden flex border-b border-[#dedede] bg-white overflow-x-auto">
+        <button onClick={() => setActiveTab("users")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "users" ? "border-[#00acb6] text-[#00acb6]" : "border-transparent text-[#737373]"}`}>Overview</button>
+        <button onClick={() => setActiveTab("students")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "students" ? "border-[#00acb6] text-[#00acb6]" : "border-transparent text-[#737373]"}`}>Students</button>
+        <button onClick={() => setActiveTab("assignments")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "assignments" ? "border-[#00acb6] text-[#00acb6]" : "border-transparent text-[#737373]"}`}>Assignments</button>
+        <button onClick={() => setActiveTab("explorer")} className={`flex-1 py-3 text-xs font-medium text-center border-b-2 transition-colors whitespace-nowrap px-3 ${activeTab === "explorer" ? "border-[#00acb6] text-[#00acb6]" : "border-transparent text-[#737373]"}`}>Explorer</button>
       </div>
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -568,17 +568,17 @@ export default function AdminDashboard() {
           <>
             {/* ── Page Header ── */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white">Dashboard</h2>
-              <p className="text-sm text-slate-400 mt-1">Platform overview and user management</p>
+              <h2 className="font-serif text-2xl font-bold text-[#333]">Dashboard</h2>
+              <p className="text-sm text-[#737373] mt-1">Platform overview and user management</p>
             </div>
 
             {/* ── Stats Grid ── */}
             {stats && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Total Users")} />
-                <StatCard label="Students" value={stats.total_students} icon={StudentIcon} color="bg-emerald-500/15" onClick={() => handleStatClick("Total Students")} />
-                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Assessments")} />
-                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-teal-500/15" onClick={() => handleStatClick("Reports")} />
+                <StatCard label="Total Users" value={stats.total_users} icon={UserIcon} color="bg-[#e6f7f8] text-[#00acb6]" onClick={() => handleStatClick("Total Users")} />
+                <StatCard label="Students" value={stats.total_students} icon={StudentIcon} color="bg-emerald-50 text-emerald-700" onClick={() => handleStatClick("Total Students")} />
+                <StatCard label="Assessments" value={stats.total_assessments} icon={AssessmentIcon} color="bg-[#e6f7f8] text-[#00acb6]" onClick={() => handleStatClick("Assessments")} />
+                <StatCard label="Reports" value={stats.total_reports} icon={ReportIcon} color="bg-[#fdecec] text-[#e61844]" onClick={() => handleStatClick("Reports")} />
               </div>
             )}
 
@@ -586,17 +586,17 @@ export default function AdminDashboard() {
             {stats && (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
                 {([
-                  { key: "PARENT" as const, label: "Parents", color: "border-l-emerald-500 bg-emerald-500/10", textColor: "text-emerald-400" },
-                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-teal-500 bg-teal-500/10", textColor: "text-teal-400" },
-                  { key: "SCHOOL" as const, label: "Schools", color: "border-l-sky-500 bg-sky-500/10", textColor: "text-sky-400" },
-                  { key: "ADMIN" as const, label: "Admins", color: "border-l-amber-500 bg-amber-500/10", textColor: "text-amber-400" },
+                  { key: "PARENT" as const, label: "Parents", color: "border-l-emerald-500 bg-emerald-50", textColor: "text-emerald-700" },
+                  { key: "PSYCHOLOGIST" as const, label: "Psychologists", color: "border-l-[#00acb6] bg-[#e6f7f8]", textColor: "text-[#0c888e]" },
+                  { key: "SCHOOL" as const, label: "Schools", color: "border-l-sky-500 bg-sky-50", textColor: "text-sky-700" },
+                  { key: "ADMIN" as const, label: "Admins", color: "border-l-[#e61844] bg-[#fdecec]", textColor: "text-[#e61844]" },
                 ] as const).map((r) => (
                   <button
                     key={r.key}
                     onClick={() => handleStatClick(r.label)}
-                    className={`text-left px-4 py-3 rounded-xl border border-white/5 border-l-[3px] ${r.color} hover:bg-white/10 transition-all`}
+                    className={`text-left px-4 py-3 rounded-xl border border-[#dedede] border-l-[3px] ${r.color} hover:bg-[#f4f4f4] transition-all`}
                   >
-                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{r.label}</p>
+                    <p className="text-[10px] font-semibold text-[#737373] uppercase tracking-wider">{r.label}</p>
                     <p className={`text-2xl font-bold ${r.textColor}`}>{stats.users_by_role[r.key]}</p>
                   </button>
                 ))}
@@ -604,18 +604,18 @@ export default function AdminDashboard() {
             )}
 
             {/* ── User Management ── */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+            <div className="bg-white backdrop-blur-sm rounded-2xl border border-[#dedede] overflow-hidden">
               {/* Table Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4 border-b border-white/5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4 border-b border-[#dedede]">
                 <div>
-                  <h3 className="text-base font-semibold text-white">User Management</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}</p>
+                  <h3 className="font-serif text-base font-semibold text-[#333]">User Management</h3>
+                  <p className="text-xs text-[#737373] mt-0.5">{filteredUsers.length} {filteredUsers.length === 1 ? "user" : "users"}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value)}
-                    className="h-9 px-3 bg-white/5 border border-white/10 rounded-lg text-xs font-medium text-slate-300 outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500/50 transition-all [&>option]:bg-slate-800 [&>option]:text-white"
+                    className="h-9 px-3 bg-white border border-[#dedede] rounded-lg text-xs font-medium text-[#737373] outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500/50 transition-all [&>option]:bg-white [&>option]:text-[#333]"
                   >
                     <option value="all">All Roles</option>
                     <option value="PARENT">Parents</option>
@@ -625,7 +625,7 @@ export default function AdminDashboard() {
                   </select>
                   <button
                     onClick={() => setShowAddUser(true)}
-                    className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5"
+                    className="h-9 px-4 bg-[#e61844] text-white text-xs font-medium rounded-lg hover:bg-[#cf0627] transition-colors flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     Add User
@@ -637,42 +637,42 @@ export default function AdminDashboard() {
               {filteredUsers.length === 0 ? (
                 <div className="py-16 text-center">
                   <svg className="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
-                  <p className="text-sm font-medium text-slate-500">No users match the selected filter</p>
+                  <p className="text-sm font-medium text-[#737373]">No users match the selected filter</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">User</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Role</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Details</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Joined</th>
-                        <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                      <tr className="border-b border-[#dedede]">
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">User</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Role</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Details</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider hidden md:table-cell">Joined</th>
+                        <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-[#dedede]">
                       {filteredUsers.map((u) => (
-                        <tr key={u.id} className="hover:bg-white/5 transition-colors group">
+                        <tr key={u.id} className="hover:bg-white transition-colors group">
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold text-slate-300 shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-[#f4f4f4] flex items-center justify-center text-xs font-semibold text-[#737373] shrink-0">
                                 {(u.full_name || u.email).charAt(0).toUpperCase()}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-medium text-white truncate">{u.full_name}</p>
-                                <p className="text-[11px] text-slate-500 truncate">{u.email}</p>
+                                <p className="text-sm font-medium text-[#333] truncate">{u.full_name}</p>
+                                <p className="text-[11px] text-[#737373] truncate">{u.email}</p>
                               </div>
                             </div>
                           </td>
                           <td className="px-5 py-3.5"><RoleBadge role={u.role} /></td>
                           <td className="px-5 py-3.5 hidden md:table-cell">
-                            <div className="text-sm text-slate-400">
+                            <div className="text-sm text-[#737373]">
                               {u.role === "PSYCHOLOGIST" || u.role === "SCHOOL" ? (
                                 <>
                                   {u.organization && <p>{u.organization}</p>}
-                                  {u.phone && <p className="text-xs text-slate-500 font-mono">{u.phone}</p>}
+                                  {u.phone && <p className="text-xs text-[#737373] font-mono">{u.phone}</p>}
                                   {!u.organization && !u.phone && "-"}
                                 </>
                               ) : (
@@ -684,27 +684,27 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-1.5">
-                              <div className={`w-1.5 h-1.5 rounded-full ${u.is_active ? "bg-emerald-400" : "bg-slate-600"}`} />
-                              <span className="text-xs text-slate-400">{u.is_active ? "Active" : "Inactive"}</span>
+                              <div className={`w-1.5 h-1.5 rounded-full ${u.is_active ? "bg-emerald-400" : "bg-[#cccccc]"}`} />
+                              <span className="text-xs text-[#737373]">{u.is_active ? "Active" : "Inactive"}</span>
                             </div>
                           </td>
                           <td className="px-5 py-3.5 hidden md:table-cell">
-                            <span className="text-xs text-slate-500">{new Date(u.created_at).toLocaleDateString()}</span>
+                            <span className="text-xs text-[#737373]">{new Date(u.created_at).toLocaleDateString()}</span>
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
+                              <button onClick={() => handleToggleUserStatus(u.id, u.is_active)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-[#dedede] text-[#737373] hover:bg-[#f4f4f4] hover:text-[#333] transition-colors" title={u.is_active ? "Deactivate" : "Activate"}>
                                 {u.is_active ? "Deactivate" : "Activate"}
                               </button>
                               {u.role === "PARENT" && (
-                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-colors disabled:opacity-40" title="Reset assessment">
+                                <button onClick={() => handleResetAssessment(u)} disabled={resetting === u.id} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-amber-300 text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-40" title="Reset assessment">
                                   {resetting === u.id ? "..." : "Reset"}
                                 </button>
                               )}
-                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 transition-colors" title="Edit user">
+                              <button onClick={() => openEditModal(u)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors" title="Edit user">
                                 Edit
                               </button>
-                              <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors" title="Delete user">
+                              <button onClick={() => handleDeleteUser(u.id)} className="h-7 w-7 flex items-center justify-center rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors" title="Delete user">
                                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               </button>
                             </div>
@@ -722,10 +722,10 @@ export default function AdminDashboard() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">Student Management</h2>
-                <p className="text-sm text-slate-400 mt-1">Create students and link parents/schools</p>
+                <h2 className="font-serif text-2xl font-bold text-[#333]">Student Management</h2>
+                <p className="text-sm text-[#737373] mt-1">Create students and link parents/schools</p>
               </div>
-              <button onClick={() => { setShowCreateStudent(true); }} className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5">
+              <button onClick={() => { setShowCreateStudent(true); }} className="h-9 px-4 bg-[#e61844] text-white text-xs font-medium rounded-lg hover:bg-[#cf0627] transition-colors flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 Add Student
               </button>
@@ -734,49 +734,49 @@ export default function AdminDashboard() {
             {studentsLoading ? (
               <div className="flex justify-center py-16"><div className="w-6 h-6 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin" /></div>
             ) : adminStudents.length === 0 ? (
-              <div className="text-center py-16 text-slate-500">No students yet. Click &quot;Add Student&quot; to create one.</div>
+              <div className="text-center py-16 text-[#737373]">No students yet. Click &quot;Add Student&quot; to create one.</div>
             ) : (
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-white backdrop-blur-sm rounded-2xl border border-[#dedede] overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead><tr className="border-b border-white/5">
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Student</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Grade</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">School</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Parent/Guardian</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <thead><tr className="border-b border-[#dedede]">
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Grade</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">School</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Parent/Guardian</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                     </tr></thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-[#dedede]">
                       {adminStudents.map((s: any) => (
-                        <tr key={s.id} className="hover:bg-white/5 transition-colors group">
+                        <tr key={s.id} className="hover:bg-white transition-colors group">
                           <td className="px-5 py-3.5">
-                            <p className="text-sm font-medium text-white">{s.first_name} {s.last_name}</p>
+                            <p className="text-sm font-medium text-[#333]">{s.first_name} {s.last_name}</p>
                           </td>
-                          <td className="px-5 py-3.5 text-sm text-slate-400">{s.grade || "-"}</td>
-                          <td className="px-5 py-3.5 text-sm text-slate-400">{s.school_name || "-"}</td>
+                          <td className="px-5 py-3.5 text-sm text-[#737373]">{s.grade || "-"}</td>
+                          <td className="px-5 py-3.5 text-sm text-[#737373]">{s.school_name || "-"}</td>
                           <td className="px-5 py-3.5">
                             {s.guardians && s.guardians.length > 0 ? (
                               <div>
-                                <p className="text-sm text-white">{s.guardians[0].name}</p>
-                                <p className="text-[11px] text-slate-500">{s.guardians[0].email}</p>
+                                <p className="text-sm text-[#333]">{s.guardians[0].name}</p>
+                                <p className="text-[11px] text-[#737373]">{s.guardians[0].email}</p>
                               </div>
                             ) : <span className="text-slate-600">No guardian</span>}
                           </td>
                           <td className="px-5 py-3.5">
                             {s.assignment_status ? (
                               <div className="flex items-center gap-2">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.assignment_status === "completed" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.assignment_status === "completed" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
                                   {s.assignment_status.toUpperCase()}
                                 </span>
                                 {s.progress_percentage > 0 && s.assignment_status !== "completed" && (
-                                  <span className="text-[11px] text-slate-500">{s.progress_percentage}%</span>
+                                  <span className="text-[11px] text-[#737373]">{s.progress_percentage}%</span>
                                 )}
                               </div>
                             ) : <span className="text-[11px] text-slate-600">No assignment</span>}
                           </td>
                           <td className="px-5 py-3.5 text-right">
-                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-teal-400 hover:text-teal-300">Reports Workspace</a>
+                            <a href={`/student/${s.id}/workspace`} className="text-[11px] font-medium text-[#00acb6] hover:text-[#0c888e]">Reports Workspace</a>
                           </td>
                         </tr>
                       ))}
@@ -791,10 +791,10 @@ export default function AdminDashboard() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white">Assessment Assignments</h2>
-                <p className="text-sm text-slate-400 mt-1">Assign assessments and manage magic links</p>
+                <h2 className="font-serif text-2xl font-bold text-[#333]">Assessment Assignments</h2>
+                <p className="text-sm text-[#737373] mt-1">Assign assessments and manage magic links</p>
               </div>
-              <button onClick={() => { setShowAssignForm(true); fetchStudentsForAssign(); }} className="h-9 px-4 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-1.5">
+              <button onClick={() => { setShowAssignForm(true); fetchStudentsForAssign(); }} className="h-9 px-4 bg-[#e61844] text-white text-xs font-medium rounded-lg hover:bg-[#cf0627] transition-colors flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 New Assignment
               </button>
@@ -803,46 +803,46 @@ export default function AdminDashboard() {
             {assignmentsLoading ? (
               <div className="flex justify-center py-16"><div className="w-6 h-6 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin" /></div>
             ) : adminAssignments.length === 0 ? (
-              <div className="text-center py-16 text-slate-500">No assignments yet. Click &quot;New Assignment&quot; to create one.</div>
+              <div className="text-center py-16 text-[#737373]">No assignments yet. Click &quot;New Assignment&quot; to create one.</div>
             ) : (
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-white backdrop-blur-sm rounded-2xl border border-[#dedede] overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead><tr className="border-b border-white/5">
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Student</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned To</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Due Date</th>
-                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Assigned</th>
-                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <thead><tr className="border-b border-[#dedede]">
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Student</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Assigned To</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Status</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Due Date</th>
+                      <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Assigned</th>
+                      <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
                     </tr></thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-[#dedede]">
                       {adminAssignments.map((a: any) => (
-                        <tr key={a.id} className="hover:bg-white/5 transition-colors group">
+                        <tr key={a.id} className="hover:bg-white transition-colors group">
                           <td className="px-5 py-3.5">
-                            <p className="text-sm font-medium text-white">{a.student ? `${a.student.first_name || ""} ${a.student.last_name || ""}`.trim() || "Unknown" : "Unknown"}</p>
+                            <p className="text-sm font-medium text-[#333]">{a.student ? `${a.student.first_name || ""} ${a.student.last_name || ""}`.trim() || "Unknown" : "Unknown"}</p>
                           </td>
                           <td className="px-5 py-3.5">
-                            <p className="text-sm text-white">{a.assigned_to?.name || "Unknown"}</p>
-                            <p className="text-[11px] text-slate-500">{a.assigned_to?.email || ""}</p>
+                            <p className="text-sm text-[#333]">{a.assigned_to?.name || "Unknown"}</p>
+                            <p className="text-[11px] text-[#737373]">{a.assigned_to?.email || ""}</p>
                           </td>
                           <td className="px-5 py-3.5">
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                              a.status === "completed" ? "bg-emerald-500/20 text-emerald-400" :
-                              a.status === "cancelled" ? "bg-slate-500/20 text-slate-400" :
-                              "bg-amber-500/20 text-amber-400"
+                              a.status === "completed" ? "bg-emerald-100 text-emerald-700" :
+                              a.status === "cancelled" ? "bg-[#737373]/20 text-[#737373]" :
+                              "bg-amber-100 text-amber-700"
                             }`}>
                               {(a.status || "").toUpperCase()}
                             </span>
                           </td>
-                          <td className="px-5 py-3.5 text-sm text-slate-400">{a.due_date ? new Date(a.due_date).toLocaleDateString() : "No deadline"}</td>
-                          <td className="px-5 py-3.5 text-sm text-slate-500">{a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : "-"}</td>
+                          <td className="px-5 py-3.5 text-sm text-[#737373]">{a.due_date ? new Date(a.due_date).toLocaleDateString() : "No deadline"}</td>
+                          <td className="px-5 py-3.5 text-sm text-[#737373]">{a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : "-"}</td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center justify-end gap-1.5">
                               {(a.status || "").toLowerCase() === "assigned" && (
                                 <>
-                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 transition-colors">Resend Link</button>
-                                  <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">Cancel</button>
+                                  <button onClick={() => handleResendInvite(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 transition-colors">Resend Link</button>
+                                  <button onClick={() => handleCancelAssignment(a.id)} className="h-7 px-2.5 text-[11px] font-medium rounded-md border border-red-300 text-red-700 hover:bg-red-50 transition-colors">Cancel</button>
                                 </>
                               )}
                             </div>
@@ -859,8 +859,8 @@ export default function AdminDashboard() {
           /* ── Data Explorer Tab ── */
           <div>
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white">Data Explorer</h2>
-              <p className="text-sm text-slate-400 mt-1">Read-only view of all database records</p>
+              <h2 className="font-serif text-2xl font-bold text-[#333]">Data Explorer</h2>
+              <p className="text-sm text-[#737373] mt-1">Read-only view of all database records</p>
             </div>
             <DataExplorer />
           </div>
@@ -871,11 +871,11 @@ export default function AdminDashboard() {
       <ModalOverlay open={showAddUser} onClose={() => { setShowAddUser(false); setCreateError(""); }}>
         <div className="p-6">
           <h3 className="text-lg font-semibold text-on-background">Add New User</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-5">Create an account for any role</p>
+          <p className="text-xs text-[#737373] mt-1 mb-5">Create an account for any role</p>
           {createError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{createError}</div>}
           <form onSubmit={handleCreateUser} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Role</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Role</label>
               <select value={createForm.role} onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="PSYCHOLOGIST">Psychologist</option>
                 <option value="SCHOOL">School</option>
@@ -884,30 +884,30 @@ export default function AdminDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Full Name</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
               <input type="text" required value={createForm.full_name} onChange={(e) => setCreateForm({ ...createForm, full_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Dr. Jane Smith" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
               <input type="email" required value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="jane@example.com" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Password</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Password</label>
               <input type="text" required minLength={8} value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Min 8 characters" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Phone</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
                 <input type="tel" value={createForm.phone} onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="+44 7700..." />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Organization</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Organization</label>
                 <input type="text" value={createForm.organization} onChange={(e) => setCreateForm({ ...createForm, organization: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Clinic name" />
               </div>
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowAddUser(false); setCreateError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={creating} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={creating} className="flex-1 h-10 text-sm font-medium text-white bg-[#e61844] rounded hover:bg-[#cf0627] transition-colors disabled:opacity-50 shadow-sm">
                 {creating ? "Creating..." : "Create User"}
               </button>
             </div>
@@ -919,29 +919,29 @@ export default function AdminDashboard() {
       <ModalOverlay open={!!selectedUser} onClose={() => { setSelectedUser(null); setEditError(""); }}>
         <div className="p-6">
           <h3 className="text-lg font-semibold text-on-background">Edit User</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-5">Update details for {selectedUser?.full_name}</p>
+          <p className="text-xs text-[#737373] mt-1 mb-5">Update details for {selectedUser?.full_name}</p>
           {editError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{editError}</div>}
           <form onSubmit={handleSaveUser} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Full Name</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
               <input type="text" value={editForm.full_name} onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
               <input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Phone</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
                 <input type="tel" value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Organization</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Organization</label>
                 <input type="text" value={editForm.organization} onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Role</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Role</label>
               <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="PARENT">Parent</option>
                 <option value="PSYCHOLOGIST">Psychologist</option>
@@ -951,7 +951,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setSelectedUser(null); setEditError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={saving} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={saving} className="flex-1 h-10 text-sm font-medium text-white bg-[#e61844] rounded hover:bg-[#cf0627] transition-colors disabled:opacity-50 shadow-sm">
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -965,7 +965,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <h3 className="text-base font-semibold text-on-background">{statPopup.title}</h3>
             <button onClick={() => setStatPopup((s) => ({ ...s, open: false }))} className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg className="w-4 h-4 text-[#737373]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
           <div className="px-5 py-4 max-h-[50vh] overflow-y-auto">
@@ -974,7 +974,7 @@ export default function AdminDashboard() {
                 <div className="w-6 h-6 border-[3px] border-slate-200 border-t-primary rounded-full animate-spin" />
               </div>
             ) : statPopup.items.length === 0 ? (
-              <p className="text-center text-sm text-slate-400 py-10">No records found</p>
+              <p className="text-center text-sm text-[#737373] py-10">No records found</p>
             ) : (
               <div className="space-y-1.5">
                 {statPopup.items.map((item, idx) => (
@@ -984,7 +984,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-on-background truncate">{item.label}</p>
-                      {item.sub && <p className="text-[11px] text-slate-400 truncate">{item.sub}</p>}
+                      {item.sub && <p className="text-[11px] text-[#737373] truncate">{item.sub}</p>}
                     </div>
                   </div>
                 ))}
@@ -992,7 +992,7 @@ export default function AdminDashboard() {
             )}
           </div>
           <div className="px-5 py-3 border-t border-slate-100">
-            <p className="text-[11px] text-slate-400 text-center">{statPopup.loading ? "" : `${statPopup.items.length} record${statPopup.items.length !== 1 ? "s" : ""}`}</p>
+            <p className="text-[11px] text-[#737373] text-center">{statPopup.loading ? "" : `${statPopup.items.length} record${statPopup.items.length !== 1 ? "s" : ""}`}</p>
           </div>
         </div>
       </ModalOverlay>
@@ -1001,30 +1001,30 @@ export default function AdminDashboard() {
       <ModalOverlay open={showCreateStudent} onClose={() => { setShowCreateStudent(false); setStudentFormError(""); }} maxW="max-w-lg">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-on-background">Create New Student</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-5">Enter student and parent/guardian details</p>
+          <p className="text-xs text-[#737373] mt-1 mb-5">Enter student and parent/guardian details</p>
           {studentFormError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{studentFormError}</div>}
           <form onSubmit={handleCreateStudent} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">First Name</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">First Name</label>
                 <input type="text" required value={studentForm.student_first_name} onChange={(e) => setStudentForm({ ...studentForm, student_first_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Last Name</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Last Name</label>
                 <input type="text" required value={studentForm.student_last_name} onChange={(e) => setStudentForm({ ...studentForm, student_last_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Date of Birth</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Date of Birth</label>
                 <input type="date" required value={studentForm.date_of_birth} onChange={(e) => setStudentForm({ ...studentForm, date_of_birth: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Grade/Year</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Grade/Year</label>
                 <input type="text" value={studentForm.grade} onChange={(e) => setStudentForm({ ...studentForm, grade: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Year 7" />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-slate-500 mb-1">Gender</label>
+                <label className="block text-[11px] font-medium text-[#737373] mb-1">Gender</label>
                 <select value={studentForm.gender} onChange={(e) => setStudentForm({ ...studentForm, gender: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                   <option value="">Select...</option>
                   <option value="Male">Male</option>
@@ -1034,7 +1034,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">School Name</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">School Name</label>
               <input type="text" value={studentForm.school_name} onChange={(e) => setStudentForm({ ...studentForm, school_name: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
             </div>
 
@@ -1044,21 +1044,21 @@ export default function AdminDashboard() {
                 <div key={idx} className="space-y-2 mb-3 p-3 bg-slate-50 rounded-lg">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Full Name</label>
+                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Full Name</label>
                       <input type="text" required value={p.full_name} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, full_name: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
+                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Email</label>
                       <input type="email" required value={p.email} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, email: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Phone</label>
+                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Phone</label>
                       <input type="tel" value={p.phone} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, phone: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Relationship</label>
+                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Relationship</label>
                       <select value={p.relationship} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, relationship: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
                         <option value="Mother">Mother</option>
                         <option value="Father">Father</option>
@@ -1067,7 +1067,7 @@ export default function AdminDashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-500 mb-1">Type</label>
+                      <label className="block text-[11px] font-medium text-[#737373] mb-1">Type</label>
                       <select value={p.type} onChange={(e) => { const parents = [...studentForm.parents]; parents[idx] = { ...p, type: e.target.value }; setStudentForm({ ...studentForm, parents }); }} className="w-full h-9 px-3 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20">
                         <option value="parent">Parent</option>
                         <option value="school">School</option>
@@ -1080,7 +1080,7 @@ export default function AdminDashboard() {
 
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowCreateStudent(false); setStudentFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={creatingStudent} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={creatingStudent} className="flex-1 h-10 text-sm font-medium text-white bg-[#e61844] rounded hover:bg-[#cf0627] transition-colors disabled:opacity-50 shadow-sm">
                 {creatingStudent ? "Creating..." : "Create Student"}
               </button>
             </div>
@@ -1092,11 +1092,11 @@ export default function AdminDashboard() {
       <ModalOverlay open={showAssignForm} onClose={() => { setShowAssignForm(false); setAssignFormError(""); }} maxW="max-w-md">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-on-background">New Assignment</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-5">Assign assessment and send magic link</p>
+          <p className="text-xs text-[#737373] mt-1 mb-5">Assign assessment and send magic link</p>
           {assignFormError && <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">{assignFormError}</div>}
           <form onSubmit={handleAssign} className="space-y-3">
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Student</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Student</label>
               <select required value={assignForm.student_id} onChange={(e) => handleStudentSelectForAssign(e.target.value)} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="">Select student...</option>
                 {assignStudents.map((s: any) => (
@@ -1105,7 +1105,7 @@ export default function AdminDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Assign To (Parent/Guardian)</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Assign To (Parent/Guardian)</label>
               <select required value={assignForm.parent_id} onChange={(e) => setAssignForm({ ...assignForm, parent_id: e.target.value })} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 <option value="">Select parent/guardian...</option>
                 {selectedStudentGuardians.map((g: any) => (
@@ -1117,12 +1117,12 @@ export default function AdminDashboard() {
               )}
             </div>
             <div>
-              <label className="block text-[11px] font-medium text-slate-500 mb-1">Notes (optional)</label>
+              <label className="block text-[11px] font-medium text-[#737373] mb-1">Notes (optional)</label>
               <textarea value={assignForm.notes} onChange={(e) => setAssignForm({ ...assignForm, notes: e.target.value })} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none" rows={2} placeholder="Any notes for the parent..." />
             </div>
             <div className="flex gap-3 pt-3">
               <button type="button" onClick={() => { setShowAssignForm(false); setAssignFormError(""); }} className="flex-1 h-10 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
-              <button type="submit" disabled={assigning} className="flex-1 h-10 text-sm font-medium text-white bg-primary rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 shadow-sm">
+              <button type="submit" disabled={assigning} className="flex-1 h-10 text-sm font-medium text-white bg-[#e61844] rounded hover:bg-[#cf0627] transition-colors disabled:opacity-50 shadow-sm">
                 {assigning ? "Assigning..." : "Assign & Send Link"}
               </button>
             </div>
