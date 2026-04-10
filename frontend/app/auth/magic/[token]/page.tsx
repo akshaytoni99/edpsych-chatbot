@@ -300,17 +300,20 @@ export default function MagicLinkPage() {
       </div>
 
       <div className="flex-1 flex items-stretch">
-        {/* Left Section: Welcome hero with cherry-blossom backdrop (theedpsych.com) */}
-        <section
-          className="hidden lg:flex w-6/12 relative ed-hero items-center justify-center p-16 border-r border-[#dedede]"
-          style={{
-            backgroundImage: "url('/images/cherry-tree.png')",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "left center",
-            backgroundSize: "520px auto",
-            backgroundColor: "#eeeeee",
-          }}
-        >
+        {/* Left Section: Welcome hero with cherry-blossom corner accents */}
+        <section className="hidden lg:flex w-6/12 relative ed-hero items-center justify-center p-16 border-r border-[#dedede] overflow-hidden">
+          <img
+            src="/images/cherry-tree.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute top-0 left-0 w-[320px] opacity-40 pointer-events-none select-none"
+          />
+          <img
+            src="/images/cherry-tree.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute bottom-0 right-0 w-[280px] opacity-30 pointer-events-none select-none transform scale-x-[-1]"
+          />
           <div className="relative z-10 max-w-xl w-full text-center">
             <div className="mb-8">
               <h1 className="brand-wordmark mb-2">The Ed Psych Practice</h1>

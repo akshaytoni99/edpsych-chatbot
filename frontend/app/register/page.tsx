@@ -10,17 +10,21 @@ export default function RegisterPage() {
         <span className="text-white font-serif text-xl tracking-wide">The Ed Psych Practice</span>
       </div>
 
-      <div
-        className="flex-1 flex items-center justify-center px-4 py-12"
-        style={{
-          backgroundImage: "url('/images/cherry-tree.png')",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "left center",
-          backgroundSize: "520px auto",
-          backgroundColor: "#eeeeee",
-        }}
-      >
-        <div className="max-w-lg w-full">
+      <div className="flex-1 flex items-center justify-center px-4 py-12 ed-hero relative overflow-hidden">
+        {/* Decorative cherry-blossom corners */}
+        <img
+          src="/images/cherry-tree.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute top-0 left-0 w-[280px] opacity-30 pointer-events-none select-none"
+        />
+        <img
+          src="/images/cherry-tree.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute bottom-0 right-0 w-[240px] opacity-25 pointer-events-none select-none transform scale-x-[-1]"
+        />
+        <div className="max-w-lg w-full relative z-10">
           {/* Branding */}
           <div className="text-center mb-8">
             <h1 className="brand-wordmark mb-2">The Ed Psych Practice</h1>
